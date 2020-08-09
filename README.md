@@ -1,1 +1,0 @@
-# guilhermeivo.github.io
