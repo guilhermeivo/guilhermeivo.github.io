@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./main.css">
+    <title>theme</title>
+</head>
+<body>
+    <h1 style="width: 100%; text-align: center;">Example</h1>
+    <hr/>
+    <div style="min-width: 1024px; margin: 0 auto">
+        <!-- Typography -->
+        <h2 style="margin: 20px">Typography</h2>
+            <div style="display: flex">
+                <div class="superfice-7" style="width: 200px; padding: 20px; margin: 20px 40px;">                                   
+                    <span class="tag-default">Regular</span>  
+                    <h1>Aa</h1>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing.</p>                
+                </div>
+
+                <div class="superfice-7" style="width: 200px; padding: 20px; margin: 20px 40px;">
+                    <span class="tag-default">Semi-Bold</span>
+                    <h1 class="semi-bold">Aa</h1>
+                    <p class="semi-bold">Lorem ipsum dolor sit amet consectetur adipisicing.</p>
+                </div>
+
+                <div class="superfice-7" style="width: 200px; padding: 20px; margin: 20px 40px;">
+                    <span class="tag-default">Bold</span>
+                    <h1 class="bold">Aa</h1>
+                    <p class="bold">Lorem ipsum dolor sit amet consectetur adipisicing.</p>
+                </div>
+            </div>
+
+        <!-- Palette Colors -->
+        <h2 style="margin: 20px">Palette Colors</h2>
+            <h3 style="margin: 20px 40px">Primary colors</h3>        
+                <span class="tag-default" style="margin: 20px 0 20px 60px; background: #288cff">#288cff</span>
+                <span class="tag-default" style="background: #fafafa; color: #121212; border: solid .5px #121212">#fafafa</span>
+                <span class="tag-default" style="background: #121212; border: solid .5px #fafafa">#121212</span>
+
+        <!-- Button -->
+        <h2 style="margin: 20px">Button</h2>                        
+            <h3 style="margin: 20px 40px">Primary</h3>                               
+                <span class="button-default" style="margin: 20px 60px">Button</span>                                
+            <h3 style="margin: 20px 40px">Second</h3>                                
+                <span class="button-second" style="margin: 20px 60px">Button</span>        
+            <h3 style="margin: 20px 40px">Outline</h3>                                
+                <span class="button-outline" style="margin: 20px 60px">Button</span>                                
+            <h3 style="margin: 20px 40px">Danger</h3>                                
+                <span class="button-danger" style="margin: 20px 60px">Button</span>
+                                        
+        <!-- Typography -->
+        <h2 style="margin: 20px">Typography</h2>                        
+            <h3 style="margin: 20px 40px">High Emphasis</h3>
+                <p class="high-emphasis" style="margin: 20px 60px">high-emphasis</p>
+            <h3 style="margin: 20px 40px">Medium Emphasis</h3>
+                <p class="medium-emphasis" style="margin: 20px 60px">medium-emphasis</p>
+            <h3 style="margin: 20px 40px">Disable Emphasis</h3>
+                <p class="disable-emphasis" style="margin: 20px 60px">disable-emphasis</p>                  
+
+        <!-- Icon -->
+        <h2 style="margin: 20px">Icon</h2>
+            <p style="margin: 20px 40px">Font Awesome (<a href="#">https://fontawesome.com/icons?d=gallery</a>)</p>
+                                    
+        <!-- changeColor -->
+        <h2 style="margin: 20px">Toogle Dark/Light Theme</h2>                        
+            <span id="changeColor" class="button-default" style="margin: 20px 40px">Dark</span>
+        
+    </div>
+                        
+    <script type="text/javascript">
+        let buttonTheme = document.querySelector("#changeColor");
+        let bodyTheme = document.body;
+
+        buttonTheme.addEventListener("click",() => {
+            bodyTheme.classList.toggle("dark");
+        });                            
+    </script>                   
+</body>
+</html>
