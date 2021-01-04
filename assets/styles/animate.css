@@ -1,0 +1,16 @@
+[data-animar], [data-animar-open] {
+  opacity: 0;
+  -webkit-transition: opacity .4s ease-in-out, -webkit-transform .4s ease-in-out;
+  transition: opacity .4s ease-in-out, -webkit-transform .4s ease-in-out;
+  transition: transform .4s ease-in-out, opacity .4s ease-in-out;
+  transition: transform .4s ease-in-out, opacity .4s ease-in-out, -webkit-transform .4s ease-in-out;
+  -webkit-transform: translate3d(0, 50px, 0);
+          transform: translate3d(0, 50px, 0);
+}
+
+[data-animar].animate, [data-animar-open].animate {
+  opacity: 1;
+  -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0);
+}
+/*# sourceMappingURL=animate.css.map */
