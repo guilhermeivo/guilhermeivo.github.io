@@ -19,7 +19,7 @@ const generateCardProjects = {
         },
         {
             title: "Gerador de cores",
-            description: "Um gerador de cores com os padõres RGB. HEX e HSL.",
+            description: "Gerador de cores com os padõres RGB. HEX e HSL.",
             link: [
                 "https://github.com/guilhermeivo/color-generator"
             ],
@@ -27,7 +27,7 @@ const generateCardProjects = {
         },
         {
             title: "Gerador de senhas",
-            description: "Um gerador de senhas com customização de caracteres.",
+            description: "Gerador de senhas com customização de caracteres.",
             link: [
                 "https://github.com/guilhermeivo/password-generator"
             ],
@@ -35,7 +35,7 @@ const generateCardProjects = {
         },
         {
             title: "TCM Codezone",
-            description: "Projeto desenvolvido para trabalho de conclusão de curso (TCM).",
+            description: "Projeto desenvolvido para trabalho de conclusão de módulo (TCM).",
             link: [
                 "https://github.com/guilhermeivo/tcm-codezone",
                 "https://guilhermeivo.github.io/projects/TCM-CodeZone/"
