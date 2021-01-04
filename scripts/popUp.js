@@ -22,6 +22,10 @@ createPopUp = {
                 this.wrapper.classList.remove("active")
             });
 
+            this.wrapper.addEventListener("click", () => {
+                this.wrapper.classList.remove("active")
+            })
+
             this.wrapper.classList.add("active")
         }
     }
