@@ -1,0 +1,179 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* #f9f9ff -> background-primary, #f0effa -> border-color, #fefefe -> background-secondary, #480ed8 -> color-primary, #3a3a3c -> text-color */
+
+body {
+    background: #f9f9ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    min-height: 100vh;
+}
+
+*, input, button {
+    font-family: 'Roboto', sans-serif;
+    color: #3a3a3c;
+}
+
+button.primary-button {
+    background: #480ed8;
+    color: #fefefe;
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button.secondary-button {
+    background: #fefefe;
+    color: #3a3a3c;
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: 1px solid #3a3a3c;
+    border-radius: 6px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+}
+
+.secondary-button span {
+    margin-right: -12px;
+}
+
+input {
+    background: #fefefe;
+    color: #3a3a3c;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: 1px solid #3a3a3c;
+    border-radius: 6px;
+}
+
+.box {
+    background: #fefefe;
+    border-radius: 6px;
+    border: 1.5px solid #f0effa;
+    width: 350px;
+}
+
+.box header {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1.5px solid #f0effa;
+}
+
+.box header h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.box header, .box .body-box {
+    padding: 25px;
+    position: relative;
+}
+
+.box input {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.box .edit-password {
+    position: absolute;
+    border: 1.5px solid #f0effa;
+    background: #fefefe;
+    border-radius: 6px;
+    padding: 25px;   
+    
+    right: 25px;
+    transform: translate(0, 15px);
+    min-width: 200px;
+
+    display: none;
+}
+
+.box .edit-password.active {
+    display: block;
+}
+
+.content-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.box .edit-password::before {
+    content: '';
+    width: 15px;
+    height: 15px;
+    border-left: 1.5px solid #f0effa;
+    border-top: 1.5px solid #f0effa;
+    background: #fefefe;
+    position: absolute;
+    transform: rotate(45deg);
+
+    top: calc(-17px / 2);
+    right: 15px;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+label input[type="checkbox"] {
+    margin: 0;
+    width: 20px;
+    margin-right: 5px;
+}
+
+input[type="range"] {
+    overflow: hidden;
+	-webkit-appearance: none;
+
+    padding: 0;
+    height: 20px;
+    margin: 5px 0 10px 0;
+    border-radius: 50px;
+    border: 1.5px solid #f0effa;
+    background: #fefefe;
+    outline: none;   
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+    -webkit-appearance: none;
+    height: 20px;
+    background:  #480ed8;
+    box-shadow: -100px 0 0 95px  #480ed8;
+    border-radius: 50%;
+    transition: box-shadow 0.2s ease-in-out;
+    position: relative;
+}
+
+.range-slider > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.range-slider > div span {
+    font-size: 12px;
+}

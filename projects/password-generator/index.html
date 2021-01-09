@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Gerador de senhas</title>
+</head>
+<body>
+    <div class="box">
+        <header>
+            <h2>Gerador de Senhas</h2>
+        </header>
+
+        <div class="body-box">
+            <input type="text" class="txtPassword">
+
+            <div class="content-buttons">
+                <button class="primary-button btnGerar">🔑 Gerar Senha</button>
+                <button class="secondary-button btnEdit">Editar <span class="material-icons">keyboard_arrow_down</span></button>
+            </div>
+
+            <div class="edit-password">
+                <div class="range-slider">
+                    <div>
+                        <p>Tamanho</p>
+                        <span class="number-slider">0</span>
+                    </div>                    
+                    <input type="range" min="1" max="50" value="30" id="rangePassword">
+                </div>
+                
+
+                <label for="uppercase">
+                    <input type="checkbox" name="uppercase" id="uppercase">
+                    <p>Maiúsculas</p>
+                </label>
+                
+                <label for="numbers">
+                    <input type="checkbox" name="numbers" id="numbers">
+                    <p>Números</p>
+                </label>
+                
+                <label for="special">
+                    <input type="checkbox" name="special" id="special">
+                    <p>Especial</p>
+                </label>
+            </div>
+        </div>       
+    </div>
+
+    <script src="./app.js"></script>
+    <script src="./generatePassword.js"></script>
+</body>
+</html>

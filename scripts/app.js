@@ -21,7 +21,8 @@ const generateCardProjects = {
             title: "Gerador de cores",
             description: "Gerador de cores com os padõres RGB. HEX e HSL.",
             link: [
-                "https://github.com/guilhermeivo/color-generator"
+                "https://github.com/guilhermeivo/color-generator",
+                "https://guilhermeivo.github.io/projects/color-generator"
             ],
             img: "illustration_color"
         },
@@ -29,7 +30,8 @@ const generateCardProjects = {
             title: "Gerador de senhas",
             description: "Gerador de senhas com customização de caracteres.",
             link: [
-                "https://github.com/guilhermeivo/password-generator"
+                "https://github.com/guilhermeivo/password-generator",
+                "https://guilhermeivo.github.io/projects/password-generator"
             ],
             img: "illustration_password"
         },
