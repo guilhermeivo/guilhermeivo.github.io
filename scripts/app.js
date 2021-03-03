@@ -36,6 +36,15 @@ const generateCardProjects = {
             img: "illustration_password"
         },
         {
+            title: "Snake Game",
+            description: "O clássico jogo da cobrinha no console gameboy.",
+            link: [
+                "https://github.com/guilhermeivo/snake-game",
+                "https://guilhermeivo.github.io/projects/snake-game/index.html"
+            ],
+            img: "illustration_gaming"
+        },
+        {
             title: "TCM Codezone",
             description: "Projeto desenvolvido para trabalho de conclusão de módulo (TCM).",
             link: [
