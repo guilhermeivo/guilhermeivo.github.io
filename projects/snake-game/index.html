@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>SnakeGame</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./styles/main.css">    
+</head>
+<body>
+    <div class="videogame-console">
+        <div class="body-console">
+            <div class="display-border">
+                <div class="display">
+                    <canvas id="gameSnake"></canvas>
+                </div>
+    
+                <div class="shadow-display"></div>
+            </div>
+    
+            <div class="controllers">
+                <div class="directionalButtons">
+                    <div class="top-left"></div>
+                    <div class="top-right"></div>
+                    <div class="bottom-left"></div>
+                    <div class="bottom-right"></div>                    
+                    <div class="center">
+                        <div></div>
+                    </div>
+
+                    <div class="buttonTop"></div>     <!-- ButtonTop    -->
+                    <div class="buttonLeft"></div>    <!-- buttonLeft   -->
+                    <div class="buttonBottom"></div>  <!-- buttonBottom -->
+                    <div class="buttonRight"></div>   <!-- buttonRight  -->
+
+                </div>
+                <div class="extraButtons">
+                    <div class="buttonA"></div>       <!-- buttonA      -->
+                    <div class="buttonB"></div>       <!-- buttonB      -->
+                </div>
+
+            </div>    
+    
+            <div class="shadow-videogame"></div>
+        </div>
+
+        <div class="shadow-videogame-bottom"></div>
+    </div>
+    
+    <script src="./scripts/snake.js"></script>
+    <script src="./scripts/setup.js"></script>
+    <script src="./scripts/fruit.js"></script>
+    <script src="./scripts/collision.js"></script>
+    <script src="./scripts/utilities.js"></script>
+
+    <script>
+        document.body.onload = setup.start()
+    </script>
+</body>
+</html>
