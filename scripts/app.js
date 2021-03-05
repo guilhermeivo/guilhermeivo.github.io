@@ -79,6 +79,7 @@ const generateCardProjects = {
             this.card.classList.add("card")
             this.card.setAttribute("data-animar", "top")            
             this.img.src = `./assets/images/${imgName}.svg`
+            this.img.alt = imgName
             this.title.textContent = title
             this.description.textContent = description
 
