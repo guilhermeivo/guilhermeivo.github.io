@@ -64,20 +64,21 @@ const generateCardProjects = {
     ],
 
     interface: {
-        list_card: document.querySelector(".list-card"),
+        list_card: document.querySelector('.list-card'),
 
-        card: document.createElement("a"),
-        img: document.createElement("img"),
-        div: document.createElement("div"),
-        title: document.createElement("h2"),
-        description: document.createElement("p"),
+        card: document.createElement('a'),
+        img: document.createElement('img'),
+        div: document.createElement('div'),
+        title: document.createElement('h2'),
+        description: document.createElement('p'),
 
-        divUp: document.createElement("div"),
+        divUp: document.createElement('div'),
 
         createCard(title, description, link, imgName) {
 
-            this.card.classList.add("card")
-            this.card.setAttribute("data-animar", "top")            
+            this.card.classList.add('card')
+            this.card.setAttribute('data-animar', 'top')      
+            this.card.setAttribute('tabindex', '0')      
             this.img.src = `./assets/images/${imgName}.svg`
             this.img.alt = imgName
             this.title.textContent = title
@@ -93,7 +94,7 @@ const generateCardProjects = {
     },
 
     generate() {
-        let element = ""
+        let element = ''
 
         for (let i = 0; i < this.projectsList.length; i++) {
             this.interface.createCard(
