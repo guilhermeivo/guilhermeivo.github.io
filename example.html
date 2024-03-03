@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example</title>
+    <link rel="stylesheet" href="./resources/style.css">
+
+    <link rel="icon" type="image/x-icon" href="./resources/favicon.ico">
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <script src="./src/v3.js"></script>
+    <script src="./src/m4.js"></script>
+    <script type="module">
+`use strict`
+
+import Shader from './src/Shader.js'
+import vertexSource from './src/shaders/vertexSource.js'
+import fragmentSource from './src/shaders/fragmentSource.js'
+
+import Scene from './src/Scene.js'
+import Camera from './src/Camera.js'
+import Renderer from './src/Renderer.js'
+
+import Geometry from './src/Geometry.js'
+import Material from './src/Material.js'
+import Mesh from './src/Mesh.js'
+
+import monkey from './src/primitives/monkey.js'
+
+window.addEventListener('load', () => {
+    const canvas = document.querySelector('#canvas')
+    const gl = canvas.getContext('webgl2')
+
+    if (!gl) {
+        alert('Unable to initialize WebGL. Your browser or machine may not support it.')
+        return
+    }
+
+    // SCENE
+    const shader = new Shader(gl, vertexSource, fragmentSource)
+    const scene = new Scene(gl, [ shader ])
+
+    /// CAMERA
+    const camera = new Camera(canvas.width / canvas.height, {
+        location: [ 0, 0, 600 ]
+    }, {
+        zNear: 30,
+        zFar: 1500,
+        fieldOfViewRadians: Math.degreeToRadians(45),
+        orthographic: false,
+        orthographicUnits: 150
+    })
+
+    /// RENDERER
+    const renderer = new Renderer(gl)
+
+    /// MONKEY
+    const geometry = new Geometry(gl)
+    geometry.setAttribute('position', monkey.vertice)
+    geometry.setAttribute('color', monkey.vertice)
+    geometry.setAttribute('normal', monkey.normal)
+    geometry.setAttribute('texcoord', monkey.texcoord, { size: 2 })
+    const material = new Material()
+    const monkeyMesh = new Mesh(geometry, material)
+    monkeyMesh.scale.set([ 150, 150, 150 ])
+    scene.addMesh(monkeyMesh)
+
+    /// ANIMATION
+    let lastTimeFps = 0
+    const rotationSpeed = .6
+    function animate(timeStamp) {
+        let deltaTime = timeStamp - lastTimeFps
+        lastTimeFps = timeStamp
+        let fps = 1000 / deltaTime
+
+        renderer.render(scene, camera, fps)
+        
+        monkeyMesh.rotation[1] += rotationSpeed / fps
+        
+        window.requestAnimationFrame(animate)
+    }
+    animate(0)
+})
+    </script>
+</body>
+</html>
