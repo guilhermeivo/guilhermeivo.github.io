@@ -13,7 +13,7 @@ export default class Letter extends Object {
         })
         this.init()
     }
-
+    
     _init() {
         this.scene.shader.setAttribute('a_position', new Float32Array(this.mesh.vertice))
         this.scene.shader.setAttribute('a_normal', new Float32Array(this.mesh.normal))

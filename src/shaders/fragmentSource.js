@@ -23,9 +23,9 @@ uniform float u_opacity;
 
 uniform vec3 u_ambientLight;
 
-uniform sampler2D u_texture;
 uniform sampler2D u_diffuseMap;
 uniform sampler2D u_specularMap;
+uniform sampler2D u_opacityMap;
 
 out vec4 outColor;
 
@@ -38,25 +38,28 @@ void main() {
 
     float light = dot(surfaceToLightDirection, normal) * v_lightItensity + .5;
     float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
-    vec3 specular;
 
+    // SPECULAR
     vec4 specularMapColor = texture(u_specularMap, v_texcoord);
-    vec3 effectiveSpecular = u_specular * specularMapColor.rgb;
+    vec3 effectiveSpecular = u_specular * pow(specularLight, u_shininess) * v_lightColor * specularMapColor.rgb;
 
-    if (light > 0.0) {
-        specular = effectiveSpecular * pow(specularLight, u_shininess);
-    }
-
+    // DIFFUSE
     vec4 diffuseMapColor = texture(u_diffuseMap, v_texcoord);
-    vec3 effectiveDiffuse = u_diffuse * diffuseMapColor.rgb * v_color.rgb;
-    float effectiveOpacity = u_opacity * diffuseMapColor.a * v_color.a;
+    vec3 effectiveDiffuse = u_diffuse * light * v_lightColor * diffuseMapColor.rgb;
+
+    // OPACITY
+    vec4 opacityMapColor = texture(u_opacityMap, v_texcoord);
+    float effectiveOpacity = u_opacity * opacityMapColor.a * diffuseMapColor.a;
+
+    // AMBIENT
+    vec3 effectiveAmbient = u_ambient * u_ambientLight;
 
     // color = ambientColor * lightAmbient + diffuseColor * sumOfLightCalculations
-    outColor = texture(u_texture, v_texcoord) * vec4(
+    outColor = vec4(
         u_emissive +
-        u_ambient * u_ambientLight +
-        effectiveDiffuse * light * v_lightColor +
-        specular,
+        effectiveAmbient +
+        effectiveDiffuse +
+        effectiveSpecular, 
         effectiveOpacity);
 }
 `

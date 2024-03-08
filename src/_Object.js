@@ -36,9 +36,8 @@ export default class _Object {
             if (!this.mesh.material.diffuseMap) this.mesh.material.diffuseMap = this.scene.shader.setEmptyTexture()
             if (!this.mesh.material.specularMap) this.mesh.material.specularMap = this.scene.shader.setEmptyTexture()
             if (!this.mesh.material.normalMap) this.mesh.material.normalMap = this.scene.shader.setEmptyTexture()
+            if (!this.mesh.material.opacityMap) this.mesh.material.opacityMap = this.scene.shader.setEmptyTexture()
         }
-
-        if (!this.mesh.geometry.texture) this.mesh.geometry.texture = this.scene.shader.setEmptyTexture()
 
         this.gl.bindVertexArray(null)
 
@@ -63,16 +62,17 @@ export default class _Object {
         this.scene.useVao(this.vao)
 
         this.gl.activeTexture(this.gl.TEXTURE0)
-        this.scene.useTexture(this.mesh.geometry.texture)
-        this.scene.shader.setUniform('u_texture', 0, this.scene.shader.types.sampler)
+        this.scene.useTexture(this.mesh.material.diffuseMap)
+        this.scene.shader.setUniform('u_diffuseMap', 0, this.scene.shader.types.sampler)
 
         this.gl.activeTexture(this.gl.TEXTURE1)
-        this.scene.useTexture(this.mesh.material.diffuseMap)
-        this.scene.shader.setUniform('u_diffuseMap', 1, this.scene.shader.types.sampler)
+        this.scene.useTexture(this.mesh.material.specularMap)
+        this.scene.shader.setUniform('u_specularMap', 1, this.scene.shader.types.sampler)
 
         this.gl.activeTexture(this.gl.TEXTURE2)
-        this.scene.useTexture(this.mesh.material.specularMap)
-        this.scene.shader.setUniform('u_specularMap', 2, this.scene.shader.types.sampler)
+        this.scene.useTexture(this.mesh.material.opacityMap)
+        this.scene.shader.setUniform('u_opacityMap', 2, this.scene.shader.types.sampler)
+
 
         if (callback) callback()
         else if (this._draw) this._draw()

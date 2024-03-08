@@ -113,7 +113,7 @@ export default class Shader {
             this.gl.bindBuffer(_target, buffer)  
             this.gl.bufferData(_target, _data, this.gl.STATIC_DRAW)
         })
-
+        
         this.gl.vertexAttribPointer(
             locationAttribute, 
             config.size || this.defaultConfigAttribute.numComponents, 
@@ -121,6 +121,7 @@ export default class Shader {
             config.normalize || this.defaultConfigAttribute.normalize, 
             config.stride || this.defaultConfigAttribute.stride, 
             config.offset || this.defaultConfigAttribute.offset)
+            
         this.gl.enableVertexAttribArray(locationAttribute)
     }
 
@@ -172,6 +173,8 @@ export default class Shader {
     }
 
     setTexture(image) {
+        if (!image) return this.setEmptyTexture()
+        
         // Create a texture.
         const texture = this.createTextures()
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture)
@@ -187,7 +190,7 @@ export default class Shader {
             this.gl.RGBA,       // format
             this.gl.UNSIGNED_BYTE, // type
             new Uint8Array([255, 255, 255, 255])) // pixels
-        
+
         // Asynchronously load an image
         image.addEventListener('load', () => {
             // Now that the image has loaded make copy it to the texture.

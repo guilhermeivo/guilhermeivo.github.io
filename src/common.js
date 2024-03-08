@@ -67,6 +67,7 @@ const objToJson = async (url, file, current = 'objects') => {
 
 		const currentObjectName = Object.keys(json[current])[Object.keys(json[current]).length - 1]
 		const currentObject = json[current][currentObjectName]
+		let tempImage = null
 
 		switch (parts.name) {
 			case 'mtllib':
@@ -103,6 +104,26 @@ const objToJson = async (url, file, current = 'objects') => {
 			case 'illum':
 				currentObject['illum'] = parts.data.map(parseFloat)
 				break;
+			case 'map_Kd':
+				tempImage = new Image()
+				tempImage.src = url + parts.data
+				currentObject['diffuseMap'] = tempImage
+				break;
+			case 'map_Bump':
+				tempImage = new Image()
+				tempImage.src = url + parts.data
+				currentObject['normalMap'] = tempImage
+				break;
+			case 'map_Ns':
+				tempImage = new Image()
+				tempImage.src = url + parts.data
+				currentObject['specularMap'] = tempImage
+				break;
+			case 'map_d':
+				tempImage = new Image()
+				tempImage.src = url + parts.data
+				currentObject['opacityMap'] = tempImage
+				break;
 			case 'o':
 				if (!json[current][parts.data]) json[current][parts.data] = { }
 				break;
@@ -138,11 +159,15 @@ const loadObj = (scene, url, object) => {
 	let materials = { }
 	let maxIndex = [ 1, 1, 1 ]
 	let vertexData = [ [], [], [] ]
+	
 	objToJson(url, object)
 		.then(json => {
 			Object.keys(json.materials).map(key => {
 				const currentMaterial = json.materials[key]
 				const material = new Material(currentMaterial)
+				material.diffuseMap = scene.shader.setTexture(currentMaterial.diffuseMap)
+				material.specularMap = scene.shader.setTexture(currentMaterial.specularMap)
+				material.normalMap = scene.shader.setTexture(currentMaterial.normalMap)
 				materials = {
 					...materials,
 					[key]: material
@@ -156,7 +181,7 @@ const loadObj = (scene, url, object) => {
 				const objVertexData = [
 					json.objects[key]['geometric_vertices'],
 					json.objects[key]['texture_coordinates'],
-					json.objects[key]['vertex_normals'],
+					json.objects[key]['vertex_normals']
 				]
 				
 				currentObject.polygonal_face.map(parts => {
@@ -164,6 +189,7 @@ const loadObj = (scene, url, object) => {
 						// vert[0] -> vertices
 						// vert[1] -> texture
 						// vert[2] -> normals
+						// vert[3] -> colors
 						vert.forEach((objIndexStr, i) => {
 							const objIndex = parseInt(objIndexStr) - maxIndex[i]
 							vertexData[i].push(...objVertexData[i][objIndex])
@@ -187,7 +213,7 @@ const loadObj = (scene, url, object) => {
 				const geometry = new Geometry(scene.gl)
 				geometry.setAttribute('position', new Float32Array(vertexData[0]), { size: 3 })
 				geometry.setAttribute('normal', new Float32Array(vertexData[2]))
-				geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2 })
+				geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
 				const mesh = new Mesh(geometry, materials[currentObject.material])
 				const object = new _Object(scene, mesh, key)
 				mesh.scale = [ 25, 25, 25 ]

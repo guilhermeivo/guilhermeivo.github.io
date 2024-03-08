@@ -1,6 +1,6 @@
 export default class Material {
     constructor(config = {}) {
-        this.shininess = config.shininess || [ 400 ]
+        this.shininess = config.shininess || [ 32 ]
         this.ambient = config.ambient || [ 0, 0, 0 ]
         this.diffuse = config.diffuse || [ 1, 1, 1 ]
         this.specular = config.specular || [ 1, 1, 1 ]
@@ -12,5 +12,6 @@ export default class Material {
         this.diffuseMap = null
         this.specularMap = null
         this.normalMap = null
+        this.opacityMap = null
     }
 }

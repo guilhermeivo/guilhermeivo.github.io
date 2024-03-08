@@ -11,7 +11,6 @@ import './components/overlayDebug/index.js'
 import Geometry from './Geometry.js'
 import Material from './Material.js'
 import Mesh from './Mesh.js'
-import monkey from './primitives/monkey.js'
 import Camera from './Camera.js'
 import Renderer from './Renderer.js'
 import CameraObject from './objects/CameraObject.js'
@@ -45,7 +44,7 @@ window.addEventListener('load', () => {
             configs: { 
                 min: '1',
                 max: '750',
-                value: '1'
+                value: '0'
             }
         }, {
             label: 'y',
@@ -53,7 +52,7 @@ window.addEventListener('load', () => {
             configs: { 
                 min: '1',
                 max: '750',
-                value: '1'
+                value: '0'
             }
         }, {
             label: 'z',
@@ -61,7 +60,7 @@ window.addEventListener('load', () => {
             configs: { 
                 min: '-750',
                 max: '750',
-                value: '600'
+                value: '300'
             }
         }, {
             label: 'orthographic',
@@ -99,34 +98,24 @@ window.addEventListener('load', () => {
         location: [ 0, 0, 600 ]
     }, {
         zNear: 30,
-        zFar: 1500,
+        zFar: 1000,
         fieldOfViewRadians: Math.degreeToRadians(45),
         orthographic: false,
         orthographicUnits: 150
     })
     const debugCamera = new Camera((canvas.width / 2) / canvas.height, {
-        location: [ 600, 400, 1200 ]
+        location: [ 200, 400, 800 ]
     }, {
         zNear: 30,
-        zFar: 3500
+        zFar: 2000
     }) 
 
     /// RENDERER
     const renderer = new Renderer(gl)
 
     /// MONKEY
-    const geometry = new Geometry(gl)
-    geometry.setAttribute('position', monkey.vertice)
-    geometry.setAttribute('color', monkey.normal)
-    geometry.setAttribute('normal', monkey.normal)
-    geometry.setAttribute('texcoord', monkey.normal, { size: 2 })
-    const material = new Material()
-    const monkeyMesh = new Mesh(geometry, material)
-    monkeyMesh.scale.set([ 50, 50, 50 ])
-    // scene.addMesh(monkeyMesh)
-
-    const collection = loadObj(scene, './src/primitives/', 'windmill.obj')
-        scene.addCollection(collection)
+    const collection = loadObj(scene, './src/primitives/', 'monkey.obj')
+    scene.addCollection(collection)
 
     /// CAMERA
     const cameraObject = new CameraObject(scene)
@@ -182,7 +171,7 @@ window.addEventListener('load', () => {
             renderer.render(scene, camera, fps)
         }
 
-        monkeyMesh.rotation[1] += rotationSpeed / fps
+        if (collection.objects[0]) collection.objects[0].mesh.rotation[1] += rotationSpeed / fps
         
         window.requestAnimationFrame(animate)
     }

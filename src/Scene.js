@@ -12,7 +12,7 @@ export default class Scene {
 
         this.camera = null
         this.lamp = new Lamp({
-            position: [ 60, 40, 120 ]
+            position: [ 0, 0, 600 ]
         })
 
         this.lastUsedProgram = null
