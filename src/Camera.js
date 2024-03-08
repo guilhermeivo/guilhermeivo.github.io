@@ -46,7 +46,7 @@ export default class Camera {
 
         // move the projection space to view space (the space in front of the camera)
         // perspective or projection matrix * view matrix
-        this.projectionViewMatrix = m4.multiply(this.projectionMatrix, this.viewMatrix)
+        m4.multiply(this.projectionViewMatrix, this.projectionMatrix, this.viewMatrix)
     }
 
     reset() {

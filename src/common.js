@@ -13,24 +13,20 @@ const makeZToWMatrix = (fudgeFactor) => {
 	]
 }
 
-function computeMatrix(projection, view, translation, rotation, scale) {
+function computeMatrix(output, projection, view, translation, rotation, scale) {
 	// projection * view * model (translation * rotation * scale)
-	let matrix = new Matrix4()
-	matrix = m4.multiply(projection, view)
-    matrix = m4.multiply(matrix, modelMatrix(translation, rotation, scale))
-	
-    return matrix
+	m4.multiply(output, projection, view)
+    m4.multiply(output, matrix, modelMatrix(translation, rotation, scale))
 }
 
-function modelMatrix(translation, rotation, scale, identity) {
-	let matrix = identity || m4.identity()
-		matrix = m4.translate(matrix, translation)
-        matrix = m4.xRotate(matrix, rotation[0])
-        matrix = m4.yRotate(matrix, rotation[1])
-        matrix = m4.yRotate(matrix, rotation[2])
-        matrix = m4.scale(matrix, scale)
-
-	return matrix
+function modelMatrix(output, translation, rotation, scale, identity) {
+	m4.identity(output)
+	
+	m4.translate(output, output, translation)
+	m4.xRotate(output, output, rotation[0])
+	m4.yRotate(output, output, rotation[1])
+	m4.yRotate(output, output, rotation[2])
+	m4.scale(output, output, scale)
 }
 
 const objToJson = async (url, file, current = 'objects') => {

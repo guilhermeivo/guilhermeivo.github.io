@@ -14,6 +14,10 @@ export default class _Object {
         this.worldMatrix = m4.identity()
 
         this.isInitialized = false
+
+        this.lastLocation = null
+        this.lastRotation = null
+        this.lastScale = null
     }
 
     init(callback = null) {
@@ -45,11 +49,14 @@ export default class _Object {
     }
 
     update(fps, callback = null) {
+        this.reset()
+        
         if (callback) callback(fps)
         else if (this._update) this._update(fps)
 
         // model or world matrix = translation * rotation * scale
-        this.worldMatrix = modelMatrix(
+        modelMatrix(
+            this.worldMatrix,
             this.mesh.location, 
             this.mesh.rotation, 
             this.mesh.scale)
@@ -99,5 +106,9 @@ export default class _Object {
             const count = this.mesh.geometry.attributes['a_position'].data.length / 3
             this.gl.drawArrays(primitiveType, offset, count)
         }
+    }
+
+    reset() {
+        this.worldMatrix.reset()
     }
 }

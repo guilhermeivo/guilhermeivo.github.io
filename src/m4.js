@@ -57,6 +57,7 @@
 
 		reset() {
 			this.fill(0)
+			// for (let i = 0; i < this.length; i++) this[i] = 0
 		}
 
 		delete() {
@@ -67,10 +68,10 @@
 	/**
 	 * @returns { Matrix4 }
 	 */
-	const zero = (result) => {
-		result = result || new Matrix4()
-		result.reset()
-		return result
+	const zero = (output) => {
+		output = output || new Matrix4()
+		output.reset()
+		return output
 	}
 
 	/**
@@ -78,35 +79,35 @@
 	 * @param { number } value 
 	 * @returns { Matrix4 }
 	 */
-	const scalar = (value, result) => {
-		result = result || new Matrix4()
-		result.reset()
+	const scalar = (output, value) => {
+		output = output || new Matrix4()
+		output.reset()
 		for (let i = 0; i < amountOfLines; i++) {
-			result[i * 4 + i] = value
+			output[i * 4 + i] = value
 		}
-		return result
+		return output
 	}
 
 	/**
 	 * @returns { Matrix4 }
 	 */
-	const identity = (result) => {
-		result = result || new Matrix4()
-		result.reset()
+	const identity = (output) => {
+		output = output || new Matrix4()
+		output.reset()
 		for (let i = 0; i < amountOfLines; i++) {
-			result[i * 4 + i] = 1
+			output[i * 4 + i] = 1
 		}
-		return result
+		return output
 	}
 
 	/**
 	 * @returns { Matrix4 }
 	 */
-	const unit = (result) => {
-		result = result || new Matrix4()
-		result.reset()
-		result.fill(1)
-		return result
+	const unit = (output) => {
+		output = output || new Matrix4()
+		output.reset()
+		output.fill(1)
+		return output
 	}
 
 	/**
@@ -115,16 +116,21 @@
 	 * @param { number } value 
 	 * @returns { Matrix4 }
 	 */
-	const scalarMultiply = (matrix, value, result) => {
-		result = result || new Matrix4()
+	const scalarMultiply = (output, matrix, value) => {
+		let temp = [ 
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0
+		]
 
-		for (let i = 0; i < result.length; i+=amountOfLines) { // line
+		for (let i = 0; i < temp.length; i+=amountOfLines) { // line
 			for (let j = 0; j < amountOfColumns; j++) { // column
-				result[i + j] = matrix[i + j] * value
+				temp[i + j] = matrix[i + j] * value
 			}
 		}
 
-		return result
+		output.set(temp)
 	}
 
 	/**
@@ -132,7 +138,13 @@
      * @param { Matrix4 } matrixB
      * @returns { Matrix4 }
      */
-    const multiply = (matrixA, matrixB, result) => {
+    const multiply = (output, matrixA, matrixB) => {
+		let temp = [ 
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0
+		]
 		/*
 		 * Solution found for multiplication using the OpenGL ES matrix pattern is to transform A*B into B*A
 		 * maintaining the mathematical matrix multiplication algorithm
@@ -145,18 +157,17 @@
 		 */
 		if (matrixA.length != matrixB.length) return
 
-		result = result || new Matrix4()
 		for (let ib = 0; ib < matrixA.length; ib+=amountOfLines) { // line
 			for (let jb = 0; jb < amountOfColumns; jb++) { // column
 				const valueB = matrixB[ib + jb]
 				for (let ja = 0; ja < amountOfColumns; ja++) { // column
 					const valueA = matrixA[jb * amountOfLines + ja]
-					result[ib + ja] += valueA * valueB
+					temp[ib + ja] += valueA * valueB
 				}
 			}
 		}
 
-		return result
+		output.set(temp)
     }
 
 	/**
@@ -366,11 +377,11 @@
 	 * @param {( number | Array.<number> | { tx: number, ty: number, tz: number } )} args 
 	 * @returns { Matrix4 }
 	 */
-	const translate = (matrix, ...args) => {
+	const translate = (output, matrix, ...args) => {
 		// newX = x + tx
 		// newY = y + ty
 		// newZ = z + tz
-		return multiply(matrix, translation(...args))
+		multiply(output, matrix, translation(...args))
 	}
 
 	/**
@@ -379,9 +390,9 @@
 	 * @param { number } angleInRadians 
 	 * @returns { Matrix4 }
 	 */
-	const xRotate = (matrix, angleInRadians) => {
+	const xRotate = (output, matrix, angleInRadians) => {
 		// unit circle
-		return multiply(matrix, xRotation(angleInRadians))
+		multiply(output, matrix, xRotation(angleInRadians))
 	}
 
 	/**
@@ -390,9 +401,9 @@
 	 * @param { number } angleInRadians 
 	 * @returns { Matrix4 }
 	 */
-	const yRotate = (matrix, angleInRadians) => {
+	const yRotate = (output, matrix, angleInRadians) => {
 		// unit circle
-		return multiply(matrix, yRotation(angleInRadians))
+		multiply(output, matrix, yRotation(angleInRadians))
 	}
 
 	/**
@@ -401,9 +412,9 @@
 	 * @param { number } angleInRadians 
 	 * @returns { Matrix4 }
 	 */
-	const zRotate = (matrix, angleInRadians) => {
+	const zRotate = (output, matrix, angleInRadians) => {
 		// unit circle
-		return multiply(matrix, zRotation(angleInRadians))
+		multiply(output, matrix, zRotation(angleInRadians))
 	}
 
 	/**
@@ -412,11 +423,11 @@
 	 * @param {( number | Array.<number> | { tx: number, ty: number, tz: number } )} args 
 	 * @returns { Matrix4 }
 	 */
-	const scale = (matrix, ...args) => {
+	const scale = (output, matrix, ...args) => {
 		// newX = x * sx
 		// newY = y * sy
 		// newZ = z * sz
-		return multiply(matrix, scaling(...args))
+		multiply(output, matrix, scaling(...args))
 	}
 
 	/// Projection Matrix
