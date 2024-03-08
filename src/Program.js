@@ -29,7 +29,6 @@ export default class Shader {
         }
 
         this.buffers = []
-        this.textures = []
     }
  
     compile(vertexShaderSource, fragmentShaderSource) {
@@ -83,18 +82,6 @@ export default class Shader {
     deleteBuffers() {
         this.buffers.forEach(buffer => {
             this.gl.deleteBuffer(buffer)
-        })
-    }
-
-    createTextures() {
-        const texture = this.gl.createTexture()
-        this.textures.push(texture)
-        return texture
-    }
-
-    deleteTextures() {
-        this.textures.forEach(texture => {
-            this.gl.deleteTexture(texture)
         })
     }
 
@@ -152,90 +139,5 @@ export default class Shader {
         }
 
         if (types[dataType]) types[dataType]()
-    }
-
-    setEmptyTexture() {
-        const texture = this.createTextures()
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture)
-
-        this.gl.texImage2D(
-            this.gl.TEXTURE_2D,
-            0,
-            this.gl.RGBA,
-            1,
-            1,
-            0,
-            this.gl.RGBA,
-            this.gl.UNSIGNED_BYTE, 
-            new Uint8Array([255, 255, 255, 255]))
-
-        return texture
-    }
-
-    setTexture(image) {
-        if (!image) return this.setEmptyTexture()
-        
-        // Create a texture.
-        const texture = this.createTextures()
-        this.gl.bindTexture(this.gl.TEXTURE_2D, texture)
-        
-        // Fill the texture with a 1x1 blue pixel (pre_load)
-        this.gl.texImage2D(
-            this.gl.TEXTURE_2D, // target
-            0,                       // level
-            this.gl.RGBA,       // internalformat
-            1,                       // width
-            1,                       // height
-            0,                       // border
-            this.gl.RGBA,       // format
-            this.gl.UNSIGNED_BYTE, // type
-            new Uint8Array([255, 255, 255, 255])) // pixels
-
-        // Asynchronously load an image
-        image.addEventListener('load', () => {
-            // Now that the image has loaded make copy it to the texture.
-            this.gl.bindTexture(this.gl.TEXTURE_2D, texture)
-            
-            this.gl.texImage2D(
-                this.gl.TEXTURE_2D, 
-                0, 
-                this.gl.RGBA, 
-                this.gl.RGBA, 
-                this.gl.UNSIGNED_BYTE, 
-                image)
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE)
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE)
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR)
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR)
-            this.gl.generateMipmap(this.gl.TEXTURE_2D)
-        })
-
-        // error_load
-        image.addEventListener('error', () => {
-            this.gl.bindTexture(this.gl.TEXTURE_2D, texture)
-            
-            const alignment = 1
-            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, alignment)
-            // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
-            this.gl.texImage2D(
-                this.gl.TEXTURE_2D, 
-                0, 
-                this.gl.R8, 
-                2, 2, 
-                0,
-                this.gl.RED, 
-                this.gl.UNSIGNED_BYTE, 
-                new Uint8Array([
-                    128,  64,
-                    0, 192
-                ]))
- 
-                this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST)
-                this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST)
-                this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE)
-                this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE)
-        })
-
-        return texture
     }
 }

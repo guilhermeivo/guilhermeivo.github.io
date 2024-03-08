@@ -1,6 +1,7 @@
+import { FloatType } from "../constants.js"
+
 export default class Geometry {
-    constructor(gl) {
-        this.gl = gl
+    constructor() {
         this.attributes = { }
         this.indice = null
     }
@@ -12,7 +13,7 @@ export default class Geometry {
                 name: name,
                 data: data,
                 size: config.size || 3,
-                type: config.type || this.gl.FLOAT,
+                type: FloatType,
                 normalize: config.normalize || true,
                 stride: config.stride || 0,
                 offset: config.offset || 0

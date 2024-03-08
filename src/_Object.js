@@ -1,5 +1,6 @@
 import Mesh from "./Mesh.js"
 import { modelMatrix } from "./common.js"
+import EmptyTexture from "./Textures/EmptyTexture.js"
 
 export default class _Object {
     constructor(scene, mesh, name) {
@@ -14,10 +15,6 @@ export default class _Object {
         this.worldMatrix = m4.identity()
 
         this.isInitialized = false
-
-        this.lastLocation = null
-        this.lastRotation = null
-        this.lastScale = null
     }
 
     init(callback = null) {
@@ -37,10 +34,9 @@ export default class _Object {
                 })
             })
 
-            if (!this.mesh.material.diffuseMap) this.mesh.material.diffuseMap = this.scene.shader.setEmptyTexture()
-            if (!this.mesh.material.specularMap) this.mesh.material.specularMap = this.scene.shader.setEmptyTexture()
-            if (!this.mesh.material.normalMap) this.mesh.material.normalMap = this.scene.shader.setEmptyTexture()
-            if (!this.mesh.material.opacityMap) this.mesh.material.opacityMap = this.scene.shader.setEmptyTexture()
+            Object.keys(this.mesh.material.samplers).forEach(sampler => {
+                if (!this.mesh.material.samplers[sampler]) this.mesh.material.samplers[sampler] = new EmptyTexture(this.gl)
+            })
         }
 
         this.gl.bindVertexArray(null)
@@ -68,18 +64,11 @@ export default class _Object {
         this.scene.useProgram(this.scene.shader.program)
         this.scene.useVao(this.vao)
 
-        this.gl.activeTexture(this.gl.TEXTURE0)
-        this.scene.useTexture(this.mesh.material.diffuseMap)
-        this.scene.shader.setUniform('u_diffuseMap', 0, this.scene.shader.types.sampler)
-
-        this.gl.activeTexture(this.gl.TEXTURE1)
-        this.scene.useTexture(this.mesh.material.specularMap)
-        this.scene.shader.setUniform('u_specularMap', 1, this.scene.shader.types.sampler)
-
-        this.gl.activeTexture(this.gl.TEXTURE2)
-        this.scene.useTexture(this.mesh.material.opacityMap)
-        this.scene.shader.setUniform('u_opacityMap', 2, this.scene.shader.types.sampler)
-
+        for (let i = 0; i < this.mesh.material.samplers.length; i++) {
+            this.gl.activeTexture(this.gl[`TEXTURE${ i }`])
+            this.scene.useTexture(this.mesh.material.samplers[i].data, this.mesh.material.samplers[i].target)
+            this.scene.shader.setUniform(`u_${ Object.keys(this.mesh.material.samplers)[i] }`, i, this.scene.shader.types.sampler)
+        }
 
         if (callback) callback()
         else if (this._draw) this._draw()

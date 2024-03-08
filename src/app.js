@@ -2,21 +2,19 @@
 
 // https://webgl2fundamentals.org/
 
-import Shader from './Shader.js'
+import Program from './Program.js'
 import vertexSource from './shaders/vertexSource.js'
 import fragmentSource from './shaders/fragmentSource.js'
 import Scene from './Scene.js'
 
 import './components/overlayDebug/index.js'
-import Geometry from './Geometry.js'
-import Material from './Material.js'
-import Mesh from './Mesh.js'
 import Camera from './Camera.js'
 import Renderer from './Renderer.js'
-import CameraObject from './objects/CameraObject.js'
-import FrustumObject from './objects/FrustumObject.js'
-import LampObject from './objects/LampObject.js'
+import CameraObject from './Helpers/CameraObject.js'
+import FrustumObject from './Helpers/FrustumObject.js'
+import LampObject from './Helpers/LampObject.js'
 import { loadObj } from './common.js'
+import Lamp from './Lamp.js'
 
 window.addEventListener('load', () => {
     const DEBUG_MODE = true
@@ -73,24 +71,13 @@ window.addEventListener('load', () => {
                 max: '500',
                 value: '150'
             }
-        }, /*{
-            label: 'Save',
-            type: 'button', 
-            configs: {
-                value: 'Save'
-            },
-            event: (arg) => {
-                canvas.toBlob((blob) => {
-                    saveblob(blob, `screencapture-${ canvas.width }x${ canvas.height }.png`)
-                })
-            }
-        }*/
+        }
     ])
 
     const fpsElement = document.querySelector('#textFPS')
 
     // SCENE
-    const shader = new Shader(gl, vertexSource, fragmentSource)
+    const shader = new Program(gl, vertexSource, fragmentSource)
     const scene = new Scene(gl, [ shader ])
 
     /// CAMERA
@@ -110,11 +97,16 @@ window.addEventListener('load', () => {
         zFar: 2000
     }) 
 
+    /// LIGHT
+    const lamp = new Lamp({
+        position: [ 100, 100, 100 ]
+    })
+
     /// RENDERER
     const renderer = new Renderer(gl)
 
     /// MONKEY
-    const collection = loadObj(scene, './src/primitives/', 'monkey.obj')
+    const collection = loadObj(scene, '../resources/monkey/', 'monkey.obj')
     scene.addCollection(collection)
 
     /// CAMERA
@@ -166,9 +158,9 @@ window.addEventListener('load', () => {
                 frustumObject.modelMatrix = m4.inverse(camera.projectionViewMatrix) 
             }
 
-            renderer.renderScissor(scene, camera, debugCamera, fps)
+            renderer.renderScissor(scene, [ camera, debugCamera ], [ lamp ], fps)
         } else {
-            renderer.render(scene, camera, fps)
+            renderer.render(scene, camera, [ lamp ], fps)
         }
 
         if (collection.objects[0]) collection.objects[0].mesh.rotation[1] += rotationSpeed / fps

@@ -11,12 +11,12 @@
 <body>
     <canvas id="canvas"></canvas>
 
-    <script src="./src/v3.js"></script>
-    <script src="./src/m4.js"></script>
+    <script src="./src/Math/v3.js"></script>
+    <script src="./src/Math/m4.js"></script>
     <script type="module">
 `use strict`
 
-import Shader from './src/Shader.js'
+import Program from './src/Program.js'
 import vertexSource from './src/shaders/vertexSource.js'
 import fragmentSource from './src/shaders/fragmentSource.js'
 
@@ -24,8 +24,8 @@ import Scene from './src/Scene.js'
 import Camera from './src/Camera.js'
 import Renderer from './src/Renderer.js'
 
-import Geometry from './src/Geometry.js'
-import Material from './src/Material.js'
+import Geometry from './src/Core/Geometry.js'
+import Material from './src/Core/Material.js'
 import Mesh from './src/Mesh.js'
 
 import monkey from './src/primitives/monkey.js'
@@ -40,7 +40,7 @@ window.addEventListener('load', () => {
     }
 
     // SCENE
-    const shader = new Shader(gl, vertexSource, fragmentSource)
+    const shader = new Program(gl, vertexSource, fragmentSource)
     const scene = new Scene(gl, [ shader ])
 
     /// CAMERA
@@ -58,7 +58,7 @@ window.addEventListener('load', () => {
     const renderer = new Renderer(gl)
 
     /// MONKEY
-    const geometry = new Geometry(gl)
+    const geometry = new Geometry()
     geometry.setAttribute('position', monkey.vertice)
     geometry.setAttribute('color', monkey.vertice)
     geometry.setAttribute('normal', monkey.normal)

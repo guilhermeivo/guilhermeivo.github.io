@@ -1,11 +1,12 @@
-import Geometry from "../Geometry.js";
-import Material from "../Material.js";
+import Geometry from "../Core/Geometry.js";
+import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
 import Object from "../_Object.js";
+import EmptyTexture from "../Textures/EmptyTexture.js";
 
 export default class CameraObject extends Object {
     constructor(scene) {
-        const geometry = new Geometry(scene.gl)
+        const geometry = new Geometry()
         geometry.setAttribute('position', camera.vertice())
         geometry.setAttribute('color', camera.color())
         geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
@@ -30,7 +31,6 @@ export default class CameraObject extends Object {
         this.scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
             size: 2
         })
-        this.mesh.geometry.texture = this.scene.shader.setEmptyTexture()
     }
 
     _draw() {

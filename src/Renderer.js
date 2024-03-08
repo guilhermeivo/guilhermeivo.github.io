@@ -3,7 +3,7 @@ export default class Renderer {
         this.gl = gl
     }
 
-    render(scene, camera, fps) {
+    render(scene, camera, lights, fps) {
         // reset display
         let width = this.gl.canvas.clientWidth
         let height = this.gl.canvas.clientHeight
@@ -27,7 +27,7 @@ export default class Renderer {
         scene.execCollections(scene.collection, fps)
     }
 
-    renderScissor(scene, primaryCamera, secondCamera, fps) {
+    renderScissor(scene, cameras, lights, fps) {
         // reset display
         let width = this.gl.canvas.clientWidth
         let height = this.gl.canvas.clientHeight
@@ -50,7 +50,7 @@ export default class Renderer {
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
-        scene.activeCamera(primaryCamera)
+        scene.activeCamera(cameras[0])
         scene.execCollections(scene.collection, fps)
 
         const rightWidth = width - leftWidth
@@ -60,7 +60,7 @@ export default class Renderer {
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
-        scene.activeCamera(secondCamera)
+        scene.activeCamera(cameras[1])
         scene.execCollections(scene.collection, fps)
     }
 }

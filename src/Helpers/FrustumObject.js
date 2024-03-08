@@ -1,11 +1,11 @@
-import Geometry from "../Geometry.js";
-import Material from "../Material.js";
+import Geometry from "../Core/Geometry.js";
+import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
 import Object from "../_Object.js";
 
 export default class FrustumObject extends Object {
     constructor(scene) {
-        const geometry = new Geometry(scene.gl)
+        const geometry = new Geometry()
         geometry.setAttribute('position', frustum.vertice())
         geometry.setAttribute('color', frustum.color())
         geometry.setAttribute('texcoord', frustum.texture(), { size: 2 })
@@ -30,7 +30,6 @@ export default class FrustumObject extends Object {
         this.scene.shader.setAttribute('a_texcoord', this.mesh.geometry.attributes['a_texcoord'].data, {
             size: 2
         })
-        this.mesh.geometry.texture = this.scene.shader.setEmptyTexture()
     }
 
     _draw() {

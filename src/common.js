@@ -1,8 +1,9 @@
 import Collection from "./Collection.js"
-import Geometry from "./Geometry.js"
-import Material from "./Material.js"
+import Geometry from "./Core/Geometry.js"
+import Material from "./Core/Material.js"
 import Mesh from "./Mesh.js"
 import _Object from "./_Object.js"
+import Texture from "./Textures/Texture.js"
 
 const makeZToWMatrix = (fudgeFactor) => {
 	return [
@@ -161,9 +162,9 @@ const loadObj = (scene, url, object) => {
 			Object.keys(json.materials).map(key => {
 				const currentMaterial = json.materials[key]
 				const material = new Material(currentMaterial)
-				material.diffuseMap = scene.shader.setTexture(currentMaterial.diffuseMap)
-				material.specularMap = scene.shader.setTexture(currentMaterial.specularMap)
-				material.normalMap = scene.shader.setTexture(currentMaterial.normalMap)
+				material.defineSampler('diffuseMap', new Texture(scene.gl, currentMaterial.diffuseMap))
+				material.defineSampler('specularMap', new Texture(scene.gl, currentMaterial.specularMap))
+				material.defineSampler('normalMap', new Texture(scene.gl, currentMaterial.normalMap))
 				materials = {
 					...materials,
 					[key]: material
@@ -206,7 +207,7 @@ const loadObj = (scene, url, object) => {
 				maxIndex[1] += objVertexData[1].length
 				maxIndex[2] += objVertexData[2].length
 
-				const geometry = new Geometry(scene.gl)
+				const geometry = new Geometry()
 				geometry.setAttribute('position', new Float32Array(vertexData[0]), { size: 3 })
 				geometry.setAttribute('normal', new Float32Array(vertexData[2]))
 				geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
@@ -260,14 +261,4 @@ const loadObj = (scene, url, object) => {
 	}
 })()
 
-const saveblob = (blob, filename) => {
-	const a = document.createElement('a')
-	document.body.appendChild(a)
-	a.style.display = 'none'
-	const url = window.URL.createObjectURL(blob)
-	a.href = url
-	a.download = filename
-	a.click()
-}
-
-export { makeZToWMatrix, computeMatrix, modelMatrix, saveblob, loadObj }
+export { makeZToWMatrix, computeMatrix, modelMatrix, loadObj }
