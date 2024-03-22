@@ -13,6 +13,9 @@ export default class FrustumObject extends Object {
         const material = new Material()
         const mesh = new Mesh(geometry, material)
         super(scene, mesh, 'frustum')
+
+        this.type = 'camera'
+
         this.init()
     }
 

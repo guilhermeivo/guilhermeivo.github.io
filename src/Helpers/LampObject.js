@@ -13,6 +13,9 @@ export default class LampObject extends Object {
         const material = new Material()
         const mesh = new Mesh(geometry, material)
         super(scene, mesh, 'lamp')
+
+        this.type = 'lamp'
+
         this.init()
     }
 

@@ -14,6 +14,9 @@ export default class CameraObject extends Object {
         const material = new Material()
         const mesh = new Mesh(geometry, material)
         super(scene, mesh, 'camera')
+
+        this.type = 'camera'
+
         this.init()
     }
 

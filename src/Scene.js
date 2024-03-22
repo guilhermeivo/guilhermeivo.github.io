@@ -11,9 +11,16 @@ export default class Scene {
         this.collection = new Collection('scene')
 
         this.camera = null
-        this.lamp = new Lamp({
-            position: [ 100, 100, 100 ]
-        })
+        this.lamps = [
+            new Lamp({
+                position: [ 50, 0, 0 ],
+                color: [ 1, 0, 0 ]
+            }),
+            new Lamp({
+                position: [ -50, 0, 0 ],
+                color: [ 0, 0, 1 ]
+            })
+        ]
 
         this.lastUsedProgram = null
         this.lastUsedVertexArray = null
@@ -70,12 +77,19 @@ export default class Scene {
         }
     }
 
-    execCollections(collectionObject, fps) {
+    execCollections(collectionObject, fps, debugMode = false) {
         if (collectionObject.constructor.name === 'Collection') {
-            collectionObject.objects.forEach(collectionObject => this.execCollections(collectionObject, fps))
+            collectionObject.objects.forEach(collectionObject => this.execCollections(collectionObject, fps, debugMode))
         } else {
-            collectionObject.update(fps)
-            collectionObject.draw()
+            if (debugMode) {
+                collectionObject.update(fps)
+                collectionObject.draw()
+            } else {
+                if (collectionObject.type === 'object') {
+                    collectionObject.update(fps)
+                    collectionObject.draw()
+                }
+            }
         }
     }
 }

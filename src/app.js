@@ -119,11 +119,17 @@ window.addEventListener('load', () => {
     scene.addObject(frustumObject)
 
     /// LAMP
-    const lampObject = new LampObject(scene)
-    lampObject.mesh.location = scene.lamp.position
-    lampObject.projectionMatrix = camera.projectionMatrix
-    lampObject.viewMatrix = camera.viewMatrix
-    scene.addObject(lampObject)
+    const lampObject001 = new LampObject(scene)
+    lampObject001.mesh.location = scene.lamps[0].position
+    lampObject001.projectionMatrix = camera.projectionMatrix
+    lampObject001.viewMatrix = camera.viewMatrix
+    scene.addObject(lampObject001)
+
+    const lampObject002 = new LampObject(scene)
+    lampObject002.mesh.location = scene.lamps[1].position
+    lampObject002.projectionMatrix = camera.projectionMatrix
+    lampObject002.viewMatrix = camera.viewMatrix
+    scene.addObject(lampObject002)
 
     if (DEBUG_MODE) overlayDebug.toggle()
 

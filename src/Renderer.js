@@ -61,6 +61,6 @@ export default class Renderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
         scene.activeCamera(cameras[1])
-        scene.execCollections(scene.collection, fps)
+        scene.execCollections(scene.collection, fps, true)
     }
 }
