@@ -12,9 +12,9 @@ import Camera from './Camera.js'
 import Renderer from './Renderer.js'
 import CameraObject from './Helpers/CameraObject.js'
 import FrustumObject from './Helpers/FrustumObject.js'
-import LampObject from './Helpers/LampObject.js'
+import LightObject from './Helpers/LightObject.js'
 import { loadObj } from './common.js'
-import Lamp from './Lamp.js'
+import Light from './Light.js'
 
 window.addEventListener('load', () => {
     const DEBUG_MODE = true
@@ -98,9 +98,14 @@ window.addEventListener('load', () => {
     }) 
 
     /// LIGHT
-    const lamp = new Lamp({
-        position: [ 100, 100, 100 ]
-    })
+    scene.addLight(new Light({
+        position: [ 150, 0, 0 ],
+        color: [ .9, 0, 0 ]
+    }))
+    scene.addLight(new Light({
+        position: [ -150, 0, 0 ],
+        color: [ 0, 0, .9 ]
+    }))
 
     /// RENDERER
     const renderer = new Renderer(gl)
@@ -118,18 +123,18 @@ window.addEventListener('load', () => {
     frustumObject.modelMatrix = m4.inverse(camera.projectionViewMatrix)
     scene.addObject(frustumObject)
 
-    /// LAMP
-    const lampObject001 = new LampObject(scene)
-    lampObject001.mesh.location = scene.lamps[0].position
-    lampObject001.projectionMatrix = camera.projectionMatrix
-    lampObject001.viewMatrix = camera.viewMatrix
-    scene.addObject(lampObject001)
+    /// Light
+    const lightObject001 = new LightObject(scene)
+    lightObject001.mesh.location = scene.lights[0].position
+    lightObject001.projectionMatrix = camera.projectionMatrix
+    lightObject001.viewMatrix = camera.viewMatrix
+    scene.addObject(lightObject001)
 
-    const lampObject002 = new LampObject(scene)
-    lampObject002.mesh.location = scene.lamps[1].position
-    lampObject002.projectionMatrix = camera.projectionMatrix
-    lampObject002.viewMatrix = camera.viewMatrix
-    scene.addObject(lampObject002)
+    const lightObject002 = new LightObject(scene)
+    lightObject002.mesh.location = scene.lights[1].position
+    lightObject002.projectionMatrix = camera.projectionMatrix
+    lightObject002.viewMatrix = camera.viewMatrix
+    scene.addObject(lightObject002)
 
     if (DEBUG_MODE) overlayDebug.toggle()
 
@@ -164,9 +169,9 @@ window.addEventListener('load', () => {
                 frustumObject.modelMatrix = m4.inverse(camera.projectionViewMatrix) 
             }
 
-            renderer.renderScissor(scene, [ camera, debugCamera ], [ lamp ], fps)
+            renderer.renderScissor(scene, [ camera, debugCamera ], fps)
         } else {
-            renderer.render(scene, camera, [ lamp ], fps)
+            renderer.render(scene, camera, fps)
         }
 
         if (collection.objects[0]) collection.objects[0].mesh.rotation[1] += rotationSpeed / fps

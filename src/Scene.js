@@ -1,5 +1,4 @@
 import Collection from "./Collection.js"
-import Lamp from "./Lamp.js"
 import _Object from "./_Object.js"
 
 export default class Scene {
@@ -11,26 +10,42 @@ export default class Scene {
         this.collection = new Collection('scene')
 
         this.camera = null
-        this.lamps = [
-            new Lamp({
-                position: [ 50, 0, 0 ],
-                color: [ 1, 0, 0 ]
-            }),
-            new Lamp({
-                position: [ -50, 0, 0 ],
-                color: [ 0, 0, 1 ]
-            })
-        ]
+        this.lights = [ ]
 
         this.lastUsedProgram = null
         this.lastUsedVertexArray = null
         this.lastUsedTexture = null
     }
 
+    add(value) {
+        switch (value.type) {
+            case 'mesh':
+                const object = new _Object(this, value)
+                object.init()
+                this.addObject(object)
+                break
+            case 'light':
+                this.lights.push(value)
+                break
+            case 'object':
+                this.collection.objects.push(value)
+                break
+            case 'camera':
+                this.collection.objects.push(value)
+                break
+            default:
+                break
+        }
+    }
+
     addMesh(mesh) {
         const object = new _Object(this, mesh)
         object.init()
         this.addObject(object)
+    }
+
+    addLight(light) {
+        this.lights.push(light)
     }
 
     addObject(object) {

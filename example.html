@@ -23,12 +23,13 @@ import fragmentSource from './src/shaders/fragmentSource.js'
 import Scene from './src/Scene.js'
 import Camera from './src/Camera.js'
 import Renderer from './src/Renderer.js'
+import Light from './src/Light.js'
 
 import Geometry from './src/Core/Geometry.js'
 import Material from './src/Core/Material.js'
 import Mesh from './src/Mesh.js'
 
-import monkey from './src/primitives/monkey.js'
+import { loadObj } from './src/common.js'
 
 window.addEventListener('load', () => {
     const canvas = document.querySelector('#canvas')
@@ -54,32 +55,35 @@ window.addEventListener('load', () => {
         orthographicUnits: 150
     })
 
+    /// LIGHT
+    scene.addLight(new Light({
+        position: [ 150, 0, 0 ],
+        color: [ .9, 0, 0 ]
+    }))
+    scene.addLight(new Light({
+        position: [ -150, 0, 0 ],
+        color: [ 0, 0, .9 ]
+    }))
+
     /// RENDERER
     const renderer = new Renderer(gl)
 
     /// MONKEY
-    const geometry = new Geometry()
-    geometry.setAttribute('position', monkey.vertice)
-    geometry.setAttribute('color', monkey.vertice)
-    geometry.setAttribute('normal', monkey.normal)
-    geometry.setAttribute('texcoord', monkey.texcoord, { size: 2 })
-    const material = new Material()
-    const monkeyMesh = new Mesh(geometry, material)
-    monkeyMesh.scale.set([ 150, 150, 150 ])
-    scene.addMesh(monkeyMesh)
+    const collection = loadObj(
+        scene, './resources/monkey/', 'monkey.obj', { scale: [ 50, 50, 50 ] })
+    scene.addCollection(collection)
 
     /// ANIMATION
-    let lastTimeFps = 0
+    let lastTime = 0
     const rotationSpeed = .6
     function animate(timeStamp) {
-        let deltaTime = timeStamp - lastTimeFps
-        lastTimeFps = timeStamp
+        let deltaTime = timeStamp - lastTime
+        lastTime = timeStamp
         let fps = 1000 / deltaTime
 
         renderer.render(scene, camera, fps)
-        
-        monkeyMesh.rotation[1] += rotationSpeed / fps
-        
+        if (collection.objects[0]) collection.objects[0].mesh.rotation[1] += rotationSpeed / fps
+
         window.requestAnimationFrame(animate)
     }
     animate(0)

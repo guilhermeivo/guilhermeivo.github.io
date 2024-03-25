@@ -151,7 +151,7 @@ const objToJson = async (url, file, current = 'objects') => {
 	return json
 }
 
-const loadObj = (scene, url, object) => {
+const loadObj = (scene, url, object, transform = { }) => {
 	const collection = new Collection(object.split('.')[0])
 	let materials = { }
 	let maxIndex = [ 1, 1, 1 ]
@@ -213,7 +213,9 @@ const loadObj = (scene, url, object) => {
 				geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
 				const mesh = new Mesh(geometry, materials[currentObject.material])
 				const object = new _Object(scene, mesh, key)
-				mesh.scale = [ 25, 25, 25 ]
+				mesh.location = transform.location || [ 0, 0, 0 ]
+				mesh.rotation = transform.rotation || [ 0, 0, 0 ]
+				mesh.scale = transform.scale || [ 25, 25, 25 ]
 				object.init()
 				collection.objects.push(object)
 			})

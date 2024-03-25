@@ -3,7 +3,7 @@ import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
 import Object from "../_Object.js";
 
-export default class LampObject extends Object {
+export default class LightObject extends Object {
     constructor(scene) {
         const geometry = new Geometry()
         geometry.setAttribute('position', lamp.vertice())

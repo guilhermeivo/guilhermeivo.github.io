@@ -1,6 +1,6 @@
-export default class Lamp {
-    constructor(configs, type) {
-        this.type = type || 'point'
+export default class Light {
+    constructor(configs) {
+        this.type = 'light'
 
         this.position = configs.position || [ 0, 0, 0 ]
 

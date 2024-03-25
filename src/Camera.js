@@ -21,6 +21,8 @@ export default class Camera {
         this.viewMatrix = new Matrix4()
         this.projectionViewMatrix = new Matrix4()
 
+        this.type = 'camera'
+
         this.init()
     }
 

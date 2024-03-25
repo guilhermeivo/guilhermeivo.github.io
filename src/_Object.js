@@ -90,15 +90,15 @@ export default class _Object {
 
             this.scene.shader.setUniform('u_ambientLight', [ .1, .1, .1 ], this.scene.shader.types.vec3)
 
-            for (let i = 0; i < this.scene.lamps.length; i++) {
-                this.scene.shader.setUniform(`u_lights[${ i }].surfaceToLight`, this.scene.lamps[i].position, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].ambient`, this.scene.lamps[i].ambient, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].diffuse`, this.scene.lamps[i].diffuse, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].specular`, this.scene.lamps[i].specular, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].color`, this.scene.lamps[i].color, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].itensity`, this.scene.lamps[i].itensity, this.scene.shader.types.float)
-                this.scene.shader.setUniform(`u_lights[${ i }].constant`, this.scene.lamps[i].constant, this.scene.shader.types.float)
-                this.scene.shader.setUniform(`u_lights[${ i }].linear`, this.scene.lamps[i].linear, this.scene.shader.types.float)
+            for (let i = 0; i < this.scene.lights.length; i++) {
+                this.scene.shader.setUniform(`u_lights[${ i }].surfaceToLight`, this.scene.lights[i].position, this.scene.shader.types.vec3)
+                this.scene.shader.setUniform(`u_lights[${ i }].ambient`, this.scene.lights[i].ambient, this.scene.shader.types.vec3)
+                this.scene.shader.setUniform(`u_lights[${ i }].diffuse`, this.scene.lights[i].diffuse, this.scene.shader.types.vec3)
+                this.scene.shader.setUniform(`u_lights[${ i }].specular`, this.scene.lights[i].specular, this.scene.shader.types.vec3)
+                this.scene.shader.setUniform(`u_lights[${ i }].color`, this.scene.lights[i].color, this.scene.shader.types.vec3)
+                this.scene.shader.setUniform(`u_lights[${ i }].itensity`, this.scene.lights[i].itensity, this.scene.shader.types.float)
+                this.scene.shader.setUniform(`u_lights[${ i }].constant`, this.scene.lights[i].constant, this.scene.shader.types.float)
+                this.scene.shader.setUniform(`u_lights[${ i }].linear`, this.scene.lights[i].linear, this.scene.shader.types.float)
             }
         
             const primitiveType = this.gl.TRIANGLES

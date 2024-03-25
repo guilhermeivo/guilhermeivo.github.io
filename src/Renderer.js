@@ -3,7 +3,7 @@ export default class Renderer {
         this.gl = gl
     }
 
-    render(scene, camera, lights, fps) {
+    render(scene, camera, fps) {
         // reset display
         let width = this.gl.canvas.clientWidth
         let height = this.gl.canvas.clientHeight
@@ -27,7 +27,7 @@ export default class Renderer {
         scene.execCollections(scene.collection, fps)
     }
 
-    renderScissor(scene, cameras, lights, fps) {
+    renderScissor(scene, cameras, fps) {
         // reset display
         let width = this.gl.canvas.clientWidth
         let height = this.gl.canvas.clientHeight
