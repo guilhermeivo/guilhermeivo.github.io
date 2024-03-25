@@ -15,17 +15,44 @@ import FrustumObject from './Helpers/FrustumObject.js'
 import LightObject from './Helpers/LightObject.js'
 import { loadObj } from './common.js'
 import Light from './Light.js'
+import AxisObject from './Helpers/AxisObject.js'
+import ThirdCamera from './Cameras/ThirdCamera.js'
 
 window.addEventListener('load', () => {
     const DEBUG_MODE = true
 
     const canvas = document.querySelector('#canvas')
-    const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true }) // WebGLRenderingContext
+    const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true, powerPreference: "high-performance" }) // WebGLRenderingContext
 
     if (!gl) {
         alert('Unable to initialize WebGL. Your browser or machine may not support it.')
         return
     }
+
+    const performance = window.performance
+    const performanceKeys = [];
+    for (var value in performance) {
+        performanceKeys.push(value)
+    }
+    console.log(performanceKeys)
+
+    function extractValue(reg, str) {
+        const matches = str.match(reg)
+        return matches && matches[0]
+    }
+    
+    const paramVendor = gl.getParameter(gl.VENDOR)
+    const paramRenderer = gl.getParameter(gl.RENDERER)
+    
+    const card = extractValue(/((NVIDIA|AMD|Intel)[^\d]*[^\s]+)/, paramRenderer)
+    
+    const tokens = card.split(' ')
+    tokens.shift()
+    
+    const manufacturer = extractValue(/(NVIDIA|AMD|Intel)/g, card)
+    const cardVersion = tokens.pop()
+    const brand = tokens.join(' ')
+    const integrated = manufacturer === 'Intel'
 
     const overlayDebug = document.querySelector('overlay-debug')
     overlayDebug.addAllContents([
@@ -37,6 +64,20 @@ window.addEventListener('load', () => {
                 readonly: 'readonly'
             }
         }, {
+            label: 'Renderer',
+            type: 'text',
+            configs: { 
+                value: card,
+                readonly: 'readonly'
+            }
+        }, {
+            label: 'Vendor',
+            type: 'text',
+            configs: { 
+                value: paramVendor,
+                readonly: 'readonly'
+            }
+        },{
             label: 'x',
             type: 'range',
             configs: { 
@@ -80,10 +121,24 @@ window.addEventListener('load', () => {
     const shader = new Program(gl, vertexSource, fragmentSource)
     const scene = new Scene(gl, [ shader ])
 
+    /// AXIS
+    const axisObject = new AxisObject(scene,)
+    axisObject.mesh.location = [ 0, 0, 0 ]
+    axisObject.mesh.scale = [ 50, 50, 50 ]
+    scene.addObject(axisObject)
+    
     /// CAMERA
     const camera = new Camera((canvas.width / 2) / canvas.height, {
         location: [ 0, 0, 600 ]
     }, {
+        zNear: 30,
+        zFar: 1000,
+        fieldOfViewRadians: Math.degreeToRadians(45),
+        orthographic: false,
+        orthographicUnits: 150
+    })
+    camera.target = axisObject
+    const thirdCamera = new ThirdCamera(axisObject, (canvas.width / 2) / canvas.height, {
         zNear: 30,
         zFar: 1000,
         fieldOfViewRadians: Math.degreeToRadians(45),
@@ -95,15 +150,17 @@ window.addEventListener('load', () => {
     }, {
         zNear: 30,
         zFar: 2000
-    }) 
+    })
+    scene.addCamera(camera)
+    scene.addCamera(debugCamera)
 
     /// LIGHT
     scene.addLight(new Light({
-        position: [ 150, 0, 0 ],
+        location: [ 150, 0, 0 ],
         color: [ .9, 0, 0 ]
     }))
     scene.addLight(new Light({
-        position: [ -150, 0, 0 ],
+        location: [ -150, 0, 0 ],
         color: [ 0, 0, .9 ]
     }))
 
@@ -111,27 +168,38 @@ window.addEventListener('load', () => {
     const renderer = new Renderer(gl)
 
     /// MONKEY
-    const collection = loadObj(scene, '../resources/monkey/', 'monkey.obj')
-    scene.addCollection(collection)
+    loadObj(scene, '../resources/monkey/', 'monkey.obj')
+        .then(collection => {
+            scene.addCollection(collection)
+            const monkey = collection.objects[0]
+            monkey.rotationSpeed = .2
+            monkey.parent = axisObject
+            monkey._update = (state, fps) => {
+                axisObject.mesh.rotation[1] += state.rotationSpeed / fps
+            }
+        })
 
     /// CAMERA
-    const cameraObject = new CameraObject(scene)
-    cameraObject.modelMatrix = camera.cameraMatrix
-    scene.addObject(cameraObject)
+    const cameraObject001 = new CameraObject(scene, camera)
+    scene.addObject(cameraObject001)
 
-    const frustumObject = new FrustumObject(scene)
-    frustumObject.modelMatrix = m4.inverse(camera.projectionViewMatrix)
-    scene.addObject(frustumObject)
+    const frustumObject001 = new FrustumObject(scene)
+    frustumObject001.modelMatrix = m4.inverse(camera.projectionViewMatrix)
+    scene.addObject(frustumObject001)
+
+    /// CAMERA
+    const cameraObject002 = new CameraObject(scene, thirdCamera)
+    scene.addObject(cameraObject002)
 
     /// Light
     const lightObject001 = new LightObject(scene)
-    lightObject001.mesh.location = scene.lights[0].position
+    lightObject001.mesh.location = scene.lights[0].location
     lightObject001.projectionMatrix = camera.projectionMatrix
     lightObject001.viewMatrix = camera.viewMatrix
     scene.addObject(lightObject001)
 
     const lightObject002 = new LightObject(scene)
-    lightObject002.mesh.location = scene.lights[1].position
+    lightObject002.mesh.location = scene.lights[1].location
     lightObject002.projectionMatrix = camera.projectionMatrix
     lightObject002.viewMatrix = camera.viewMatrix
     scene.addObject(lightObject002)
@@ -140,7 +208,6 @@ window.addEventListener('load', () => {
 
     let lastTimeFps = 0
     let lastTimeSecond = 0
-    const rotationSpeed = .6
     function animate(timeStamp) {
         let deltaTime = timeStamp - lastTimeFps
         lastTimeFps = timeStamp
@@ -163,18 +230,16 @@ window.addEventListener('load', () => {
                 camera.location[2] = Number(window.DEBUG_Z)
                 camera.orthographic = window.DEBUG_ORTHOGRAPHIC
                 camera.orthographicUnits = Number(window.DEBUG_UNITS)
-                camera.init()
-    
-                cameraObject.modelMatrix = camera.cameraMatrix
-                frustumObject.modelMatrix = m4.inverse(camera.projectionViewMatrix) 
+
+                // TODO: transform in object class
+                camera.update()
+                thirdCamera.update()
             }
 
             renderer.renderScissor(scene, [ camera, debugCamera ], fps)
         } else {
             renderer.render(scene, camera, fps)
         }
-
-        if (collection.objects[0]) collection.objects[0].mesh.rotation[1] += rotationSpeed / fps
         
         window.requestAnimationFrame(animate)
     }

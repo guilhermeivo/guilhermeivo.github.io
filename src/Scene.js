@@ -10,6 +10,7 @@ export default class Scene {
         this.collection = new Collection('scene')
 
         this.camera = null
+        this.cameras = [ ]
         this.lights = [ ]
 
         this.lastUsedProgram = null
@@ -46,6 +47,10 @@ export default class Scene {
 
     addLight(light) {
         this.lights.push(light)
+    }
+
+    addCamera(camera) {
+        this.cameras.push(camera)
     }
 
     addObject(object) {

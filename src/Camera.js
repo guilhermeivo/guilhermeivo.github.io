@@ -3,6 +3,8 @@ export default class Camera {
         this.location = transformation.location || [ 0, 0, 0 ] // viewWorldPosition
         this.rotation = transformation.rotation || [ 0, 0, 0 ]
         this.scale = transformation.scale || [ 1, 1, 1 ]
+
+        this.type = 'camera'
         
         this.aspect = aspect
 
@@ -13,6 +15,8 @@ export default class Camera {
         this.orthographic = config.orthographic || false
         this.orthographicUnits = config.orthographicUnits || 1
 
+        this.parent = this
+
         this.target = [ 0, 0, 0 ]
         this.up = [0, 1, 0]
 
@@ -21,12 +25,10 @@ export default class Camera {
         this.viewMatrix = new Matrix4()
         this.projectionViewMatrix = new Matrix4()
 
-        this.type = 'camera'
-
-        this.init()
+        this.update()
     }
 
-    init() {
+    update() {
         this.reset()
         
         // perspective or projection matrix
@@ -41,7 +43,10 @@ export default class Camera {
         : m4.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
 
         // camera matrix
-        this.cameraMatrix = m4.lookAt(this.location, this.target, this.up)
+        let location = !!this.parent.mesh ? this.parent.mesh.location : this.parent.location
+        this.cameraMatrix = m4.lookAt(
+            location, 
+            !!this.target.mesh ? this.target.mesh.location : this.target, this.up)
 
         // Make a view matrix from the camera matrix
         this.viewMatrix = m4.inverse(this.cameraMatrix)
@@ -50,7 +55,7 @@ export default class Camera {
         // perspective or projection matrix * view matrix
         m4.multiply(this.projectionViewMatrix, this.projectionMatrix, this.viewMatrix)
     }
-
+    
     reset() {
         this.projectionViewMatrix.reset()
     }

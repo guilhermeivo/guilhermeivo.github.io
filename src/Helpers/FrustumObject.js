@@ -1,9 +1,9 @@
 import Geometry from "../Core/Geometry.js";
 import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
-import Object from "../_Object.js";
+import _Object from "../_Object.js";
 
-export default class FrustumObject extends Object {
+export default class FrustumObject extends _Object {
     constructor(scene) {
         const geometry = new Geometry()
         geometry.setAttribute('position', frustum.vertice())
@@ -33,6 +33,10 @@ export default class FrustumObject extends Object {
         this.scene.shader.setAttribute('a_texcoord', this.mesh.geometry.attributes['a_texcoord'].data, {
             size: 2
         })
+    }
+
+    _update() {
+        this.modelMatrix = m4.inverse(this.scene.cameras[0].projectionViewMatrix)
     }
 
     _draw() {

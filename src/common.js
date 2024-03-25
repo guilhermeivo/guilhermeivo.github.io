@@ -151,13 +151,13 @@ const objToJson = async (url, file, current = 'objects') => {
 	return json
 }
 
-const loadObj = (scene, url, object, transform = { }) => {
+const loadObj = async (scene, url, object, transform = { }) => {
 	const collection = new Collection(object.split('.')[0])
 	let materials = { }
 	let maxIndex = [ 1, 1, 1 ]
 	let vertexData = [ [], [], [] ]
 	
-	objToJson(url, object)
+	await (objToJson(url, object)
 		.then(json => {
 			Object.keys(json.materials).map(key => {
 				const currentMaterial = json.materials[key]
@@ -219,7 +219,7 @@ const loadObj = (scene, url, object, transform = { }) => {
 				object.init()
 				collection.objects.push(object)
 			})
-		})
+		}))
 
 	return collection
 }

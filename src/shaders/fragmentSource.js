@@ -45,6 +45,8 @@ uniform Light u_lights[NUMBER_LIGHTS];
 
 uniform vec3 u_ambientLight;
 
+float gamma = 1.15;
+
 out vec4 outColor;
 
 vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
@@ -63,7 +65,7 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
 
     // DIFFUSE
     vec4 diffuseMapColor = texture(u_material.diffuseMap, v_texcoord);
-    vec3 effectiveDiffuse = light.diffuse * u_material.diffuse * fakeLight * light.color * diffuseMapColor.rgb;
+    vec3 effectiveDiffuse = pow(light.diffuse * u_material.diffuse * fakeLight * light.color * diffuseMapColor.rgb, vec3(1.0 / gamma));
 
     // AMBIENT
     vec3 effectiveAmbient = light.ambient * u_material.ambient * u_ambientLight;
@@ -85,6 +87,6 @@ void main() {
     for(int i = 0; i < NUMBER_LIGHTS; i++)
         outputColor += CalcLight(u_lights[i], normal, surfaceToViewDirection); 
 
-    outColor = vec4(outputColor, effectiveOpacity);
+    outColor = vec4(pow(outputColor.rgb, vec3(1.0 / gamma)), effectiveOpacity);
 }
 `

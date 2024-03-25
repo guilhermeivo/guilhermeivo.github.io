@@ -1,4 +1,4 @@
-export default class Shader {
+export default class Program {
     constructor(gl, vertexShaderSource, fragmentShaderSource) {
         this.gl = gl
         this.program = this.compile(vertexShaderSource, fragmentShaderSource)

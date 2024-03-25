@@ -11,6 +11,8 @@ export default class _Object {
 
         this.name = name || `${ Math.floor(Math.random() * Math.pow(10, 5)) }_${ Date.now() }`
         this.mesh = mesh || new Mesh(this.gl)
+
+        this.parent = this
         
         this.worldMatrix = m4.identity()
 
@@ -49,20 +51,21 @@ export default class _Object {
     update(fps, callback = null) {
         this.reset()
         
-        if (callback) callback(fps)
-        else if (this._update) this._update(fps)
+        if (callback) callback(this, fps)
+        else if (this._update) this._update(this, fps)
 
         // model or world matrix = translation * rotation * scale
         modelMatrix(
             this.worldMatrix,
-            this.mesh.location, 
-            this.mesh.rotation, 
-            this.mesh.scale)
+            this.parent.mesh.location, 
+            this.parent.mesh.rotation, 
+            this.parent.mesh.scale)
     }
 
     draw(callback = null) {
         if (!this.isInitialized) return
         
+        this.scene.activeShaders(0)
         this.scene.useProgram(this.scene.shader.program)
         this.scene.useVao(this.vao)
 
@@ -91,7 +94,7 @@ export default class _Object {
             this.scene.shader.setUniform('u_ambientLight', [ .1, .1, .1 ], this.scene.shader.types.vec3)
 
             for (let i = 0; i < this.scene.lights.length; i++) {
-                this.scene.shader.setUniform(`u_lights[${ i }].surfaceToLight`, this.scene.lights[i].position, this.scene.shader.types.vec3)
+                this.scene.shader.setUniform(`u_lights[${ i }].surfaceToLight`, this.scene.lights[i].location, this.scene.shader.types.vec3)
                 this.scene.shader.setUniform(`u_lights[${ i }].ambient`, this.scene.lights[i].ambient, this.scene.shader.types.vec3)
                 this.scene.shader.setUniform(`u_lights[${ i }].diffuse`, this.scene.lights[i].diffuse, this.scene.shader.types.vec3)
                 this.scene.shader.setUniform(`u_lights[${ i }].specular`, this.scene.lights[i].specular, this.scene.shader.types.vec3)

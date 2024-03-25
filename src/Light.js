@@ -1,8 +1,8 @@
 export default class Light {
     constructor(configs) {
-        this.type = 'light'
+        this.location = configs.location || [ 0, 0, 0 ]
 
-        this.position = configs.position || [ 0, 0, 0 ]
+        this.type = 'light'
 
         this.color = configs.color || [ 1, 1, 1 ]
         this.itensity = configs.itensity || [ .5 ]

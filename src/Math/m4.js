@@ -32,6 +32,10 @@
 			this.fill(0)
 		}
 
+		get translation() {
+			return [ this[12], this[13], this[14] ]
+		}
+
 		set(matrix) {
 			for (let i = 0; i < this.length; i+=amountOfLines) { // lines
 				for (let j = 0; j < amountOfColumns; j++) {
