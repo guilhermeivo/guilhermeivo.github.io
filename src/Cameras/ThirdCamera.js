@@ -39,7 +39,7 @@ export default class ThirdCamera extends Camera {
             this.parent.mesh.location[1] + 100, 
             this.parent.mesh.location[2] - 200)
         this.cameraMatrix = m4.lookAt(
-            this.tempLocation.translation, this.parent.mesh.location, [0, 1, 0]
+            this.tempLocation.translation, this.parent.mesh.location, this.up
         )
 
         // Make a view matrix from the camera matrix

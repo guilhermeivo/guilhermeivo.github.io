@@ -47,9 +47,10 @@ window.addEventListener('load', () => {
     const scene = new Scene(gl, [ shader ])
 
     /// AXIS
-    const axis = new Axis(gl)
-    axis.mesh.location = [ 0, 0, 0 ]
-    axis.mesh.scale = [ 50, 50, 50 ]
+    const axis = new Axis(gl, {
+        location: new Vector3([ 0, 0, 0 ]),
+        scale: new Vector3([ 50, 50, 50 ])
+    })
     scene.add(axis)
 
     /// CAMERA

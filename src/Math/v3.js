@@ -39,7 +39,6 @@
         get components() {
             return this
         }
-
         set x(newX) {
             this[0] = newX
         }
@@ -110,76 +109,78 @@
      * V = 〈 0, 0, 0 〉
      * @returns { Vector3 }
      */
-    const zero = (res) => {
-        const vector = res || new Vector3()
-        vector.reset()
-        return vector
+    const zero = (output) => {
+        output = output || new Vector3()
+        output.reset()
+        return output
     }
 
     /**
      * V = 〈 1, 0, 0 〉
      * @returns { Vector3 }
      */
-    const unitX = (res) => {
-        const vector = res || new Vector3()
-        vector.reset()
-        vector.x = 1
-        return vector
+    const unitX = (output) => {
+        output = output || new Vector3()
+        output.reset()
+        output.x = 1
+        return output
     }
 
     /**
      * V = 〈 0, 1, 0 〉
      * @returns { Vector3 }
      */
-    const unitY = (res) => {
-        const vector = res || new Vector3()
-        vector.reset()
-        vector.y = 1
-        return vector
+    const unitY = (output) => {
+        output = output || new Vector3()
+        output.reset()
+        output.y = 1
+        return output
     }
 
     /**
      * V = 〈 0, 0, 1 〉
      * @returns { Vector3 }
      */
-    const unitZ = (res) => {
-        const vector = res || new Vector3()
-        vector.reset()
-        vector.z = 1
-        return vector
+    const unitZ = (output) => {
+        output = output || new Vector3()
+        output.reset()
+        output.z = 1
+        return output
     }
 
     /**
      * @param { Vector3 } vector 
      * @returns { Vector3 }
      */
-    const opposite = (vector, res) => {
-        let result = res || new Vector3()
-        for (let i = 0; i < result.length; i++) {
-            result[i] = vector[i] * -1
+    const opposite = (output) => {
+        output = output || new Vector3()
+        for (let i = 0; i < output.length; i++) {
+            output[i] *= -1
         }
-        return result
+        return output
     }
 
 	/**
 	 * @param { Vector3 } vector 
 	 * @returns { Vector3 }
 	 */
-	const normalize = (vector, res) => {
-		let result = res || new Vector3()
+	const normalize = (output) => {
+        let temp = [ 0, 0, 0 ]
+		output = output || new Vector3()
 		let magnitude = 0
-		for (let i = 0; i < result.length; i++) {
-			magnitude += vector[i] * vector[i]
+		for (let i = 0; i < output.length; i++) {
+			magnitude += output[i] * output[i]
 		}
 		magnitude = Math.sqrt(magnitude)
 		
-		if (magnitude <= 0) return result
+		if (magnitude <= 0) return output
 
-		for (let i = 0; i < result.length; i++) {
-			result[i] = vector[i] / magnitude
+		for (let i = 0; i < output.length; i++) {
+			temp[i] = output[i] / magnitude
 		}
 
-		return result
+		output.set ? output.set(temp) : output = temp
+        return output
 	}
 
     /**
@@ -187,12 +188,13 @@
      * @param { number } value 
      * @returns { Vector3 }
      */
-    const multiply = (vector, value) => {
-        let result = new Vector3()
-        for (let i = 0; i < result.length; i++) {
-            result[i] = vector[i] * value
+    const multiply = (output, value) => {
+        let temp = [ 0, 0, 0 ]
+        for (let i = 0; i < temp.length; i++) {
+            temp[i] = output[i] * value
         }
-        return result
+        output.set(temp)
+        return output
     }
 
     /**
@@ -200,12 +202,13 @@
      * @param { number } value 
      * @returns { Vector3 }
      */
-    const divide = (vector, value) => {
-        let result = new Vector3()
+    const divide = (output, value) => {
+        let temp = [ 0, 0, 0 ]
         for (let i = 0; i < result.length; i++) {
-            result[i] = vector[i] / value
+            temp[i] = output[i] / value
         }
-        return result
+        output.set(temp)
+        return output
     }
 
     /**
@@ -227,13 +230,13 @@
 	 * @returns { Vector3 }
 	 */
 	const subtract = (vectorA, vectorB) => {
-		let result = new Vector3()
+        let temp = [ 0, 0, 0 ]
 
-		for (let i = 0; i < result.length; i++) {
-			result[i] = vectorA[i] - vectorB[i]
+		for (let i = 0; i < temp.length; i++) {
+			temp[i] = vectorA[i] - vectorB[i]
 		}
 
-		return result
+		return temp
 	}
 
     /**
@@ -242,13 +245,13 @@
 	 * @returns { Vector3 }
 	 */
     const sum = (vectorA, vectorB) => {
-        let result = new Vector3()
+        let temp = [ 0, 0, 0 ]
 
-		for (let i = 0; i < result.length; i++) {
-			result[i] = vectorA[i] + vectorB[i]
+		for (let i = 0; i < temp.length; i++) {
+			temp[i] = vectorA[i] + vectorB[i]
 		}
 
-		return result
+		return temp
     }
 
 	/**
@@ -257,11 +260,13 @@
 	 * @returns { Vector3 }
 	 */
 	const cross = (vectorA, vectorB) => {
-		const result = new Vector3()
-		result[0] = vectorA[1] * vectorB[2] - vectorA[2] * vectorB[1]
-		result[1] = vectorA[2] * vectorB[0] - vectorA[0] * vectorB[2]
-		result[2] = vectorA[0] * vectorB[1] - vectorA[1] * vectorB[0]
-		return result
+		let temp = [ 0, 0, 0 ]
+
+		temp[0] = vectorA[1] * vectorB[2] - vectorA[2] * vectorB[1]
+		temp[1] = vectorA[2] * vectorB[0] - vectorA[0] * vectorB[2]
+		temp[2] = vectorA[0] * vectorB[1] - vectorA[1] * vectorB[0]
+        
+		return temp
 	}
 
 	return {

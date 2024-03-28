@@ -1,10 +1,10 @@
-import _Object from "../_Object.js";
+import Lines from "../Objects/Lines.js";
 
-export default class LightHelper extends _Object {
+export default class LightHelper extends Lines {
     constructor(lightElement) {
         super(lightElement.gl, lightElement.mesh, 'light')
         lightElement.mesh.geometry.setAttribute('position', light.vertice())
-        lightElement.mesh.geometry.setAttribute('color', light.color())
+        lightElement.mesh.geometry.setAttribute('color', light.color(), { type: lightElement.gl.UNSIGNED_BYTE })
         lightElement.mesh.geometry.setAttribute('texcoord', light.texture(), { size: 2 })
         lightElement.mesh.geometry.setIndice(light.indices())
 
@@ -12,32 +12,8 @@ export default class LightHelper extends _Object {
         this.light = lightElement
     }
 
-    _init(scene) {
-        scene.shader.setAttribute('a_position', [
-            new Float32Array(this.mesh.geometry.attributes['a_position'].data),
-            { data: new Uint32Array(this.mesh.geometry.indice), target: this.gl.ELEMENT_ARRAY_BUFFER },
-        ])
-
-        scene.shader.setAttribute('a_color', new Uint8Array(this.mesh.geometry.attributes['a_color'].data), {
-            type: this.gl.UNSIGNED_BYTE
-        })
-
-        scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
-            size: 2
-        })
-    }
-
-    update() { }
-
-    _draw(scene) {
-        scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_world', this.light.worldMatrix, scene.shader.types.mat4)
-
-        const primitiveType = this.gl.LINES
-        const offset = 0
-        const indexType = this.gl.UNSIGNED_INT
-        this.gl.drawElements(primitiveType, light.indices().length, indexType, offset)
+    update() { 
+        this.worldMatrix = this.light.worldMatrix
     }
 }
 
@@ -103,27 +79,27 @@ const light = {
 
     vertice: () => {
         light.configuration()
-        return light._vertice
+        return  new Float32Array(light._vertice)
     },
 
     _indices: [],
 
     indices: () => {
         light.configuration()
-        return light._indices
+        return new Uint32Array(light._indices)
     },
 
     _color: [],
 
     color: () => {
         light.configuration()
-        return light._color
+        return  new Uint8Array(light._color)
     },
 
     _texture: [],
 
     texture: () => {
         light.configuration()
-        return light._texture
+        return new Float32Array(light._texture)
     }
 }

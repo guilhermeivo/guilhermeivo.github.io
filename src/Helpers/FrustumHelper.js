@@ -1,13 +1,13 @@
 import Geometry from "../Core/Geometry.js";
 import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
-import _Object from "../_Object.js";
+import Lines from "../Objects/Lines.js";
 
-export default class FrustumHelper extends _Object {
+export default class FrustumHelper extends Lines {
     constructor(cameraElement) {
         const geometry = new Geometry()
         geometry.setAttribute('position', frustum.vertice())
-        geometry.setAttribute('color', frustum.color())
+        geometry.setAttribute('color', frustum.color(), { type: cameraElement.gl.UNSIGNED_BYTE })
         geometry.setAttribute('texcoord', frustum.texture(), { size: 2 })
         geometry.setIndice(frustum.indices())
         const material = new Material()
@@ -18,36 +18,8 @@ export default class FrustumHelper extends _Object {
         this.camera = cameraElement
     }
 
-    _init(scene) {
-        // vbo & ebo
-        scene.shader.setAttribute('a_position', [
-            this.mesh.geometry.attributes['a_position'].data,
-            { data: this.mesh.geometry.indice, target: this.gl.ELEMENT_ARRAY_BUFFER },
-        ])
-
-        scene.shader.setAttribute('a_color', this.mesh.geometry.attributes['a_color'].data, {
-            type: this.gl.UNSIGNED_BYTE
-        })
-
-        scene.shader.setAttribute('a_texcoord', this.mesh.geometry.attributes['a_texcoord'].data, {
-            size: 2
-        })
-    }
-
     update() {
-        this.modelMatrix = m4.inverse(this.camera.projectionViewMatrix)
-        this.modelMatrix = m4.inverse(this.camera.projectionViewMatrix)
-    }
-
-    _draw(scene) {
-        scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_world', this.modelMatrix, scene.shader.types.mat4)
-
-        const primitiveType = this.gl.LINES
-        const offset = 0
-        const indexType = this.gl.UNSIGNED_INT
-        this.gl.drawElements(primitiveType, this.mesh.geometry.indice.length, indexType, offset)
+        this.worldMatrix = m4.inverse(this.camera.projectionViewMatrix)
     }
 }
 

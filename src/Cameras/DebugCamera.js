@@ -1,4 +1,3 @@
-import _Object from "../_Object.js";
 import Camera from "./Camera.js";
 
 export default class DebugCamera extends Camera {

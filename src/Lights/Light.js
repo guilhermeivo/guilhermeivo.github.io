@@ -1,9 +1,7 @@
-import Geometry from "../Core/Geometry.js";
-import Material from "../Core/Material.js";
 import LightMesh from "./LightMesh.js";
-import _Object from "../_Object.js";
+import BasicObject from "../Objects/BasicObject.js";
 
-export default class DebugLight extends _Object {
+export default class DebugLight extends BasicObject {
     constructor(gl, configs = { }) {
         const mesh = new LightMesh(configs)
         super(gl, mesh, 'light')
@@ -23,6 +21,4 @@ export default class DebugLight extends _Object {
     init(scene) { }
 
     _update() { }
-
-    draw(scene) { }
 }

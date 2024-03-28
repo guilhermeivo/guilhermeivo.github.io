@@ -1,5 +1,4 @@
 import Collection from "./Collection.js"
-import _Object from "./_Object.js"
 
 export default class Scene {
     constructor(gl, shaders) {
@@ -20,9 +19,6 @@ export default class Scene {
 
     add(value) {
         switch (value.type) {
-            case 'mesh':
-                this.addMesh(value)
-                break
             case 'light':
                 this.addLight(value)
                 break
@@ -38,11 +34,6 @@ export default class Scene {
             default:
                 break
         }
-    }
-
-    addMesh(mesh) {
-        const object = new _Object(this.gl, mesh)
-        this.addObject(object)
     }
 
     addLight(light) {

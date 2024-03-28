@@ -434,6 +434,22 @@
 		multiply(output, matrix, scaling(...args))
 	}
 
+	const computeMatrix = (output, projection, view, translation, rotation, scale) => {
+		// projection * view * model (translation * rotation * scale)
+		multiply(output, projection, view)
+		multiply(output, output, modelMatrix(translation, rotation, scale))
+	}
+	
+	const modelMatrix = (output, translation, rotation, scale, identity) => {
+		m4.identity(output)
+		
+		m4.translate(output, output, translation)
+		m4.xRotate(output, output, rotation[0])
+		m4.yRotate(output, output, rotation[1])
+		m4.yRotate(output, output, rotation[2])
+		m4.scale(output, output, scale)
+	}
+
 	/// Projection Matrix
 	// A matrix that converts a frustum of space into clip space or some orthographic space into clip space.
 
@@ -479,9 +495,9 @@
 	 * @returns { Matrix4 }
 	 */
 	const lookAt = (position, target, yAxis) => {
-		const front = v3.normalize(v3.subtract(position, target))
-		const right = v3.normalize(v3.cross(yAxis, front))
-		const up = v3.normalize(v3.cross(front, right))
+		const front = v3.normalize(v3.subtract( position, target))
+		const right = v3.normalize(v3.cross( yAxis, front))
+		const up = v3.normalize(v3.cross( front, right))
 
 		const result = [
 			right[0], right[1], right[2], 0,
@@ -544,6 +560,8 @@
 		yRotate,
 		zRotate,
 		scale,
+		computeMatrix,
+		modelMatrix,
 		perspective,
 		orthographic,
 		projection,

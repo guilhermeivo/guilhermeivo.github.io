@@ -1,10 +1,9 @@
-import Mesh from "./Mesh.js"
-import { modelMatrix } from "./common.js"
-import EmptyTexture from "./Textures/EmptyTexture.js"
-import Geometry from "./Core/Geometry.js"
-import Material from "./Core/Material.js"
+import Mesh from "../Mesh.js"
+import EmptyTexture from "../Textures/EmptyTexture.js"
+import Geometry from "../Core/Geometry.js"
+import Material from "../Core/Material.js"
 
-export default class _Object {
+export default class BasicObject {
     constructor(gl, mesh, name) {
         this.gl = gl
 
@@ -32,13 +31,20 @@ export default class _Object {
         else {
             const attributes = this.mesh.geometry.attributes
             Object.keys(this.mesh.geometry.attributes).forEach(key => {
-                scene.shader.setAttribute(key, attributes[key].data, {
-                    size: attributes[key].size,
-                    type: attributes[key].type, 
-                    normalize: attributes[key].normalize, 
-                    stride: attributes[key].stride, 
-                    offset: attributes[key].offset
-                })
+                if (key === 'a_position' && this.mesh.geometry.indice) {
+                    scene.shader.setAttribute(key, [
+                        this.mesh.geometry.attributes[key].data,
+                        { data: this.mesh.geometry.indice, target: this.gl.ELEMENT_ARRAY_BUFFER },
+                    ])
+                } else {
+                    scene.shader.setAttribute(key, attributes[key].data, {
+                        size: attributes[key].size,
+                        type: attributes[key].type, 
+                        normalize: attributes[key].normalize, 
+                        stride: attributes[key].stride, 
+                        offset: attributes[key].offset
+                    })
+                }
             })
 
             Object.keys(this.mesh.material.samplers).forEach(sampler => {
@@ -58,7 +64,7 @@ export default class _Object {
         else if (this._update) this._update(this, fps)
 
         // model or world matrix = translation * rotation * scale
-        modelMatrix(
+        m4.modelMatrix(
             this.worldMatrix,
             this.parent.mesh.location, 
             this.parent.mesh.rotation, 

@@ -11,7 +11,7 @@ import './components/overlayDebug/index.js'
 import Renderer from './Renderer.js'
 import FrustumHelper from './Helpers/FrustumHelper.js'
 import Light from './Lights/Light.js'
-import { loadObj } from './common.js'
+import { loadObj } from './Loader.js'
 import Axis from './Objects/Axis.js'
 import ThirdCamera from './Cameras/ThirdCamera.js'
 import DebugCamera from './Cameras/DebugCamera.js'
@@ -41,7 +41,7 @@ window.addEventListener('load', () => {
         const matches = str.match(reg)
         return matches && matches[0]
     }
-    
+
     const paramVendor = gl.getParameter(gl.VENDOR)
     const paramRenderer = gl.getParameter(gl.RENDERER)
     
@@ -123,14 +123,15 @@ window.addEventListener('load', () => {
     const scene = new Scene(gl, [ shader ])
 
     /// AXIS
-    const axis = new Axis(gl)
-    axis.mesh.location = [ 0, 0, 0 ]
-    axis.mesh.scale = [ 50, 50, 50 ]
+    const axis = new Axis(gl, {
+        location: new Vector3([ 0, 0, 0 ]),
+        scale: new Vector3([ 50, 50, 50 ])
+    })
     scene.add(axis)
 
     /// CAMERA
     const camera = new DebugCamera(gl, (canvas.width / 2) / canvas.height, {
-        location: [ 0, 0, 600 ]
+        location: new Vector3([ 0, 0, 600 ])
     }, {
         zNear: 30,
         zFar: 1000,
@@ -154,7 +155,7 @@ window.addEventListener('load', () => {
     scene.add(new CameraHelper(thirdCamera))
 
     const debugCamera = new Camera(gl, (canvas.width / 2) / canvas.height, {
-        location: [ 200, 400, 800 ]
+        location: new Vector3([ 200, 400, 800 ])
     }, {
         zNear: 30,
         zFar: 2000
@@ -178,14 +179,14 @@ window.addEventListener('load', () => {
 
     /// Light
     const light001 = new Light(gl, { 
-        location: [ 150, 0, 0 ],
+        location: new Vector3([ 150, 0, 0 ]),
         color: [ .9, 0, 0 ] 
     })
     scene.add(light001)
     scene.add(new LightHelper(light001))
 
     const light002 = new Light(gl, {
-        location: [ -150, 0, 0 ],
+        location: new Vector3([ -150, 0, 0 ]),
         color: [ 0, 0, .9 ]
     })
     scene.add(light002)

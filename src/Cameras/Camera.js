@@ -1,7 +1,7 @@
 import CameraMesh from "./CameraMesh.js";
-import _Object from "../_Object.js";
+import BasicObject from "../Objects/BasicObject.js";
 
-export default class Camera extends _Object {
+export default class Camera extends BasicObject {
     constructor(gl, aspect, transformation = {}, config = {}) {
         const mesh = new CameraMesh(transformation)
         super(gl, mesh, 'camera')
@@ -19,8 +19,8 @@ export default class Camera extends _Object {
 
         this.parent = this
 
-        this.target = [ 0, 0, 0 ]
-        this.up = [0, 1, 0]
+        this.target = new Vector3([ 0, 0, 0 ])
+        this.up = new Vector3([0, 1, 0])
 
         this.projectionMatrix = new Matrix4()
         this.cameraMatrix = new Matrix4()
@@ -62,7 +62,5 @@ export default class Camera extends _Object {
 
         this.modelMatrix = this.cameraMatrix
     }
-
-    draw(scene) { }
 }
 

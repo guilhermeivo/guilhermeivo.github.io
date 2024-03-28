@@ -1,10 +1,10 @@
-import _Object from "../_Object.js";
+import Lines from "../Objects/Lines.js";
 
-export default class CameraHelper extends _Object {
+export default class CameraHelper extends Lines {
     constructor(cameraElement) {
         super(cameraElement.gl, cameraElement.mesh, 'camera')
         cameraElement.mesh.geometry.setAttribute('position', camera.vertice())
-        cameraElement.mesh.geometry.setAttribute('color', camera.color())
+        cameraElement.mesh.geometry.setAttribute('color', camera.color(), { type: cameraElement.gl.UNSIGNED_BYTE })
         cameraElement.mesh.geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
         cameraElement.mesh.geometry.setIndice(camera.indices())
 
@@ -12,32 +12,8 @@ export default class CameraHelper extends _Object {
         this.camera = cameraElement
     }
 
-    _init(scene) {
-        scene.shader.setAttribute('a_position', [
-            new Float32Array(this.mesh.geometry.attributes['a_position'].data),
-            { data: new Uint32Array(this.mesh.geometry.indice), target: this.gl.ELEMENT_ARRAY_BUFFER },
-        ])
-
-        scene.shader.setAttribute('a_color', new Uint8Array(this.mesh.geometry.attributes['a_color'].data), {
-            type: this.gl.UNSIGNED_BYTE
-        })
-
-        scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
-            size: 2
-        })
-    }
-
-    update() { }
-
-    _draw(scene) {
-        scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_world', this.camera.modelMatrix, scene.shader.types.mat4)
-
-        const primitiveType = this.gl.LINES
-        const offset = 0
-        const indexType = this.gl.UNSIGNED_INT
-        this.gl.drawElements(primitiveType, camera.indices().length, indexType, offset)
+    update() {
+        this.worldMatrix = this.camera.modelMatrix
     }
 }
 
@@ -90,7 +66,7 @@ const camera = {
 
     vertice: () => {
         camera.configuration()
-        return camera._vertice
+        return new Float32Array(camera._vertice)
     },
 
     _indices: [
@@ -101,20 +77,20 @@ const camera = {
 
     indices: () => {
         camera.configuration()
-        return camera._indices
+        return new Uint32Array(camera._indices)
     },
 
     _color: [],
 
     color: () => {
         camera.configuration()
-        return camera._color
+        return new Uint8Array(camera._color)
     },
 
     _texture: [],
 
     texture: () => {
         camera.configuration()
-        return camera._texture
+        return new Float32Array(camera._texture)
     }
 }

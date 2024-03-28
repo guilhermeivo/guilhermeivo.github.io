@@ -1,46 +1,20 @@
 import Geometry from "../Core/Geometry.js";
 import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
-import _Object from "../_Object.js";
+import Lines from "./Lines.js";
 
-export default class AxisObject extends _Object {
-    constructor(gl) {
+export default class AxisObject extends Lines {
+    constructor(gl, transformation = { }) {
         const geometry = new Geometry()
         geometry.setAttribute('position', axis.vertice())
-        geometry.setAttribute('color', axis.color())
+        geometry.setAttribute('color', axis.color(), { type: gl.UNSIGNED_BYTE })
         geometry.setAttribute('texcoord', axis.texture(), { size: 2 })
         geometry.setIndice(axis.indices())
         const material = new Material()
-        const mesh = new Mesh(geometry, material)
+        const mesh = new Mesh(geometry, material, transformation)
         super(gl, mesh, 'axis')
 
-        this.type = 'axis'
-    }
-
-    _init(scene) {
-        scene.shader.setAttribute('a_position', [
-            new Float32Array(this.mesh.geometry.attributes['a_position'].data),
-            { data: new Uint32Array(this.mesh.geometry.indice), target: this.gl.ELEMENT_ARRAY_BUFFER },
-        ])
-
-        scene.shader.setAttribute('a_color', new Uint8Array(this.mesh.geometry.attributes['a_color'].data), {
-            type: this.gl.UNSIGNED_BYTE
-        })
-
-        scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
-            size: 2
-        })
-    }
-
-    _draw(scene) {
-        scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
-        scene.shader.setUniform('u_world', this.worldMatrix, scene.shader.types.mat4)
-
-        const primitiveType = this.gl.LINES
-        const offset = 0
-        const indexType = this.gl.UNSIGNED_INT
-        this.gl.drawElements(primitiveType, axis.indices().length, indexType, offset)
+        this.debug = true
     }
 }
 
@@ -90,7 +64,7 @@ const axis = {
 
     vertice: () => {
         axis.configuration()
-        return axis._vertice
+        return new Float32Array(axis._vertice)
     },
 
     _indices: [
@@ -99,20 +73,20 @@ const axis = {
 
     indices: () => {
         axis.configuration()
-        return axis._indices
+        return new Uint32Array(axis._indices)
     },
 
     _color: [],
 
     color: () => {
         axis.configuration()
-        return axis._color
+        return new Uint8Array(axis._color)
     },
 
     _texture: [],
 
     texture: () => {
         axis.configuration()
-        return axis._texture
+        return new Float32Array(axis._texture)
     }
 }
