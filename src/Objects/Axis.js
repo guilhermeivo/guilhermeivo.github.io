@@ -4,7 +4,7 @@ import Mesh from "../Mesh.js";
 import _Object from "../_Object.js";
 
 export default class AxisObject extends _Object {
-    constructor(scene) {
+    constructor(gl) {
         const geometry = new Geometry()
         geometry.setAttribute('position', axis.vertice())
         geometry.setAttribute('color', axis.color())
@@ -12,33 +12,30 @@ export default class AxisObject extends _Object {
         geometry.setIndice(axis.indices())
         const material = new Material()
         const mesh = new Mesh(geometry, material)
-        super(scene, mesh, 'axis')
+        super(gl, mesh, 'axis')
 
         this.type = 'axis'
-
-        this.init()
     }
 
-    _init() {
-        // vbo & ebo
-        this.scene.shader.setAttribute('a_position', [
+    _init(scene) {
+        scene.shader.setAttribute('a_position', [
             new Float32Array(this.mesh.geometry.attributes['a_position'].data),
             { data: new Uint32Array(this.mesh.geometry.indice), target: this.gl.ELEMENT_ARRAY_BUFFER },
         ])
 
-        this.scene.shader.setAttribute('a_color', new Uint8Array(this.mesh.geometry.attributes['a_color'].data), {
+        scene.shader.setAttribute('a_color', new Uint8Array(this.mesh.geometry.attributes['a_color'].data), {
             type: this.gl.UNSIGNED_BYTE
         })
 
-        this.scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
+        scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
             size: 2
         })
     }
 
-    _draw() {
-        this.scene.shader.setUniform('u_projection', this.scene.camera.projectionMatrix, this.scene.shader.types.mat4)
-        this.scene.shader.setUniform('u_view', this.scene.camera.viewMatrix, this.scene.shader.types.mat4)
-        this.scene.shader.setUniform('u_world', this.worldMatrix, this.scene.shader.types.mat4)
+    _draw(scene) {
+        scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
+        scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
+        scene.shader.setUniform('u_world', this.worldMatrix, scene.shader.types.mat4)
 
         const primitiveType = this.gl.LINES
         const offset = 0

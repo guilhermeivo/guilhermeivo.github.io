@@ -1,11 +1,13 @@
-export default class Camera {
-    constructor(aspect, transformation = {}, config = {}) {
-        this.location = transformation.location || [ 0, 0, 0 ] // viewWorldPosition
-        this.rotation = transformation.rotation || [ 0, 0, 0 ]
-        this.scale = transformation.scale || [ 1, 1, 1 ]
+import CameraMesh from "./CameraMesh.js";
+import _Object from "../_Object.js";
+
+export default class Camera extends _Object {
+    constructor(gl, aspect, transformation = {}, config = {}) {
+        const mesh = new CameraMesh(transformation)
+        super(gl, mesh, 'camera')
 
         this.type = 'camera'
-        
+
         this.aspect = aspect
 
         this.zNear = config.zNear || 0
@@ -24,12 +26,12 @@ export default class Camera {
         this.cameraMatrix = new Matrix4()
         this.viewMatrix = new Matrix4()
         this.projectionViewMatrix = new Matrix4()
-
-        this.update()
     }
 
+    init(scene) { }
+
     update() {
-        this.reset()
+        this.projectionViewMatrix.reset()
         
         // perspective or projection matrix
         this.projectionMatrix = this.orthographic 
@@ -43,10 +45,13 @@ export default class Camera {
         : m4.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
 
         // camera matrix
-        let location = !!this.parent.mesh ? this.parent.mesh.location : this.parent.location
-        this.cameraMatrix = m4.lookAt(
-            location, 
-            !!this.target.mesh ? this.target.mesh.location : this.target, this.up)
+        let location = !!this.parent.mesh
+            ? this.parent.mesh.location 
+            : this.parent.location
+        let target = !!this.target.mesh 
+            ? this.target.mesh.location 
+            : this.target
+        this.cameraMatrix = m4.lookAt(location, target, this.up)
 
         // Make a view matrix from the camera matrix
         this.viewMatrix = m4.inverse(this.cameraMatrix)
@@ -54,9 +59,10 @@ export default class Camera {
         // move the projection space to view space (the space in front of the camera)
         // perspective or projection matrix * view matrix
         m4.multiply(this.projectionViewMatrix, this.projectionMatrix, this.viewMatrix)
+
+        this.modelMatrix = this.cameraMatrix
     }
-    
-    reset() {
-        this.projectionViewMatrix.reset()
-    }
+
+    draw(scene) { }
 }
+

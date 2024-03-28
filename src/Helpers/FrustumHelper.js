@@ -3,8 +3,8 @@ import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
 import _Object from "../_Object.js";
 
-export default class FrustumObject extends _Object {
-    constructor(scene) {
+export default class FrustumHelper extends _Object {
+    constructor(cameraElement) {
         const geometry = new Geometry()
         geometry.setAttribute('position', frustum.vertice())
         geometry.setAttribute('color', frustum.color())
@@ -12,37 +12,37 @@ export default class FrustumObject extends _Object {
         geometry.setIndice(frustum.indices())
         const material = new Material()
         const mesh = new Mesh(geometry, material)
-        super(scene, mesh, 'frustum')
-
-        this.type = 'camera'
-
-        this.init()
+        super(cameraElement.gl, mesh, 'frustum')
+        
+        this.debug = true
+        this.camera = cameraElement
     }
 
-    _init() {
+    _init(scene) {
         // vbo & ebo
-        this.scene.shader.setAttribute('a_position', [
+        scene.shader.setAttribute('a_position', [
             this.mesh.geometry.attributes['a_position'].data,
             { data: this.mesh.geometry.indice, target: this.gl.ELEMENT_ARRAY_BUFFER },
         ])
 
-        this.scene.shader.setAttribute('a_color', this.mesh.geometry.attributes['a_color'].data, {
+        scene.shader.setAttribute('a_color', this.mesh.geometry.attributes['a_color'].data, {
             type: this.gl.UNSIGNED_BYTE
         })
 
-        this.scene.shader.setAttribute('a_texcoord', this.mesh.geometry.attributes['a_texcoord'].data, {
+        scene.shader.setAttribute('a_texcoord', this.mesh.geometry.attributes['a_texcoord'].data, {
             size: 2
         })
     }
 
-    _update() {
-        this.modelMatrix = m4.inverse(this.scene.cameras[0].projectionViewMatrix)
+    update() {
+        this.modelMatrix = m4.inverse(this.camera.projectionViewMatrix)
+        this.modelMatrix = m4.inverse(this.camera.projectionViewMatrix)
     }
 
-    _draw() {
-        this.scene.shader.setUniform('u_projection', this.scene.camera.projectionMatrix, this.scene.shader.types.mat4)
-        this.scene.shader.setUniform('u_view', this.scene.camera.viewMatrix, this.scene.shader.types.mat4)
-        this.scene.shader.setUniform('u_world', this.modelMatrix, this.scene.shader.types.mat4)
+    _draw(scene) {
+        scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
+        scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
+        scene.shader.setUniform('u_world', this.modelMatrix, scene.shader.types.mat4)
 
         const primitiveType = this.gl.LINES
         const offset = 0

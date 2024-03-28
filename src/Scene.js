@@ -21,18 +21,19 @@ export default class Scene {
     add(value) {
         switch (value.type) {
             case 'mesh':
-                const object = new _Object(this, value)
-                object.init()
-                this.addObject(object)
+                this.addMesh(value)
                 break
             case 'light':
-                this.lights.push(value)
+                this.addLight(value)
                 break
             case 'object':
-                this.collection.objects.push(value)
+                this.addObject(value)
+                break
+            case 'collection':
+                this.addCollection(value)
                 break
             case 'camera':
-                this.collection.objects.push(value)
+                this.addCamera(value)
                 break
             default:
                 break
@@ -40,20 +41,22 @@ export default class Scene {
     }
 
     addMesh(mesh) {
-        const object = new _Object(this, mesh)
-        object.init()
+        const object = new _Object(this.gl, mesh)
         this.addObject(object)
     }
 
     addLight(light) {
+        this.addObject(light)
         this.lights.push(light)
     }
 
     addCamera(camera) {
+        this.addObject(camera)
         this.cameras.push(camera)
     }
 
     addObject(object) {
+        object.init(this)
         this.collection.objects.push(object)
     }
     
@@ -103,11 +106,11 @@ export default class Scene {
         } else {
             if (debugMode) {
                 collectionObject.update(fps)
-                collectionObject.draw()
+                collectionObject.draw(this)
             } else {
-                if (collectionObject.type === 'object') {
+                if (!collectionObject.debug) {
                     collectionObject.update(fps)
-                    collectionObject.draw()
+                    collectionObject.draw(this)
                 }
             }
         }

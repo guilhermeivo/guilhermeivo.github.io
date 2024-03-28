@@ -1,18 +1,22 @@
+import _Object from "../_Object.js";
 import Camera from "./Camera.js";
 
-export default class ThirdCamera extends Camera {
-    constructor(scene, target, aspect, config = {}) {
-        super(scene, aspect, { }, config)
-        this.parent = target
-        this.target = target
+export default class DebugCamera extends Camera {
+    constructor(gl, aspect, transformation = {}, config = {}) {
+        super(gl, aspect, transformation, config)
 
-        this.tempLocation = new Matrix4()
-
-        this.update()
+        this.type = 'camera'
+        this.prefix = 'DEBUG_CAMERA'
     }
 
     update() {
-        this.reset()
+        this.mesh.location[0] = Number(window[`${ this.prefix }_X`])
+        this.mesh.location[1] = Number(window[`${ this.prefix }_Y`])
+        this.mesh.location[2] = Number(window[`${ this.prefix }_Z`])
+        this.orthographic = window[`${ this.prefix }_ORTHOGRAPHIC`]
+        this.orthographicUnits = Number(window[`${ this.prefix }_UNITS`])
+
+        this.projectionViewMatrix.reset()
         
         // perspective or projection matrix
         this.projectionMatrix = this.orthographic 
@@ -26,21 +30,10 @@ export default class ThirdCamera extends Camera {
         : m4.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
 
         // camera matrix
-        if (!this.parent.mesh) return
-
-        m4.identity(this.tempLocation)
-	
-        m4.xRotate(this.tempLocation, this.tempLocation, this.parent.mesh.rotation[0])
-        m4.yRotate(this.tempLocation, this.tempLocation, this.parent.mesh.rotation[1])
-        m4.yRotate(this.tempLocation, this.tempLocation, this.parent.mesh.rotation[2])
-        m4.translate(
-            this.tempLocation, this.tempLocation, 
-            this.parent.mesh.location[0], 
-            this.parent.mesh.location[1] + 100, 
-            this.parent.mesh.location[2] - 200)
+        let location = !!this.parent.mesh ? this.parent.mesh.location : this.parent.location
         this.cameraMatrix = m4.lookAt(
-            this.tempLocation.translation, this.parent.mesh.location, [0, 1, 0]
-        )
+            location, 
+            !!this.target.mesh ? this.target.mesh.location : this.target, this.up)
 
         // Make a view matrix from the camera matrix
         this.viewMatrix = m4.inverse(this.cameraMatrix)

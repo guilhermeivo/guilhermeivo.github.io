@@ -212,11 +212,11 @@ const loadObj = async (scene, url, object, transform = { }) => {
 				geometry.setAttribute('normal', new Float32Array(vertexData[2]))
 				geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
 				const mesh = new Mesh(geometry, materials[currentObject.material])
-				const object = new _Object(scene, mesh, key)
+				const object = new _Object(scene.gl, mesh, key)
 				mesh.location = transform.location || [ 0, 0, 0 ]
 				mesh.rotation = transform.rotation || [ 0, 0, 0 ]
 				mesh.scale = transform.scale || [ 25, 25, 25 ]
-				object.init()
+				object.init(scene)
 				collection.objects.push(object)
 			})
 		}))

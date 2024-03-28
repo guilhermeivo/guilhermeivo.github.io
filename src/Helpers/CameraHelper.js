@@ -1,50 +1,38 @@
-import Geometry from "../Core/Geometry.js";
-import Material from "../Core/Material.js";
-import Mesh from "../Mesh.js";
 import _Object from "../_Object.js";
 
-export default class CameraObject extends _Object {
-    constructor(scene, cameraElement) {
-        const geometry = new Geometry()
-        geometry.setAttribute('position', camera.vertice())
-        geometry.setAttribute('color', camera.color())
-        geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
-        geometry.setIndice(camera.indices())
-        const material = new Material()
-        const mesh = new Mesh(geometry, material)
-        super(scene, mesh, 'camera')
+export default class CameraHelper extends _Object {
+    constructor(cameraElement) {
+        super(cameraElement.gl, cameraElement.mesh, 'camera')
+        cameraElement.mesh.geometry.setAttribute('position', camera.vertice())
+        cameraElement.mesh.geometry.setAttribute('color', camera.color())
+        cameraElement.mesh.geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
+        cameraElement.mesh.geometry.setIndice(camera.indices())
 
-        this.cameraElement = cameraElement
-
-        this.type = 'camera'
-
-        this.init()
+        this.debug = true
+        this.camera = cameraElement
     }
 
-    _init() {
-        // vbo & ebo
-        this.scene.shader.setAttribute('a_position', [
+    _init(scene) {
+        scene.shader.setAttribute('a_position', [
             new Float32Array(this.mesh.geometry.attributes['a_position'].data),
             { data: new Uint32Array(this.mesh.geometry.indice), target: this.gl.ELEMENT_ARRAY_BUFFER },
         ])
 
-        this.scene.shader.setAttribute('a_color', new Uint8Array(this.mesh.geometry.attributes['a_color'].data), {
+        scene.shader.setAttribute('a_color', new Uint8Array(this.mesh.geometry.attributes['a_color'].data), {
             type: this.gl.UNSIGNED_BYTE
         })
 
-        this.scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
+        scene.shader.setAttribute('a_texcoord', new Float32Array(this.mesh.geometry.attributes['a_texcoord'].data), {
             size: 2
         })
     }
 
-    _update() {
-        this.modelMatrix = this.cameraElement.cameraMatrix
-    }
+    update() { }
 
-    _draw() {
-        this.scene.shader.setUniform('u_projection', this.scene.camera.projectionMatrix, this.scene.shader.types.mat4)
-        this.scene.shader.setUniform('u_view', this.scene.camera.viewMatrix, this.scene.shader.types.mat4)
-        this.scene.shader.setUniform('u_world', this.modelMatrix, this.scene.shader.types.mat4)
+    _draw(scene) {
+        scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
+        scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
+        scene.shader.setUniform('u_world', this.camera.modelMatrix, scene.shader.types.mat4)
 
         const primitiveType = this.gl.LINES
         const offset = 0

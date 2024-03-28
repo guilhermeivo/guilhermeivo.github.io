@@ -1,35 +1,38 @@
 import Mesh from "./Mesh.js"
 import { modelMatrix } from "./common.js"
 import EmptyTexture from "./Textures/EmptyTexture.js"
+import Geometry from "./Core/Geometry.js"
+import Material from "./Core/Material.js"
 
 export default class _Object {
-    constructor(scene, mesh, name) {
-        this.scene = scene
-        this.gl = this.scene.gl
+    constructor(gl, mesh, name) {
+        this.gl = gl
 
         this.vao = this.gl.createVertexArray()
 
         this.name = name || `${ Math.floor(Math.random() * Math.pow(10, 5)) }_${ Date.now() }`
-        this.mesh = mesh || new Mesh(this.gl)
+        this.mesh = mesh || new Mesh(new Geometry(), new Material())
 
         this.parent = this
         
         this.worldMatrix = m4.identity()
 
         this.type = 'object'
+        this.debug = false
 
         this.isInitialized = false
     }
 
-    init(callback = null) {
+    init(scene, callback = null) {
+        // vbo & ebo
         this.gl.bindVertexArray(this.vao)
 
-        if (callback) callback()
-        else if (this._init) this._init()
+        if (callback) callback(scene)
+        else if (this._init) this._init(scene)
         else {
             const attributes = this.mesh.geometry.attributes
             Object.keys(this.mesh.geometry.attributes).forEach(key => {
-                this.scene.shader.setAttribute(key, attributes[key].data, {
+                scene.shader.setAttribute(key, attributes[key].data, {
                     size: attributes[key].size,
                     type: attributes[key].type, 
                     normalize: attributes[key].normalize, 
@@ -62,46 +65,46 @@ export default class _Object {
             this.parent.mesh.scale)
     }
 
-    draw(callback = null) {
+    draw(scene, callback = null) {
         if (!this.isInitialized) return
         
-        this.scene.activeShaders(0)
-        this.scene.useProgram(this.scene.shader.program)
-        this.scene.useVao(this.vao)
+        scene.activeShaders(0)
+        scene.useProgram(scene.shader.program)
+        scene.useVao(this.vao)
 
         for (let i = 0; i < this.mesh.material.samplers.length; i++) {
             this.gl.activeTexture(this.gl[`TEXTURE${ i }`])
-            this.scene.useTexture(this.mesh.material.samplers[i].data, this.mesh.material.samplers[i].target)
-            this.scene.shader.setUniform(`u_material.${ Object.keys(this.mesh.material.samplers)[i] }`, i, this.scene.shader.types.sampler)
+            scene.useTexture(this.mesh.material.samplers[i].data, this.mesh.material.samplers[i].target)
+            scene.shader.setUniform(`u_material.${ Object.keys(this.mesh.material.samplers)[i] }`, i, scene.shader.types.sampler)
         }
 
-        if (callback) callback()
-        else if (this._draw) this._draw()
+        if (callback) callback(scene)
+        else if (this._draw) this._draw(scene)
         else {
-            this.scene.shader.setUniform('u_projection', this.scene.camera.projectionMatrix, this.scene.shader.types.mat4)
-            this.scene.shader.setUniform('u_view', this.scene.camera.viewMatrix, this.scene.shader.types.mat4)
-            this.scene.shader.setUniform('u_world', this.worldMatrix, this.scene.shader.types.mat4)
+            scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
+            scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
+            scene.shader.setUniform('u_world', this.worldMatrix, scene.shader.types.mat4)
             
-            this.scene.shader.setUniform('u_viewWorldPosition', this.scene.camera.location, this.scene.shader.types.vec3)
+            scene.shader.setUniform('u_viewWorldPosition', scene.camera.mesh.location, scene.shader.types.vec3)
 
-            this.scene.shader.setUniform('u_material.shininess', this.mesh.material.shininess, this.scene.shader.types.float)
-            this.scene.shader.setUniform('u_material.diffuse', this.mesh.material.diffuse, this.scene.shader.types.vec3)
-            this.scene.shader.setUniform('u_material.ambient', this.mesh.material.ambient, this.scene.shader.types.vec3)
-            this.scene.shader.setUniform('u_material.emissive', this.mesh.material.emissive, this.scene.shader.types.vec3)
-            this.scene.shader.setUniform('u_material.specular', this.mesh.material.specular, this.scene.shader.types.vec3)
-            this.scene.shader.setUniform('u_material.opacity', this.mesh.material.opacity, this.scene.shader.types.float)
+            scene.shader.setUniform('u_material.shininess', this.mesh.material.shininess, scene.shader.types.float)
+            scene.shader.setUniform('u_material.diffuse', this.mesh.material.diffuse, scene.shader.types.vec3)
+            scene.shader.setUniform('u_material.ambient', this.mesh.material.ambient, scene.shader.types.vec3)
+            scene.shader.setUniform('u_material.emissive', this.mesh.material.emissive, scene.shader.types.vec3)
+            scene.shader.setUniform('u_material.specular', this.mesh.material.specular, scene.shader.types.vec3)
+            scene.shader.setUniform('u_material.opacity', this.mesh.material.opacity, scene.shader.types.float)
 
-            this.scene.shader.setUniform('u_ambientLight', [ .1, .1, .1 ], this.scene.shader.types.vec3)
+            scene.shader.setUniform('u_ambientLight', [ .1, .1, .1 ], scene.shader.types.vec3)
 
-            for (let i = 0; i < this.scene.lights.length; i++) {
-                this.scene.shader.setUniform(`u_lights[${ i }].surfaceToLight`, this.scene.lights[i].location, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].ambient`, this.scene.lights[i].ambient, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].diffuse`, this.scene.lights[i].diffuse, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].specular`, this.scene.lights[i].specular, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].color`, this.scene.lights[i].color, this.scene.shader.types.vec3)
-                this.scene.shader.setUniform(`u_lights[${ i }].itensity`, this.scene.lights[i].itensity, this.scene.shader.types.float)
-                this.scene.shader.setUniform(`u_lights[${ i }].constant`, this.scene.lights[i].constant, this.scene.shader.types.float)
-                this.scene.shader.setUniform(`u_lights[${ i }].linear`, this.scene.lights[i].linear, this.scene.shader.types.float)
+            for (let i = 0; i < scene.lights.length; i++) {
+                scene.shader.setUniform(`u_lights[${ i }].surfaceToLight`, scene.lights[i].mesh.location, scene.shader.types.vec3)
+                scene.shader.setUniform(`u_lights[${ i }].ambient`, scene.lights[i].ambient, scene.shader.types.vec3)
+                scene.shader.setUniform(`u_lights[${ i }].diffuse`, scene.lights[i].diffuse, scene.shader.types.vec3)
+                scene.shader.setUniform(`u_lights[${ i }].specular`, scene.lights[i].specular, scene.shader.types.vec3)
+                scene.shader.setUniform(`u_lights[${ i }].color`, scene.lights[i].color, scene.shader.types.vec3)
+                scene.shader.setUniform(`u_lights[${ i }].itensity`, scene.lights[i].itensity, scene.shader.types.float)
+                scene.shader.setUniform(`u_lights[${ i }].constant`, scene.lights[i].constant, scene.shader.types.float)
+                scene.shader.setUniform(`u_lights[${ i }].linear`, scene.lights[i].linear, scene.shader.types.float)
             }
         
             const primitiveType = this.gl.TRIANGLES

@@ -8,15 +8,16 @@ import fragmentSource from './shaders/fragmentSource.js'
 import Scene from './Scene.js'
 
 import './components/overlayDebug/index.js'
-import Camera from './Camera.js'
 import Renderer from './Renderer.js'
-import CameraObject from './Helpers/CameraObject.js'
-import FrustumObject from './Helpers/FrustumObject.js'
-import LightObject from './Helpers/LightObject.js'
+import FrustumHelper from './Helpers/FrustumHelper.js'
+import Light from './Lights/Light.js'
 import { loadObj } from './common.js'
-import Light from './Light.js'
-import AxisObject from './Helpers/AxisObject.js'
+import Axis from './Objects/Axis.js'
 import ThirdCamera from './Cameras/ThirdCamera.js'
+import DebugCamera from './Cameras/DebugCamera.js'
+import Camera from './Cameras/Camera.js'
+import CameraHelper from './Helpers/CameraHelper.js'
+import LightHelper from './Helpers/LightHelper.js'
 
 window.addEventListener('load', () => {
     const DEBUG_MODE = true
@@ -34,7 +35,7 @@ window.addEventListener('load', () => {
     for (var value in performance) {
         performanceKeys.push(value)
     }
-    console.log(performanceKeys)
+    // console.log(performanceKeys)
 
     function extractValue(reg, str) {
         const matches = str.match(reg)
@@ -78,7 +79,7 @@ window.addEventListener('load', () => {
                 readonly: 'readonly'
             }
         },{
-            label: 'x',
+            label: 'camera_x',
             type: 'range',
             configs: { 
                 min: '1',
@@ -86,7 +87,7 @@ window.addEventListener('load', () => {
                 value: '0'
             }
         }, {
-            label: 'y',
+            label: 'camera_y',
             type: 'range',
             configs: { 
                 min: '1',
@@ -94,7 +95,7 @@ window.addEventListener('load', () => {
                 value: '0'
             }
         }, {
-            label: 'z',
+            label: 'camera_z',
             type: 'range',
             configs: { 
                 min: '-750',
@@ -102,10 +103,10 @@ window.addEventListener('load', () => {
                 value: '300'
             }
         }, {
-            label: 'orthographic',
+            label: 'camera_orthographic',
             type: 'checkbox',
         }, {
-            label: 'units',
+            label: 'camera_units',
             type: 'range',
             configs: { 
                 min: '0',
@@ -122,13 +123,13 @@ window.addEventListener('load', () => {
     const scene = new Scene(gl, [ shader ])
 
     /// AXIS
-    const axisObject = new AxisObject(scene,)
-    axisObject.mesh.location = [ 0, 0, 0 ]
-    axisObject.mesh.scale = [ 50, 50, 50 ]
-    scene.addObject(axisObject)
-    
+    const axis = new Axis(gl)
+    axis.mesh.location = [ 0, 0, 0 ]
+    axis.mesh.scale = [ 50, 50, 50 ]
+    scene.add(axis)
+
     /// CAMERA
-    const camera = new Camera((canvas.width / 2) / canvas.height, {
+    const camera = new DebugCamera(gl, (canvas.width / 2) / canvas.height, {
         location: [ 0, 0, 600 ]
     }, {
         zNear: 30,
@@ -137,32 +138,28 @@ window.addEventListener('load', () => {
         orthographic: false,
         orthographicUnits: 150
     })
-    camera.target = axisObject
-    const thirdCamera = new ThirdCamera(axisObject, (canvas.width / 2) / canvas.height, {
+    camera.target = axis
+    scene.add(camera)
+    scene.add(new CameraHelper(camera))
+    scene.add(new FrustumHelper(camera))
+
+    const thirdCamera = new ThirdCamera(gl, axis, (canvas.width / 2) / canvas.height, {
         zNear: 30,
         zFar: 1000,
         fieldOfViewRadians: Math.degreeToRadians(45),
         orthographic: false,
         orthographicUnits: 150
     })
-    const debugCamera = new Camera((canvas.width / 2) / canvas.height, {
+    scene.add(thirdCamera)
+    scene.add(new CameraHelper(thirdCamera))
+
+    const debugCamera = new Camera(gl, (canvas.width / 2) / canvas.height, {
         location: [ 200, 400, 800 ]
     }, {
         zNear: 30,
         zFar: 2000
     })
-    scene.addCamera(camera)
-    scene.addCamera(debugCamera)
-
-    /// LIGHT
-    scene.addLight(new Light({
-        location: [ 150, 0, 0 ],
-        color: [ .9, 0, 0 ]
-    }))
-    scene.addLight(new Light({
-        location: [ -150, 0, 0 ],
-        color: [ 0, 0, .9 ]
-    }))
+    scene.add(debugCamera)
 
     /// RENDERER
     const renderer = new Renderer(gl)
@@ -170,39 +167,29 @@ window.addEventListener('load', () => {
     /// MONKEY
     loadObj(scene, '../resources/monkey/', 'monkey.obj')
         .then(collection => {
-            scene.addCollection(collection)
+            scene.add(collection)
             const monkey = collection.objects[0]
             monkey.rotationSpeed = .2
-            monkey.parent = axisObject
+            monkey.parent = axis
             monkey._update = (state, fps) => {
-                axisObject.mesh.rotation[1] += state.rotationSpeed / fps
+                axis.mesh.rotation[1] += state.rotationSpeed / fps
             }
         })
 
-    /// CAMERA
-    const cameraObject001 = new CameraObject(scene, camera)
-    scene.addObject(cameraObject001)
-
-    const frustumObject001 = new FrustumObject(scene)
-    frustumObject001.modelMatrix = m4.inverse(camera.projectionViewMatrix)
-    scene.addObject(frustumObject001)
-
-    /// CAMERA
-    const cameraObject002 = new CameraObject(scene, thirdCamera)
-    scene.addObject(cameraObject002)
-
     /// Light
-    const lightObject001 = new LightObject(scene)
-    lightObject001.mesh.location = scene.lights[0].location
-    lightObject001.projectionMatrix = camera.projectionMatrix
-    lightObject001.viewMatrix = camera.viewMatrix
-    scene.addObject(lightObject001)
+    const light001 = new Light(gl, { 
+        location: [ 150, 0, 0 ],
+        color: [ .9, 0, 0 ] 
+    })
+    scene.add(light001)
+    scene.add(new LightHelper(light001))
 
-    const lightObject002 = new LightObject(scene)
-    lightObject002.mesh.location = scene.lights[1].location
-    lightObject002.projectionMatrix = camera.projectionMatrix
-    lightObject002.viewMatrix = camera.viewMatrix
-    scene.addObject(lightObject002)
+    const light002 = new Light(gl, {
+        location: [ -150, 0, 0 ],
+        color: [ 0, 0, .9 ]
+    })
+    scene.add(light002)
+    scene.add(new LightHelper(light002))
 
     if (DEBUG_MODE) overlayDebug.toggle()
 
@@ -218,22 +205,6 @@ window.addEventListener('load', () => {
             if (timeStamp - lastTimeSecond >= 1000) {
                 lastTimeSecond = timeStamp
                 fpsElement.value = fps.toFixed(2)
-            }
-
-            if (camera.location != Number(window.DEBUG_X) || 
-                camera.location[1] != Number(window.DEBUG_Y) || 
-                camera.location[2] != Number(window.DEBUG_Z) ||
-                camera.orthographic != window.DEBUG_ORTHOGRAPHIC ||
-                camera.orthographicUnits != Number(window.DEBUG_UNITS)) {
-                camera.location[0] = Number(window.DEBUG_X)
-                camera.location[1] = Number(window.DEBUG_Y)
-                camera.location[2] = Number(window.DEBUG_Z)
-                camera.orthographic = window.DEBUG_ORTHOGRAPHIC
-                camera.orthographicUnits = Number(window.DEBUG_UNITS)
-
-                // TODO: transform in object class
-                camera.update()
-                thirdCamera.update()
             }
 
             renderer.renderScissor(scene, [ camera, debugCamera ], fps)
