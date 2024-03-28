@@ -43,9 +43,7 @@ const camera = {
             camera._vertice[ndx] *= 20
         })
         for (let i = 0; i < camera._vertice.length / 3; i++) {
-            for (let j = 0; j < 4; j++) {
-                camera._color.push(1)
-            }
+            camera._color.push(1, 1, 1, 1)
             for (let j = 0; j < 2; j++) {
                 camera._texture.push(1)
             }

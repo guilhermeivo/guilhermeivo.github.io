@@ -24,6 +24,8 @@ export default class Lines extends BasicObject {
             scene.shader.setUniform('u_projection', scene.camera.projectionMatrix, scene.shader.types.mat4)
             scene.shader.setUniform('u_view', scene.camera.viewMatrix, scene.shader.types.mat4)
             scene.shader.setUniform('u_world', this.worldMatrix, scene.shader.types.mat4)
+
+            scene.shader.setUniform('u_material.opacity', this.mesh.material.opacity, scene.shader.types.float)
     
             const primitiveType = this.gl.LINES
             const offset = 0
