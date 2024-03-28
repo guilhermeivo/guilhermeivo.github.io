@@ -20,14 +20,16 @@ import Program from './src/Program.js'
 import vertexSource from './src/shaders/vertexSource.js'
 import fragmentSource from './src/shaders/fragmentSource.js'
 
-import Scene from './src/Scene.js'
-import Camera from './src/Camera.js'
-import Renderer from './src/Renderer.js'
-import Light from './src/Light.js'
-
 import Geometry from './src/Core/Geometry.js'
 import Material from './src/Core/Material.js'
 import Mesh from './src/Mesh.js'
+
+import Scene from './src/Scene.js'
+import Renderer from './src/Renderer.js'
+
+import Camera from './src/Cameras/Camera.js'
+import Light from './src/Lights/Light.js'
+import Axis from './src/Objects/Axis.js'
 
 import { loadObj } from './src/common.js'
 
@@ -44,45 +46,61 @@ window.addEventListener('load', () => {
     const shader = new Program(gl, vertexSource, fragmentSource)
     const scene = new Scene(gl, [ shader ])
 
+    /// AXIS
+    const axis = new Axis(gl)
+    axis.mesh.location = [ 0, 0, 0 ]
+    axis.mesh.scale = [ 50, 50, 50 ]
+    scene.add(axis)
+
     /// CAMERA
-    const camera = new Camera(canvas.width / canvas.height, {
+    const camera = new Camera(gl, canvas.width / canvas.height, {
         location: [ 0, 0, 600 ]
     }, {
         zNear: 30,
-        zFar: 1500,
+        zFar: 1000,
         fieldOfViewRadians: Math.degreeToRadians(45),
         orthographic: false,
         orthographicUnits: 150
     })
+    camera.target = axis
+    scene.add(camera)
 
-    /// LIGHT
-    scene.addLight(new Light({
-        position: [ 150, 0, 0 ],
-        color: [ .9, 0, 0 ]
-    }))
-    scene.addLight(new Light({
-        position: [ -150, 0, 0 ],
+    /// Light
+    const lightRed = new Light(gl, { 
+        location: [ 150, 0, 0 ],
+        color: [ .9, 0, 0 ] 
+    })
+    scene.add(lightRed)
+
+    const lightBlue = new Light(gl, {
+        location: [ -150, 0, 0 ],
         color: [ 0, 0, .9 ]
-    }))
+    })
+    scene.add(lightBlue)
+
+    /// MONKEY
+    loadObj(scene, '../resources/monkey/', 'monkey.obj')
+        .then(collection => {
+            scene.add(collection)
+            const monkey = collection.objects[0]
+            monkey.rotationSpeed = .2
+            monkey.parent = axis
+            monkey._update = (state, fps) => {
+                axis.mesh.rotation[1] += state.rotationSpeed / fps
+            }
+        })
 
     /// RENDERER
     const renderer = new Renderer(gl)
 
-    /// MONKEY
-    const collection = loadObj(
-        scene, './resources/monkey/', 'monkey.obj', { scale: [ 50, 50, 50 ] })
-    scene.addCollection(collection)
-
     /// ANIMATION
     let lastTime = 0
-    const rotationSpeed = .6
     function animate(timeStamp) {
         let deltaTime = timeStamp - lastTime
         lastTime = timeStamp
         let fps = 1000 / deltaTime
 
         renderer.render(scene, camera, fps)
-        if (collection.objects[0]) collection.objects[0].mesh.rotation[1] += rotationSpeed / fps
 
         window.requestAnimationFrame(animate)
     }
