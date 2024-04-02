@@ -82,17 +82,17 @@ window.addEventListener('load', () => {
             label: 'camera_x',
             type: 'range',
             configs: { 
-                min: '1',
+                min: '-750',
                 max: '750',
-                value: '0'
+                value: '250'
             }
         }, {
             label: 'camera_y',
             type: 'range',
             configs: { 
-                min: '1',
+                min: '-750',
                 max: '750',
-                value: '0'
+                value: '100'
             }
         }, {
             label: 'camera_z',
@@ -100,18 +100,21 @@ window.addEventListener('load', () => {
             configs: { 
                 min: '-750',
                 max: '750',
-                value: '300'
+                value: '100'
             }
         }, {
             label: 'camera_orthographic',
             type: 'checkbox',
+            configs: {
+                checked: 'checked'
+            }
         }, {
             label: 'camera_units',
             type: 'range',
             configs: { 
                 min: '0',
                 max: '500',
-                value: '150'
+                value: '65'
             }
         }
     ])
@@ -124,35 +127,23 @@ window.addEventListener('load', () => {
 
     /// AXIS
     const axis = new Axis(gl, {
-        location: new Vector3([ 0, 0, 0 ]),
+        location: new Vector3([ 0, 40, 0 ]),
         scale: new Vector3([ 50, 50, 50 ])
     })
     scene.add(axis)
 
     /// CAMERA
-    const camera = new DebugCamera(gl, (canvas.width / 2) / canvas.height, {
-        location: new Vector3([ 0, 0, 600 ])
-    }, {
+    const camera = new DebugCamera(gl, (canvas.width / 2) / canvas.height, { }, {
         zNear: 30,
         zFar: 1000,
         fieldOfViewRadians: Math.degreeToRadians(45),
         orthographic: false,
-        orthographicUnits: 150
+        orthographicUnits: 50
     })
     camera.target = axis
     scene.add(camera)
     scene.add(new CameraHelper(camera))
     scene.add(new FrustumHelper(camera))
-
-    const thirdCamera = new ThirdCamera(gl, axis, (canvas.width / 2) / canvas.height, {
-        zNear: 30,
-        zFar: 1000,
-        fieldOfViewRadians: Math.degreeToRadians(45),
-        orthographic: false,
-        orthographicUnits: 150
-    })
-    scene.add(thirdCamera)
-    scene.add(new CameraHelper(thirdCamera))
 
     const debugCamera = new Camera(gl, (canvas.width / 2) / canvas.height, {
         location: new Vector3([ 200, 400, 800 ])
@@ -166,28 +157,20 @@ window.addEventListener('load', () => {
     const renderer = new Renderer(gl)
 
     /// MONKEY
-    loadObj(scene, '../resources/monkey/', 'monkey.obj')
+    loadObj(scene, '../resources/arcade/', 'arcade.obj')
         .then(collection => {
             scene.add(collection)
-            const monkey = collection.objects[0]
-            monkey.rotationSpeed = .2
-            monkey.parent = axis
-            monkey._update = (state, fps) => {
-                axis.mesh.rotation[1] += state.rotationSpeed / fps
-            }
         })
 
     /// Light
     const light001 = new Light(gl, { 
-        location: new Vector3([ 150, 0, 0 ]),
-        color: [ .9, 0, 0 ] 
+        location: new Vector3([ 125, 125, -125 ])
     })
     scene.add(light001)
     scene.add(new LightHelper(light001))
 
     const light002 = new Light(gl, {
-        location: new Vector3([ -150, 0, 0 ]),
-        color: [ 0, 0, .9 ]
+        location: new Vector3([ -125, 150, 125 ])
     })
     scene.add(light002)
     scene.add(new LightHelper(light002))
@@ -203,7 +186,7 @@ window.addEventListener('load', () => {
         let fps = 1000 / deltaTime
 
         if (DEBUG_MODE) {
-            if (timeStamp - lastTimeSecond >= 1000) {
+            if (timeStamp - lastTimeSecond >= 5000) {
                 lastTimeSecond = timeStamp
                 fpsElement.value = fps.toFixed(2)
             }
@@ -213,6 +196,7 @@ window.addEventListener('load', () => {
             renderer.render(scene, camera, fps)
         }
         
+        window.scene = scene
         window.requestAnimationFrame(animate)
     }
     animate(0)

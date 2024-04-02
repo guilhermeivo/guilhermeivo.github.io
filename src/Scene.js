@@ -14,7 +14,6 @@ export default class Scene {
 
         this.lastUsedProgram = null
         this.lastUsedVertexArray = null
-        this.lastUsedTexture = null
     }
 
     add(value) {
@@ -81,13 +80,6 @@ export default class Scene {
         if (vao !== this.lastUsedVertexArray) {
             this.lastUsedVertexArray = vao
             this.gl.bindVertexArray(vao)
-        }
-    }
-
-    useTexture(texture, target = this.gl.TEXTURE_2D) {
-        if (texture !== this.lastUsedTexture) {
-            this.lastUsedTexture = texture
-            this.gl.bindTexture(target, texture)
         }
     }
 

@@ -140,4 +140,9 @@ export default class Program {
 
         if (types[dataType]) types[dataType]()
     }
+
+    getUniform(uniformName) {
+        const uniformLocation = this.gl.getUniformLocation(this.program, uniformName)
+        return this.gl.getUniform(this.program, uniformLocation)
+    }
 }

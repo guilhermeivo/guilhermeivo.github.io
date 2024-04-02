@@ -1,69 +1,72 @@
 export default class Texture {
-    constructor(gl, image = null) {
-        this.gl = gl
+    constructor(gl) {
         this.data = null
-        this.image = null
-        this.target = this.gl.TEXTURE_2D
-
-        if (image) {
-            this.setTexture(image)
-        }
+        this.target = gl.TEXTURE_2D
+        this.data = gl.createTexture()
     }
 
-    setTexture(image) {
-        if (!image) return this.setEmptyTexture()
-        this.image = image
+    setImageTexture(gl, image) {
+        if (!image) {
+            gl.bindTexture(this.target, this.data)
+            this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
+
+            return this.data
+        }
         
-        // Create a texture.
-        this.data = this.gl.createTexture()
-        this.gl.bindTexture(this.target, this.data)
-        
-        // Fill the texture with a 1x1 blue pixel (pre_load)
-        this.createTextureWithPixels(1, 1, new Uint8Array([255, 255, 255, 255]))
+        gl.bindTexture(this.target, this.data)
 
-        // Asynchronously load an image
-        this.image.addEventListener('load', () => {
-            // Now that the image has loaded make copy it to the texture.
-            this.gl.bindTexture(this.target, this.data)
-            
-            this.createTextureWithImage(this.image)
+        this.createTextureWithImage(gl, image)
 
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE)
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE)
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR)
-            this.gl.texParameteri(this.target, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR)
-            this.gl.generateMipmap(this.target)
-        })
-
-        // error_load
-        this.image.addEventListener('error', () => {
-            this.gl.bindTexture(this.target, texture)
-            
-            const alignment = 1
-            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, alignment)
-            // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
-            this.createTextureWithPixels(
-                2, 2, 
-                new Uint8Array([
-                    128,  64,
-                    0, 192
-                ]),
-                this.gl.R8, this.gl.RED)
- 
-                this.gl.texParameteri(this.target, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST)
-                this.gl.texParameteri(this.target, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST)
-                this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE)
-                this.gl.texParameteri(this.target, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE)
-        })
+        gl.texParameteri(this.target, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(this.target, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+        gl.texParameteri(this.target, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.generateMipmap(this.target)  
 
         return this.data
     }
 
-    createTextureWithPixels(
+    setEmptyTexture(gl) {
+        gl.bindTexture(this.target, this.data)
+        this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
+
+        return this.data
+    }
+
+    setTexture(gl) {
+        gl.bindTexture(this.target, this.data)
+        this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
+
+        return this.data
+    }
+
+    setErrorTexture(gl) {
+        gl.bindTexture(this.target, this.data)
+            
+        const alignment = 1
+        gl.pixelStorei(gl.UNPACK_ALIGNMENT, alignment)
+        // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
+        this.createTextureWithPixels(gl,
+            2, 2, 
+            new Uint8Array([
+                128,  64,
+                0, 192
+            ]),
+            gl.R8, gl.RED)
+
+        gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+        gl.texParameteri(this.target, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+        gl.texParameteri(this.target, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(this.target, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        
+        return this.data
+    }
+
+    createTextureWithPixels(gl,
         width, height, pixels, 
-        internalformat = this.gl.RGBA, format = this.gl.RGBA, type = this.gl.UNSIGNED_BYTE) {
-        return this.gl.texImage2D(
-            this.target,      // target
+        internalformat = gl.RGBA, format = gl.RGBA, type = gl.UNSIGNED_BYTE) {
+        return gl.texImage2D(
+            this.target,             // target
             0,                       // level
             internalformat,          // internalformat
             width,                   // width
@@ -74,23 +77,15 @@ export default class Texture {
             pixels)                  // pixels
     }
 
-    createTextureWithImage(
+    createTextureWithImage(gl,
         image, 
-        internalformat = this.gl.RGBA, format = this.gl.RGBA, type = this.gl.UNSIGNED_BYTE) {
-        return this.gl.texImage2D(
+        internalformat = gl.RGBA, format = gl.RGBA, type = gl.UNSIGNED_BYTE) {
+        return gl.texImage2D(
             this.target, 
             0, 
             internalformat, 
             format, 
             type, 
             image)
-    }
-
-    setEmptyTexture() {
-        this.data = this.gl.createTexture()
-        this.gl.bindTexture(this.target, this.data)
-        this.createTextureWithPixels(1, 1, new Uint8Array([255, 255, 255, 255]))
-
-        return this.data
     }
 }

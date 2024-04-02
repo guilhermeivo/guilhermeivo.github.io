@@ -1,7 +1,7 @@
 import Geometry from "../Core/Geometry.js";
-import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
 import Lines from "./Lines.js";
+import Material from "../Core/Material.js";
 
 export default class AxisObject extends Lines {
     constructor(gl, transformation = { }) {
@@ -12,6 +12,7 @@ export default class AxisObject extends Lines {
         geometry.setIndice(axis.indices())
         const material = new Material()
         const mesh = new Mesh(geometry, material, transformation)
+        
         super(gl, mesh, 'axis')
 
         this.debug = true

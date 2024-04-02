@@ -1,10 +1,3 @@
-const DEFAULT_CONFIG_SAMPLER = {
-    diffuseMap: null,
-    specularMap: null,
-    normalMap: null,
-    opacityMap: null,
-}
-
 const DEFAULT_CONFIG_MATERIAL = {
     shininess:  [ 32 ],
     ambient: [ 0, 0, 0 ],
@@ -26,8 +19,14 @@ export default class Material {
         this.opticalDensity = config.opticalDensity || DEFAULT_CONFIG_MATERIAL.opticalDensity
         this.opacity = config.opacity || DEFAULT_CONFIG_MATERIAL.opacity
         this.illum = config.illum || DEFAULT_CONFIG_MATERIAL.illum
+        this.name = config.name || ''
 
-        this.samplers = DEFAULT_CONFIG_SAMPLER
+        this.samplers = {
+            diffuseMap: null,
+            specularMap: null,
+            normalMap: null,
+            opacityMap: null,
+        }
     }
 
     defineUniform(name, value) {

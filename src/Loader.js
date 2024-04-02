@@ -4,6 +4,7 @@ import Material from "./Core/Material.js"
 import Mesh from "./Mesh.js"
 import Texture from "./Textures/Texture.js"
 import TriObject from "./Objects/TriObject.js"
+import EmptyTexture from "./Textures/EmptyTexture.js"
 
 const objToJson = async (url, file, current = 'objects') => {
 	const data = await fetch(url + file)
@@ -77,24 +78,32 @@ const objToJson = async (url, file, current = 'objects') => {
 				currentObject['illum'] = parts.data.map(parseFloat)
 				break;
 			case 'map_Kd':
-				tempImage = new Image()
-				tempImage.src = url + parts.data
-				currentObject['diffuseMap'] = tempImage
+				if (!json.images) json.images = { }
+				if (!json.images[`${ url }${ parts.data }`]) {
+					json.images[`${ url }${ parts.data }`] = null
+				}
+				currentObject['diffuseMap'] = `${ url }${ parts.data }`
 				break;
 			case 'map_Bump':
-				tempImage = new Image()
-				tempImage.src = url + parts.data
-				currentObject['normalMap'] = tempImage
+				if (!json.images) json.images = { }
+				if (!json.images[`${ url }${ parts.data }`]) {
+					json.images[`${ url }${ parts.data }`] = null
+				}
+				currentObject['normalMap'] = `${ url }${ parts.data }`
 				break;
 			case 'map_Ns':
-				tempImage = new Image()
-				tempImage.src = url + parts.data
-				currentObject['specularMap'] = tempImage
+				if (!json.images) json.images = { }
+				if (!json.images[`${ url }${ parts.data }`]) {
+					json.images[`${ url }${ parts.data }`] = null
+				}
+				currentObject['specularMap'] = `${ url }${ parts.data }`
 				break;
 			case 'map_d':
-				tempImage = new Image()
-				tempImage.src = url + parts.data
-				currentObject['opacityMap'] = tempImage
+				if (!json.images) json.images = { }
+				if (!json.images[`${ url }${ parts.data }`]) {
+					json.images[`${ url }${ parts.data }`] = null
+				}
+				currentObject['opacityMap'] = `${ url }${ parts.data }`
 				break;
 			case 'o':
 				if (!json[current][parts.data]) json[current][parts.data] = { }
@@ -132,19 +141,57 @@ const loadObj = async (scene, url, object, transform = { }) => {
 	let maxIndex = [ 1, 1, 1 ]
 	let vertexData = [ [], [], [] ]
 	
+	let textures = { }
+	const samplersName = ['diffuseMap','specularMap','normalMap','opacityMap']
+
 	await (objToJson(url, object)
-		.then(json => {
+		.then(async json => {
+			await Promise.all(Object.keys(json.images).map(url => {
+				return new Promise((resolve, reject) => {
+					const image = new Image()
+
+					image.onload = () => {
+						json.images[url] = {
+							data: image,
+							succeed: true
+						}
+						resolve()
+					}
+					image.onerror = () => {
+						json.images[url] = {
+							data: null,
+							succeed: false
+						}
+						resolve()
+					}
+
+					image.src = url
+				})
+			}))
+
 			Object.keys(json.materials).map(key => {
-				const currentMaterial = json.materials[key]
-				const material = new Material(currentMaterial)
-				material.defineSampler('diffuseMap', new Texture(scene.gl, currentMaterial.diffuseMap))
-				material.defineSampler('specularMap', new Texture(scene.gl, currentMaterial.specularMap))
-				material.defineSampler('normalMap', new Texture(scene.gl, currentMaterial.normalMap))
-				materials = {
-					...materials,
-					[key]: material
+				if (!Object.keys(materials).includes(key)) {
+					const currentMaterial = json.materials[key]
+					const material = new Material(currentMaterial)
+					material.name = key
+
+					samplersName.forEach(async samplerKey => {
+						const name = currentMaterial[samplerKey] || 'empty'
+						if (!Object.keys(textures).includes(name)) {
+							const texture = new Texture(scene.gl)
+
+							if (!json.images[name]) texture.setEmptyTexture(scene.gl)
+							else if (json.images[name].succeed) texture.setImageTexture(scene.gl, json.images[name].data)
+							else texture.setErrorTexture(scene.gl)
+
+							textures[name] = texture
+						}
+						material.defineSampler(samplerKey, textures[name])
+					})
+					materials[key] = material
 				}
 			})
+			
 			Object.keys(json.objects).map(key => {
 				// reset
 				vertexData = [ [], [], [] ]
@@ -194,6 +241,7 @@ const loadObj = async (scene, url, object, transform = { }) => {
 				object.init(scene)
 				collection.objects.push(object)
 			})
+			
 		}))
 
 	return collection

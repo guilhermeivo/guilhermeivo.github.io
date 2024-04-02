@@ -12,11 +12,14 @@ export default class TriObject extends BasicObject {
         scene.useProgram(scene.shader.program)
         scene.useVao(this.vao)
 
-        for (let i = 0; i < this.mesh.material.samplers.length; i++) {
-            this.gl.activeTexture(this.gl[`TEXTURE${ i }`])
-            scene.useTexture(this.mesh.material.samplers[i].data, this.mesh.material.samplers[i].target)
-            scene.shader.setUniform(`u_material.${ Object.keys(this.mesh.material.samplers)[i] }`, i, scene.shader.types.sampler)
-        }
+        Object.keys(this.mesh.material.samplers).forEach((key, index) => {
+            const currentSampler = this.mesh.material.samplers[key]
+
+            scene.shader.setUniform(`u_material.${ key }`, index, scene.shader.types.sampler)
+
+            this.gl.activeTexture(this.gl[`TEXTURE${ index }`])
+            this.gl.bindTexture(this.gl.TEXTURE_2D, currentSampler.data)
+        })
 
         if (callback) callback(scene)
         else if (this._draw) this._draw(scene)
@@ -52,5 +55,7 @@ export default class TriObject extends BasicObject {
             const count = this.mesh.geometry.attributes['a_position'].data.length / 3
             this.gl.drawArrays(primitiveType, offset, count)
         }
+
+        console.groupEnd()
     }
 }

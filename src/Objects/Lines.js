@@ -12,12 +12,6 @@ export default class Lines extends BasicObject {
         scene.useProgram(scene.shader.program)
         scene.useVao(this.vao)
 
-        for (let i = 0; i < this.mesh.material.samplers.length; i++) {
-            this.gl.activeTexture(this.gl[`TEXTURE${ i }`])
-            scene.useTexture(this.mesh.material.samplers[i].data, this.mesh.material.samplers[i].target)
-            scene.shader.setUniform(`u_material.${ Object.keys(this.mesh.material.samplers)[i] }`, i, scene.shader.types.sampler)
-        }
-
         if (callback) callback(scene)
         else if (this._draw) this._draw(scene)
         else {
