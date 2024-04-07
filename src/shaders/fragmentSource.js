@@ -34,11 +34,11 @@ struct Material {
     vec3 emissive;
     vec3 specular;
     float opacity;
-
-    sampler2D diffuseMap;
-    sampler2D specularMap;
-    sampler2D opacityMap;
 };
+
+uniform sampler2D diffuseMap;
+uniform sampler2D specularMap;
+uniform sampler2D opacityMap;
 
 uniform Material u_material;
 uniform Light u_lights[NUMBER_LIGHTS];
@@ -60,11 +60,11 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     float attenuation = (light.constant + light.linear * distance); 
 
     // SPECULAR
-    vec4 specularMapColor = texture(u_material.specularMap, v_texcoord);
+    vec4 specularMapColor = texture(specularMap, v_texcoord);
     vec3 effectiveSpecular = light.specular * u_material.specular * pow(specularLight, u_material.shininess) * light.color * specularMapColor.rgb;
 
     // DIFFUSE
-    vec4 diffuseMapColor = texture(u_material.diffuseMap, v_texcoord);
+    vec4 diffuseMapColor = texture(diffuseMap, v_texcoord);
     vec3 effectiveDiffuse = pow(light.diffuse * u_material.diffuse * fakeLight * light.color * diffuseMapColor.rgb, vec3(1.0 / gamma));
 
     // AMBIENT
@@ -78,8 +78,8 @@ void main() {
     vec3 surfaceToViewDirection = normalize(v_surfaceToView);
 
     // OPACITY
-    vec4 opacityMapColor = texture(u_material.opacityMap, v_texcoord);
-    vec4 diffuseMapColor = texture(u_material.diffuseMap, v_texcoord);
+    vec4 opacityMapColor = texture(opacityMap, v_texcoord);
+    vec4 diffuseMapColor = texture(diffuseMap, v_texcoord);
     float effectiveOpacity = u_material.opacity * opacityMapColor.a * diffuseMapColor.a;
 
     // color = ambientColor * lightAmbient + diffuseColor * sumOfLightCalculations

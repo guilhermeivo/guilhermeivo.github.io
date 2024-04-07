@@ -1,5 +1,7 @@
 import BasicObject from "./BasicObject.js"
 
+`use strict`
+
 export default class TriObject extends BasicObject {
     constructor(gl, mesh, name) {
         super(gl, mesh, name)
@@ -14,11 +16,10 @@ export default class TriObject extends BasicObject {
 
         Object.keys(this.mesh.material.samplers).forEach((key, index) => {
             const currentSampler = this.mesh.material.samplers[key]
-
-            scene.shader.setUniform(`u_material.${ key }`, index, scene.shader.types.sampler)
-
-            this.gl.activeTexture(this.gl[`TEXTURE${ index }`])
+                
+            this.gl.activeTexture(this.gl.TEXTURE0 + currentSampler.id)
             this.gl.bindTexture(this.gl.TEXTURE_2D, currentSampler.data)
+            scene.shader.setUniform(`${ key }`, currentSampler.id, scene.shader.types.sampler)
         })
 
         if (callback) callback(scene)
@@ -52,10 +53,8 @@ export default class TriObject extends BasicObject {
         
             const primitiveType = this.gl.TRIANGLES
             const offset = 0
-            const count = this.mesh.geometry.attributes['a_position'].data.length / 3
+            const count = this.counter / 3
             this.gl.drawArrays(primitiveType, offset, count)
         }
-
-        console.groupEnd()
     }
 }

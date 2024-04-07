@@ -1,6 +1,8 @@
 import CameraMesh from "./CameraMesh.js";
 import BasicObject from "../Objects/BasicObject.js";
 
+`use strict`
+
 export default class Camera extends BasicObject {
     constructor(gl, aspect, transformation = {}, config = {}) {
         const mesh = new CameraMesh(transformation)

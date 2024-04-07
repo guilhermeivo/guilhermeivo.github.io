@@ -1,3 +1,5 @@
+`use strict`
+
 const DEFAULT_CONFIG_MATERIAL = {
     shininess:  [ 32 ],
     ambient: [ 0, 0, 0 ],

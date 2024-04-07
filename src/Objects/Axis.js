@@ -3,6 +3,8 @@ import Mesh from "../Mesh.js";
 import Lines from "./Lines.js";
 import Material from "../Core/Material.js";
 
+`use strict`
+
 export default class AxisObject extends Lines {
     constructor(gl, transformation = { }) {
         const geometry = new Geometry()

@@ -1,19 +1,15 @@
+`use strict`
+
 export default class Texture {
-    constructor(gl) {
+    constructor(gl, textureTarget = gl.TEXTURE_2D) {
+        this.id = 0
         this.data = null
-        this.target = gl.TEXTURE_2D
+        this.target = textureTarget
         this.data = gl.createTexture()
     }
 
     setImageTexture(gl, image) {
-        if (!image) {
-            gl.bindTexture(this.target, this.data)
-            this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
-
-            return this.data
-        }
-        
-        gl.bindTexture(this.target, this.data)
+        this.bind(gl, this.id)
 
         this.createTextureWithImage(gl, image)
 
@@ -21,27 +17,27 @@ export default class Texture {
         gl.texParameteri(this.target, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
         gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
         gl.texParameteri(this.target, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-        gl.generateMipmap(this.target)  
+        gl.generateMipmap(this.target)
 
         return this.data
     }
 
     setEmptyTexture(gl) {
-        gl.bindTexture(this.target, this.data)
+        this.bind(gl, this.id)
         this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
 
         return this.data
     }
 
     setTexture(gl) {
-        gl.bindTexture(this.target, this.data)
+        this.bind(gl, this.id)
         this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
 
         return this.data
     }
 
     setErrorTexture(gl) {
-        gl.bindTexture(this.target, this.data)
+        this.bind(gl, this.id)
             
         const alignment = 1
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, alignment)
@@ -87,5 +83,14 @@ export default class Texture {
             format, 
             type, 
             image)
+    }
+
+    bind(gl, textureUnit) {
+        gl.activeTexture(gl.TEXTURE0 + textureUnit)
+        gl.bindTexture(gl.TEXTURE_2D, this.data)
+    }
+
+    unbind(gl) {
+        gl.bindTexture(this.target, null)
     }
 }

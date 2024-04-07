@@ -1,5 +1,7 @@
 import BasicObject from "./BasicObject.js"
 
+`use strict`
+
 export default class Lines extends BasicObject {
     constructor(gl, mesh, name) {
         super(gl, mesh, name)
@@ -11,6 +13,12 @@ export default class Lines extends BasicObject {
         scene.activeShaders(0)
         scene.useProgram(scene.shader.program)
         scene.useVao(this.vao)
+
+        Object.keys(this.mesh.material.samplers).forEach((key, index) => {
+            const currentSampler = this.mesh.material.samplers[key]
+            //currentSampler.bind(this.gl, index)
+            //scene.shader.setUniform(`${ key }`, index, scene.shader.types.sampler)
+        })
 
         if (callback) callback(scene)
         else if (this._draw) this._draw(scene)
@@ -24,7 +32,7 @@ export default class Lines extends BasicObject {
             const primitiveType = this.gl.LINES
             const offset = 0
             const indexType = this.gl.UNSIGNED_INT
-            this.gl.drawElements(primitiveType, this.mesh.geometry.indice.length, indexType, offset)
+            this.gl.drawElements(primitiveType, this.mesh.geometry.indice.data.length, indexType, offset)
         }
     }
 }

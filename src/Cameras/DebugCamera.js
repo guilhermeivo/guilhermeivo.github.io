@@ -1,5 +1,7 @@
 import Camera from "./Camera.js";
 
+`use strict`
+
 export default class DebugCamera extends Camera {
     constructor(gl, aspect, transformation = {}, config = {}) {
         super(gl, aspect, transformation, config)

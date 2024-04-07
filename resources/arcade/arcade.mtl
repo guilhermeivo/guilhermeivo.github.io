@@ -12,7 +12,6 @@ d 1.000000
 illum 2
 
 newmtl CabinetOuter
-Ns 490.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.600000 0.600000 0.600000
 Ke 0.000000 0.000000 0.000000
@@ -20,6 +19,8 @@ Ni 1.450000
 d 1.000000
 illum 2
 map_Kd background.png
+map_Ns roughness_map.png
+map_Bump normal_map.png
 
 newmtl Metal
 Ns 490.000000
@@ -32,7 +33,7 @@ d 1.000000
 illum 3
 
 newmtl Plastic
-Ns 490.000000
+Ns 360.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.000000 0.000000 0.000000
 Ks 0.600000 0.600000 0.600000
@@ -40,6 +41,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+map_Bump normal_map.png
 
 newmtl Screen
 Ns 640.000000

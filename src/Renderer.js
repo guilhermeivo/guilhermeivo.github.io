@@ -1,3 +1,5 @@
+`use strict`
+
 export default class Renderer {
     constructor(gl) {
         this.gl = gl
@@ -24,7 +26,7 @@ export default class Renderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
         scene.activeCamera(camera)
-        scene.execCollections(scene.collection, fps)
+        scene.exec(fps)
     }
 
     renderScissor(scene, cameras, fps) {
@@ -51,7 +53,7 @@ export default class Renderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
         scene.activeCamera(cameras[0])
-        scene.execCollections(scene.collection, fps)
+        scene.exec(fps)
 
         const rightWidth = width - leftWidth
         this.gl.viewport(leftWidth, 0, rightWidth, height)
@@ -61,6 +63,6 @@ export default class Renderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
         scene.activeCamera(cameras[1])
-        scene.execCollections(scene.collection, fps, true)
+        scene.exec(fps, true)
     }
 }

@@ -1,3 +1,5 @@
+`use strict`
+
 export default class Program {
     constructor(gl, vertexShaderSource, fragmentShaderSource) {
         this.gl = gl
@@ -19,16 +21,6 @@ export default class Program {
             uvec3: 'uvec3',
             uvec4: 'uvec4'
         }
-
-        this.defaultConfigAttribute = {
-            numComponents: 3, // VEC3
-            type: this.gl.FLOAT,
-            normalize: true,
-            offset: 0,
-            stride: 0,
-        }
-
-        this.buffers = []
     }
  
     compile(vertexShaderSource, fragmentShaderSource) {
@@ -73,41 +65,20 @@ export default class Program {
         this.gl.deleteProgram(program)
     }
 
-    createBuffers() {
-        const buffer = this.gl.createBuffer()
-        this.buffers.push(buffer)
-        return buffer
-    }
-
-    deleteBuffers() {
-        this.buffers.forEach(buffer => {
-            this.gl.deleteBuffer(buffer)
-        })
-    }
-
     // dados retirados de buffers
-    setAttribute(attributeName, data, config = {}) {
-        const locationAttribute = this.gl.getAttribLocation(this.program, attributeName) 
-        
-        if (!Array.isArray(data)) data = [data]
+    setAttribute(attributeName, attribute, indice) {
+        const locationAttribute = this.gl.getAttribLocation(this.program, attributeName)
 
-        data.forEach(element => {
-            const buffer = this.createBuffers()
-
-            let _data = element.hasOwnProperty('data') ? element['data'] : element
-            let _target = element.hasOwnProperty('target') ? element['target'] : this.gl.ARRAY_BUFFER
-
-            this.gl.bindBuffer(_target, buffer)  
-            this.gl.bufferData(_target, _data, this.gl.STATIC_DRAW)
-        })
+        attribute.bind(this.gl)
+        if (indice) indice.bind(this.gl)
         
         this.gl.vertexAttribPointer(
             locationAttribute, 
-            config.size || this.defaultConfigAttribute.numComponents, 
-            config.type || this.defaultConfigAttribute.type, 
-            config.normalize || this.defaultConfigAttribute.normalize, 
-            config.stride || this.defaultConfigAttribute.stride, 
-            config.offset || this.defaultConfigAttribute.offset)
+            attribute.size, 
+            attribute.type, 
+            attribute.normalize, 
+            attribute.stride, 
+            attribute.offset)
             
         this.gl.enableVertexAttribArray(locationAttribute)
     }
@@ -139,10 +110,5 @@ export default class Program {
         }
 
         if (types[dataType]) types[dataType]()
-    }
-
-    getUniform(uniformName) {
-        const uniformLocation = this.gl.getUniformLocation(this.program, uniformName)
-        return this.gl.getUniform(this.program, uniformLocation)
     }
 }

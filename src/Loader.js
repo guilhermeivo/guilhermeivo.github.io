@@ -4,7 +4,8 @@ import Material from "./Core/Material.js"
 import Mesh from "./Mesh.js"
 import Texture from "./Textures/Texture.js"
 import TriObject from "./Objects/TriObject.js"
-import EmptyTexture from "./Textures/EmptyTexture.js"
+
+`use strict`
 
 const objToJson = async (url, file, current = 'objects') => {
 	const data = await fetch(url + file)
@@ -146,102 +147,108 @@ const loadObj = async (scene, url, object, transform = { }) => {
 
 	await (objToJson(url, object)
 		.then(async json => {
-			await Promise.all(Object.keys(json.images).map(url => {
-				return new Promise((resolve, reject) => {
-					const image = new Image()
-
-					image.onload = () => {
-						json.images[url] = {
-							data: image,
-							succeed: true
+			if (json.images) {
+				await Promise.all(Object.keys(json.images).map(url => {
+					return new Promise((resolve, reject) => {
+						const image = new Image()
+	
+						image.onload = () => {
+							json.images[url] = {
+								data: image,
+								succeed: true
+							}
+							resolve()
 						}
-						resolve()
-					}
-					image.onerror = () => {
-						json.images[url] = {
-							data: null,
-							succeed: false
+						image.onerror = () => {
+							json.images[url] = {
+								data: null,
+								succeed: false
+							}
+							resolve()
 						}
-						resolve()
-					}
-
-					image.src = url
-				})
-			}))
-
-			Object.keys(json.materials).map(key => {
-				if (!Object.keys(materials).includes(key)) {
-					const currentMaterial = json.materials[key]
-					const material = new Material(currentMaterial)
-					material.name = key
-
-					samplersName.forEach(async samplerKey => {
-						const name = currentMaterial[samplerKey] || 'empty'
-						if (!Object.keys(textures).includes(name)) {
-							const texture = new Texture(scene.gl)
-
-							if (!json.images[name]) texture.setEmptyTexture(scene.gl)
-							else if (json.images[name].succeed) texture.setImageTexture(scene.gl, json.images[name].data)
-							else texture.setErrorTexture(scene.gl)
-
-							textures[name] = texture
-						}
-						material.defineSampler(samplerKey, textures[name])
+	
+						image.src = url
 					})
-					materials[key] = material
-				}
-			})
-			
-			Object.keys(json.objects).map(key => {
-				// reset
-				vertexData = [ [], [], [] ]
+				}))
+			}
 
-				const currentObject = json.objects[key]
-				const objVertexData = [
-					json.objects[key]['geometric_vertices'],
-					json.objects[key]['texture_coordinates'],
-					json.objects[key]['vertex_normals']
-				]
-				
-				currentObject.polygonal_face.map(parts => {
-					const addVertex = (vert) => {
-						// vert[0] -> vertices
-						// vert[1] -> texture
-						// vert[2] -> normals
-						// vert[3] -> colors
-						vert.forEach((objIndexStr, i) => {
-							const objIndex = parseInt(objIndexStr) - maxIndex[i]
-							vertexData[i].push(...objVertexData[i][objIndex])
+			if (json.materials) {
+				Object.keys(json.materials).map(key => {
+					if (!Object.keys(materials).includes(key)) {
+						const currentMaterial = json.materials[key]
+						const material = new Material(currentMaterial)
+						material.name = key
+	
+						samplersName.forEach(async (samplerKey, index) => {
+							const name = currentMaterial[samplerKey] || 'empty'
+							if (!Object.keys(textures).includes(name) || textures[name].id != index) {
+								const texture = new Texture(scene.gl)
+								texture.id = index
+
+								if (!json.images || !json.images[name]) texture.setEmptyTexture(scene.gl)
+								else if (json.images[name].succeed) texture.setImageTexture(scene.gl, json.images[name].data)
+								else texture.setErrorTexture(scene.gl)
+	
+								textures[name] = texture
+							}
+							material.defineSampler(samplerKey, textures[name])
 						})
+						materials[key] = material
 					}
+				})
+			}
 
-					// convert quad -> tri or tri -> tri
-					const numTriangles = parts.length - 2
-						for (let tri = 0; tri < numTriangles; tri++) {
-							addVertex(parts[0])
-							addVertex(parts[tri + 1])
-							addVertex(parts[tri + 2])
+			if (json.objects) {
+				Object.keys(json.objects).map(key => {
+					// reset
+					vertexData = [ [], [], [] ]
+	
+					const currentObject = json.objects[key]
+					const objVertexData = [
+						json.objects[key]['geometric_vertices'],
+						json.objects[key]['texture_coordinates'],
+						json.objects[key]['vertex_normals']
+					]
+					
+					currentObject.polygonal_face.map(parts => {
+						const addVertex = (vert) => {
+							// vert[0] -> vertices
+							// vert[1] -> texture
+							// vert[2] -> normals
+							// vert[3] -> colors
+							vert.forEach((objIndexStr, i) => {
+								const objIndex = parseInt(objIndexStr) - maxIndex[i]
+								vertexData[i].push(...objVertexData[i][objIndex])
+							})
 						}
-					})
-				
-				// config
-				maxIndex[0] += objVertexData[0].length
-				maxIndex[1] += objVertexData[1].length
-				maxIndex[2] += objVertexData[2].length
-
-				const geometry = new Geometry()
-				geometry.setAttribute('position', new Float32Array(vertexData[0]), { size: 3 })
-				geometry.setAttribute('normal', new Float32Array(vertexData[2]))
-				geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
-				const mesh = new Mesh(geometry, materials[currentObject.material])
-				const object = new TriObject(scene.gl, mesh, key)
-				mesh.location = transform.location || new Vector3([ 0, 0, 0 ])
-				mesh.rotation = transform.rotation || new Vector3([ 0, 0, 0 ])
-				mesh.scale = transform.scale || new Vector3([ 25, 25, 25 ])
-				object.init(scene)
-				collection.objects.push(object)
-			})
-			
+	
+						// convert quad -> tri or tri -> tri
+						const numTriangles = parts.length - 2
+							for (let tri = 0; tri < numTriangles; tri++) {
+								addVertex(parts[0])
+								addVertex(parts[tri + 1])
+								addVertex(parts[tri + 2])
+							}
+						})
+					
+					// config
+					maxIndex[0] += objVertexData[0].length
+					maxIndex[1] += objVertexData[1].length
+					maxIndex[2] += objVertexData[2].length
+	
+					const geometry = new Geometry()
+					geometry.setAttribute('position', new Float32Array(vertexData[0]), { size: 3 })
+					geometry.setAttribute('normal', new Float32Array(vertexData[2]))
+					geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
+					const mesh = new Mesh(geometry, materials[currentObject.material])
+					const object = new TriObject(scene.gl, mesh, key)
+					mesh.location = transform.location || new Vector3([ 0, 0, 0 ])
+					mesh.rotation = transform.rotation || new Vector3([ 0, 0, 0 ])
+					mesh.scale = transform.scale || new Vector3([ 25, 25, 25 ])
+					object.init(scene)
+					collection.objects.push(object)
+				})
+			}
 		}))
 
 	return collection

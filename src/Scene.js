@@ -1,5 +1,7 @@
 import Collection from "./Collection.js"
 
+`use strict`
+
 export default class Scene {
     constructor(gl, shaders) {
         this.gl = gl
@@ -12,8 +14,9 @@ export default class Scene {
         this.cameras = [ ]
         this.lights = [ ]
 
-        this.lastUsedProgram = null
+        this.lastUsedProgramInfo = null
         this.lastUsedVertexArray = null
+        this.lastUsedTexture = null
     }
 
     add(value) {
@@ -51,7 +54,7 @@ export default class Scene {
     }
     
     addCollection(collection) {
-        this.collection.objects.push(collection)
+        this.collection.objects.push(...collection.objects)
     }
 
     activeCamera(camera) {
@@ -69,6 +72,10 @@ export default class Scene {
         })
     }
 
+    activeTexture(texture) {
+        this.lastUsedTexture = texture
+    }
+
     useProgram(program) {
         if (program !== this.lastUsedProgramInfo) {
             this.lastUsedProgramInfo = program
@@ -83,19 +90,17 @@ export default class Scene {
         }
     }
 
-    execCollections(collectionObject, fps, debugMode = false) {
-        if (collectionObject.constructor.name === 'Collection') {
-            collectionObject.objects.forEach(collectionObject => this.execCollections(collectionObject, fps, debugMode))
-        } else {
+    exec(fps, debugMode = false) {
+        this.collection.objects.forEach(object => {
             if (debugMode) {
-                collectionObject.update(fps)
-                collectionObject.draw(this)
+                object.update(fps)
+                object.draw(this)
             } else {
-                if (!collectionObject.debug) {
-                    collectionObject.update(fps)
-                    collectionObject.draw(this)
+                if (!object.debug) {
+                    object.update(fps)
+                    object.draw(this)
                 }
             }
-        }
+        })
     }
 }

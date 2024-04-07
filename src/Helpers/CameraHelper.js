@@ -1,5 +1,7 @@
 import Lines from "../Objects/Lines.js";
 
+`use strict`
+
 export default class CameraHelper extends Lines {
     constructor(cameraElement) {
         super(cameraElement.gl, cameraElement.mesh, 'camera')

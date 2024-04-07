@@ -1,5 +1,7 @@
 import Light from "./Light.js";
 
+`use strict`
+
 export default class DebugLight extends Light {
     constructor(scene, configs = { }) {
         super(scene, configs)

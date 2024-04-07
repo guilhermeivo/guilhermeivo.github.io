@@ -1,4 +1,6 @@
 (function() {
+	`use strict`
+	
 	if (!Math.floorDecimal) {
 		Math.floorDecimal = function(value, exp) {
 			let decimal = 1

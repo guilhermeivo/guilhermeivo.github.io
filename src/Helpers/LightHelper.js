@@ -1,5 +1,7 @@
 import Lines from "../Objects/Lines.js";
 
+`use strict`
+
 export default class LightHelper extends Lines {
     constructor(lightElement) {
         super(lightElement.gl, lightElement.mesh, 'light')

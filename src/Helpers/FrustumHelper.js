@@ -3,6 +3,8 @@ import Material from "../Core/Material.js";
 import Mesh from "../Mesh.js";
 import Lines from "../Objects/Lines.js";
 
+`use strict`
+
 export default class FrustumHelper extends Lines {
     constructor(cameraElement) {
         const geometry = new Geometry()

@@ -9,8 +9,12 @@
     <link rel="icon" type="image/x-icon" href="./resources/favicon.ico">
 </head>
 <body>
+    <button id="buttonLoadObject">Load object</button>
+    <button id="buttonRemoveObject">Remove object</button>
+
     <canvas id="canvas"></canvas>
 
+    <script src="./src/common.js"></script>
     <script src="./src/Math/v3.js"></script>
     <script src="./src/Math/m4.js"></script>
     <script type="module">
@@ -31,7 +35,7 @@ import Camera from './src/Cameras/Camera.js'
 import Light from './src/Lights/Light.js'
 import Axis from './src/Objects/Axis.js'
 
-import { loadObj } from './src/common.js'
+import { loadObj } from './src/Loader.js'
 
 window.addEventListener('load', () => {
     const canvas = document.querySelector('#canvas')
@@ -41,6 +45,28 @@ window.addEventListener('load', () => {
         alert('Unable to initialize WebGL. Your browser or machine may not support it.')
         return
     }
+
+    document.querySelector('#buttonLoadObject').addEventListener('click', () => {
+        /// MONKEY
+        loadObj(scene, '../resources/monkey/', 'monkey.obj')
+            .then(collection => {
+                scene.add(collection)
+                const monkey = collection.objects[0]
+                monkey.rotationSpeed = .2
+                monkey.parent = axis
+                monkey._update = (state, fps) => {
+                    axis.mesh.rotation[1] += state.rotationSpeed / fps
+                }
+            })
+    })
+
+    document.querySelector('#buttonRemoveObject').addEventListener('click', () => {
+        const suzanne = scene.collection.objects.filter(object => object.name === 'Suzanne')[0]
+        const index = scene.collection.objects.indexOf(suzanne)
+        if (index > -1) { 
+            scene.collection.objects.splice(index, 1)
+        }
+    })
 
     // SCENE
     const shader = new Program(gl, vertexSource, fragmentSource)
@@ -78,18 +104,6 @@ window.addEventListener('load', () => {
         color: [ 0, 0, .9 ]
     })
     scene.add(lightBlue)
-
-    /// MONKEY
-    loadObj(scene, '../resources/monkey/', 'monkey.obj')
-        .then(collection => {
-            scene.add(collection)
-            const monkey = collection.objects[0]
-            monkey.rotationSpeed = .2
-            monkey.parent = axis
-            monkey._update = (state, fps) => {
-                axis.mesh.rotation[1] += state.rotationSpeed / fps
-            }
-        })
 
     /// RENDERER
     const renderer = new Renderer(gl)

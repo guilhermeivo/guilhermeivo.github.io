@@ -47,12 +47,13 @@ window.addEventListener('load', () => {
     
     const card = extractValue(/((NVIDIA|AMD|Intel)[^\d]*[^\s]+)/, paramRenderer)
     
-    const tokens = card.split(' ')
-    tokens.shift()
+    // const tokens = card.split(' ')
+    // tokens.shift()
     
-    const manufacturer = extractValue(/(NVIDIA|AMD|Intel)/g, card)
-    const cardVersion = tokens.pop()
-    const brand = tokens.join(' ')
+    // const manufacturer = extractValue(/(NVIDIA|AMD|Intel)/g, card)
+    const manufacturer = 'AMD'
+    // const cardVersion = tokens.pop()
+    // const brand = tokens.join(' ')
     const integrated = manufacturer === 'Intel'
 
     const overlayDebug = document.querySelector('overlay-debug')

@@ -1,6 +1,8 @@
 import LightMesh from "./LightMesh.js";
 import BasicObject from "../Objects/BasicObject.js";
 
+`use strict`
+
 export default class DebugLight extends BasicObject {
     constructor(gl, configs = { }) {
         const mesh = new LightMesh(configs)

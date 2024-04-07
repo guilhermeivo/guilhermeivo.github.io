@@ -1,3 +1,5 @@
+`use strict`
+
 export default class Mesh {
     constructor(geometry, material, transformation = {}) {
         this.geometry = geometry

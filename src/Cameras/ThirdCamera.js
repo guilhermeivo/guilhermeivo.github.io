@@ -1,5 +1,7 @@
 import Camera from "./Camera.js";
 
+`use strict`
+
 export default class ThirdCamera extends Camera {
     constructor(scene, target, aspect, config = {}) {
         super(scene, aspect, { }, config)
