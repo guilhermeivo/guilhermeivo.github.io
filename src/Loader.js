@@ -240,6 +240,7 @@ const loadObj = async (scene, url, object, transform = { }) => {
 					geometry.setAttribute('position', new Float32Array(vertexData[0]), { size: 3 })
 					geometry.setAttribute('normal', new Float32Array(vertexData[2]))
 					geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
+
 					const mesh = new Mesh(geometry, materials[currentObject.material])
 					const object = new TriObject(scene.gl, mesh, key)
 					mesh.location = transform.location || new Vector3([ 0, 0, 0 ])

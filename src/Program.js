@@ -28,6 +28,8 @@ export default class Program {
         const fragmentShader = this.compileShader(fragmentShaderSource, this.gl.FRAGMENT_SHADER)
 
         const program = this.createProgram(vertexShader, fragmentShader)
+        this.deleteShader(vertexShader)
+        this.deleteShader(fragmentShader)
         return program
     }
 

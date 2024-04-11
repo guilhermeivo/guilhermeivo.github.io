@@ -13,13 +13,18 @@ import FrustumHelper from './Helpers/FrustumHelper.js'
 import Light from './Lights/Light.js'
 import { loadObj } from './Loader.js'
 import Axis from './Objects/Axis.js'
-import ThirdCamera from './Cameras/ThirdCamera.js'
 import DebugCamera from './Cameras/DebugCamera.js'
 import Camera from './Cameras/Camera.js'
 import CameraHelper from './Helpers/CameraHelper.js'
 import LightHelper from './Helpers/LightHelper.js'
 
-window.addEventListener('load', () => {
+import monkey from '../resources/monkey/monkey.js'
+import Material from './Core/Material.js'
+import Geometry from './Core/Geometry.js'
+import Mesh from './Mesh.js'
+import TriObject from './Objects/TriObject.js'
+
+(() => {
     const DEBUG_MODE = true
 
     const canvas = document.querySelector('#canvas')
@@ -158,10 +163,32 @@ window.addEventListener('load', () => {
     const renderer = new Renderer(gl)
 
     /// MONKEY
-    loadObj(scene, '../resources/arcade/', 'arcade.obj')
+    /*loadObj(scene, '../resources/monkey/', 'monkey.obj')
         .then(collection => {
             scene.add(collection)
-        })
+            const monkey = collection.objects[0]
+            monkey.rotationSpeed = .2
+            monkey.parent = axis
+            monkey._update = (state, fps) => {
+                axis.mesh.rotation[1] += state.rotationSpeed / fps
+            }
+        })*/
+
+    const geometry = new Geometry()
+    geometry.setAttribute('position', monkey.vertice(), { size: 3 })
+    geometry.setAttribute('normal', monkey.normal())
+    geometry.setAttribute('color', monkey.color(), { size: 2, normalize: false })
+    geometry.setAttribute('texcoord', monkey.texture(), { size: 2, normalize: false })
+    const material = new Material()
+    const mesh = new Mesh(geometry, material)
+    mesh.scale.set([ 50, 50, 50 ])
+    const object = new TriObject(gl, mesh, 'monkey')
+    object.rotationSpeed = .2
+    object.parent = axis
+    object._update = (state, fps) => {
+        axis.mesh.rotation[1] += state.rotationSpeed / fps
+    }
+    scene.add(object)
 
     /// Light
     const light001 = new Light(gl, { 
@@ -187,7 +214,7 @@ window.addEventListener('load', () => {
         let fps = 1000 / deltaTime
 
         if (DEBUG_MODE) {
-            if (timeStamp - lastTimeSecond >= 5000) {
+            if (timeStamp - lastTimeSecond >= 1000) {
                 lastTimeSecond = timeStamp
                 fpsElement.value = fps.toFixed(2)
             }
@@ -197,8 +224,7 @@ window.addEventListener('load', () => {
             renderer.render(scene, camera, fps)
         }
         
-        window.scene = scene
         window.requestAnimationFrame(animate)
     }
     animate(0)
-})
+})()

@@ -1,0 +1,1 @@
+export const FloatType = 5126

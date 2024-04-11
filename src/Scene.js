@@ -6,7 +6,7 @@ export default class Scene {
     constructor(gl, shaders) {
         this.gl = gl
         this.shaders = shaders
-        this.shader = this.shaders[0]
+        this.activeShaders(0)
 
         this.collection = new Collection('scene')
 

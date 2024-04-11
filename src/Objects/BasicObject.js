@@ -61,11 +61,11 @@ export default class BasicObject {
             })
         }
 
+        this.counter = this.mesh.geometry.attributes['a_position'].data.length
+
         this.gl.bindVertexArray(null)
 
         this.isInitialized = true
-
-        this.counter = this.mesh.geometry.attributes['a_position'].data.length
 
         Object.keys(this.mesh.geometry.attributes).forEach(key => {
             const currentAttribute = this.mesh.geometry.attributes[key]

@@ -2,11 +2,9 @@
   "name": "webgl",
   "version": "1.0.0",
   "description": "",
-  "main": "",
+  "main": "index.js",
   "scripts": {},
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "memlab": "^1.1.45"
-  }
+  "type": "module",
+  "license": "ISC"
 }

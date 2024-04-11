@@ -9,3 +9,7 @@
 # Links
 
 [Opengl materials](http://devernay.free.fr/cours/opengl/materials.html)
+
+- node --trace index.js
+- node --inspect index.js
+    - chrome://inspect/#devices

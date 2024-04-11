@@ -172,6 +172,7 @@
 		}
 
 		output.set(temp)
+		temp = null
     }
 
 	/**
@@ -180,57 +181,57 @@
 	 * @returns { Matrix4 }
 	 */
 	const inverse = (matrix) => {
-		var m00 = matrix[0 * 4 + 0]
-		var m01 = matrix[0 * 4 + 1]
-		var m02 = matrix[0 * 4 + 2]
-		var m03 = matrix[0 * 4 + 3]
-		var m10 = matrix[1 * 4 + 0]
-		var m11 = matrix[1 * 4 + 1]
-		var m12 = matrix[1 * 4 + 2]
-		var m13 = matrix[1 * 4 + 3]
-		var m20 = matrix[2 * 4 + 0]
-		var m21 = matrix[2 * 4 + 1]
-		var m22 = matrix[2 * 4 + 2]
-		var m23 = matrix[2 * 4 + 3]
-		var m30 = matrix[3 * 4 + 0]
-		var m31 = matrix[3 * 4 + 1]
-		var m32 = matrix[3 * 4 + 2]
-		var m33 = matrix[3 * 4 + 3]
-		var tmp_0  = m22 * m33
-		var tmp_1  = m32 * m23
-		var tmp_2  = m12 * m33
-		var tmp_3  = m32 * m13
-		var tmp_4  = m12 * m23
-		var tmp_5  = m22 * m13
-		var tmp_6  = m02 * m33
-		var tmp_7  = m32 * m03
-		var tmp_8  = m02 * m23
-		var tmp_9  = m22 * m03
-		var tmp_10 = m02 * m13
-		var tmp_11 = m12 * m03
-		var tmp_12 = m20 * m31
-		var tmp_13 = m30 * m21
-		var tmp_14 = m10 * m31
-		var tmp_15 = m30 * m11
-		var tmp_16 = m10 * m21
-		var tmp_17 = m20 * m11
-		var tmp_18 = m00 * m31
-		var tmp_19 = m30 * m01
-		var tmp_20 = m00 * m21
-		var tmp_21 = m20 * m01
-		var tmp_22 = m00 * m11
-		var tmp_23 = m10 * m01
+		m00 = matrix[0 * 4 + 0]
+		m01 = matrix[0 * 4 + 1]
+		m02 = matrix[0 * 4 + 2]
+		m03 = matrix[0 * 4 + 3]
+		m10 = matrix[1 * 4 + 0]
+		m11 = matrix[1 * 4 + 1]
+		m12 = matrix[1 * 4 + 2]
+		m13 = matrix[1 * 4 + 3]
+		m20 = matrix[2 * 4 + 0]
+		m21 = matrix[2 * 4 + 1]
+		m22 = matrix[2 * 4 + 2]
+		m23 = matrix[2 * 4 + 3]
+		m30 = matrix[3 * 4 + 0]
+		m31 = matrix[3 * 4 + 1]
+		m32 = matrix[3 * 4 + 2]
+		m33 = matrix[3 * 4 + 3]
+		tmp_0  = m22 * m33
+		tmp_1  = m32 * m23
+		tmp_2  = m12 * m33
+		tmp_3  = m32 * m13
+		tmp_4  = m12 * m23
+		tmp_5  = m22 * m13
+		tmp_6  = m02 * m33
+		tmp_7  = m32 * m03
+		tmp_8  = m02 * m23
+		tmp_9  = m22 * m03
+		tmp_10 = m02 * m13
+		tmp_11 = m12 * m03
+		tmp_12 = m20 * m31
+		tmp_13 = m30 * m21
+		tmp_14 = m10 * m31
+		tmp_15 = m30 * m11
+		tmp_16 = m10 * m21
+		tmp_17 = m20 * m11
+		tmp_18 = m00 * m31
+		tmp_19 = m30 * m01
+		tmp_20 = m00 * m21
+		tmp_21 = m20 * m01
+		tmp_22 = m00 * m11
+		tmp_23 = m10 * m01
 	
-		var t0 = (tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31) -
+		t0 = (tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31) -
 				 (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31)
-		var t1 = (tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31) -
+		t1 = (tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31) -
 				 (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31)
-		var t2 = (tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31) -
+		t2 = (tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31) -
 				 (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31)
-		var t3 = (tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21) -
+		t3 = (tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21) -
 				 (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21)
 	
-		var d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3)
+		const d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3)
 	
 		return [
 		  d * t0,
