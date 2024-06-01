@@ -1,21 +1,20 @@
+import Geometry from "../Core/Geometry.js";
+import Material from "../Core/Material.js";
 import Lines from "../Objects/Lines.js";
-
-`use strict`
+import { UnsignedByte } from "../constants.js";
 
 export default class LightHelper extends Lines {
     constructor(lightElement) {
-        super(lightElement.gl, lightElement.mesh, 'light')
-        lightElement.mesh.geometry.setAttribute('position', light.vertice())
-        lightElement.mesh.geometry.setAttribute('color', light.color(), { type: lightElement.gl.UNSIGNED_BYTE })
-        lightElement.mesh.geometry.setAttribute('texcoord', light.texture(), { size: 2 })
-        lightElement.mesh.geometry.setIndice(light.indices())
+        const geometry = new Geometry()
+        geometry.setAttribute('position', light.vertice())
+        geometry.setAttribute('color', light.color(), { type: UnsignedByte })
+        geometry.setAttribute('texcoord', light.texture(), { size: 2 })
+        geometry.setIndice(light.indices())
+        const material = new Material()
 
-        this.debug = true
-        this.light = lightElement
-    }
+        super(geometry, material)
 
-    update() { 
-        this.worldMatrix = this.light.worldMatrix
+        this.parent = lightElement
     }
 }
 

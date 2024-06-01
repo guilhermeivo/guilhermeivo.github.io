@@ -1,20 +1,20 @@
+import Matrix4 from "../Math/Matrix4.js";
 import Camera from "./Camera.js";
 
-`use strict`
-
+// TODO: remake
 export default class ThirdCamera extends Camera {
-    constructor(scene, target, aspect, config = {}) {
-        super(scene, aspect, { }, config)
+    constructor(target, config = {}) {
+        super({ }, config)
         this.parent = target
         this.target = target
 
         this.tempLocation = new Matrix4()
 
-        this.update()
+        this._onBeforeRender()
     }
 
-    update() {
-        this.reset()
+    _onBeforeRender() {
+        this.projectionViewMatrix.identity()
         
         // perspective or projection matrix
         this.projectionMatrix = this.orthographic 

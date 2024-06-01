@@ -1,21 +1,18 @@
 import Geometry from "../Core/Geometry.js";
-import Mesh from "../Mesh.js";
 import Lines from "./Lines.js";
 import Material from "../Core/Material.js";
-
-`use strict`
+import { UnsignedByte } from "../constants.js";
 
 export default class AxisObject extends Lines {
-    constructor(gl, transformation = { }) {
+    constructor(transformation = { }) {
         const geometry = new Geometry()
         geometry.setAttribute('position', axis.vertice())
-        geometry.setAttribute('color', axis.color(), { type: gl.UNSIGNED_BYTE })
+        geometry.setAttribute('color', axis.color(), { type: UnsignedByte })
         geometry.setAttribute('texcoord', axis.texture(), { size: 2 })
         geometry.setIndice(axis.indices())
         const material = new Material()
-        const mesh = new Mesh(geometry, material, transformation)
         
-        super(gl, mesh, 'axis')
+        super(geometry, material, transformation)
 
         this.debug = true
     }

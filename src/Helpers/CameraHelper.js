@@ -1,20 +1,23 @@
+import Geometry from "../Core/Geometry.js";
+import Material from "../Core/Material.js";
 import Lines from "../Objects/Lines.js";
-
-`use strict`
+import { UnsignedByte } from "../constants.js";
 
 export default class CameraHelper extends Lines {
     constructor(cameraElement) {
-        super(cameraElement.gl, cameraElement.mesh, 'camera')
-        cameraElement.mesh.geometry.setAttribute('position', camera.vertice())
-        cameraElement.mesh.geometry.setAttribute('color', camera.color(), { type: cameraElement.gl.UNSIGNED_BYTE })
-        cameraElement.mesh.geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
-        cameraElement.mesh.geometry.setIndice(camera.indices())
+        const geometry = new Geometry()
+        geometry.setAttribute('position', camera.vertice())
+        geometry.setAttribute('color', camera.color(), { type: UnsignedByte })
+        geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
+        geometry.setIndice(camera.indices())
+        const material = new Material()
 
-        this.debug = true
+        super(geometry, material)
+        
         this.camera = cameraElement
     }
 
-    update() {
+    onBeforeRender() {
         this.worldMatrix = this.camera.modelMatrix
     }
 }

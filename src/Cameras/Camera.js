@@ -1,16 +1,14 @@
-import CameraMesh from "./CameraMesh.js";
-import BasicObject from "../Objects/BasicObject.js";
+import Vector3 from "../Math/Vector3.js";
+import Matrix4 from "../Math/Matrix4.js";
+import Object3 from "../Objects/Object3.js";
 
-`use strict`
-
-export default class Camera extends BasicObject {
-    constructor(gl, aspect, transformation = {}, config = {}) {
-        const mesh = new CameraMesh(transformation)
-        super(gl, mesh, 'camera')
+export default class Camera extends Object3 {
+    constructor(transformation = {}, config = {}) {
+        super(transformation)
 
         this.type = 'camera'
 
-        this.aspect = aspect
+        this.aspect = 1
 
         this.zNear = config.zNear || 0
         this.zFar = config.zFar || 1
@@ -19,10 +17,10 @@ export default class Camera extends BasicObject {
         this.orthographic = config.orthographic || false
         this.orthographicUnits = config.orthographicUnits || 1
 
-        this.parent = this
+        this.parent = null
 
-        this.target = new Vector3([ 0, 0, 0 ])
-        this.up = new Vector3([0, 1, 0])
+        this.target = new Vector3(0, 0, 0)
+        this.up = new Vector3(0, 1, 0)
 
         this.projectionMatrix = new Matrix4()
         this.cameraMatrix = new Matrix4()
@@ -30,13 +28,11 @@ export default class Camera extends BasicObject {
         this.projectionViewMatrix = new Matrix4()
     }
 
-    init(scene) { }
-
-    update() {
-        this.projectionViewMatrix.reset()
+    _onBeforeRender() {
+        this.projectionViewMatrix.identity()
         
         // perspective or projection matrix
-        this.projectionMatrix = this.orthographic 
+        /*this.projectionMatrix = this.orthographic 
         ? m4.orthographic(
             -this.orthographicUnits * this.aspect,  // left
             this.orthographicUnits * this.aspect,   // right
@@ -44,23 +40,22 @@ export default class Camera extends BasicObject {
             this.orthographicUnits,            // top
             this.zNear,
             this.zFar)
-        : m4.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
+        : m4.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)*/
+        this.projectionMatrix.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
 
         // camera matrix
-        let location = !!this.parent.mesh
-            ? this.parent.mesh.location 
-            : this.parent.location
-        let target = !!this.target.mesh 
-            ? this.target.mesh.location 
-            : this.target
-        this.cameraMatrix = m4.lookAt(location, target, this.up)
+        this.cameraMatrix.lookAt(
+            !this.parent ? this.position.elements : this.parent.position.elements,
+            this.target.elements, 
+            this.up.elements)
 
         // Make a view matrix from the camera matrix
-        this.viewMatrix = m4.inverse(this.cameraMatrix)
+        this.viewMatrix.invert(this.cameraMatrix)
 
         // move the projection space to view space (the space in front of the camera)
         // perspective or projection matrix * view matrix
-        m4.multiply(this.projectionViewMatrix, this.projectionMatrix, this.viewMatrix)
+        this.projectionViewMatrix.multiply(this.projectionMatrix)
+        this.projectionViewMatrix.multiply(this.viewMatrix)
 
         this.modelMatrix = this.cameraMatrix
     }

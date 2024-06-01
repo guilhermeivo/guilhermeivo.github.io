@@ -1,6 +1,4 @@
-`use strict`
-
-export default class Texture {
+export default class GLTexture {
     constructor(gl, textureTarget = gl.TEXTURE_2D) {
         this.id = 0
         this.data = null
@@ -12,11 +10,8 @@ export default class Texture {
         this.bind(gl, this.id)
 
         this.createTextureWithImage(gl, image)
-
-        gl.texParameteri(this.target, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(this.target, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-        gl.texParameteri(this.target, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR );
         gl.generateMipmap(this.target)
 
         return this.data

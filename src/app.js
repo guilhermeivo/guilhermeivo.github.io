@@ -1,14 +1,10 @@
 `use strict`
 
-// https://webgl2fundamentals.org/
-
-import Program from './Program.js'
 import vertexSource from './shaders/vertexSource.js'
 import fragmentSource from './shaders/fragmentSource.js'
 import Scene from './Scene.js'
 
 import './components/overlayDebug/index.js'
-import Renderer from './Renderer.js'
 import FrustumHelper from './Helpers/FrustumHelper.js'
 import Light from './Lights/Light.js'
 import { loadObj } from './Loader.js'
@@ -22,18 +18,15 @@ import monkey from '../resources/monkey/monkey.js'
 import Material from './Core/Material.js'
 import Geometry from './Core/Geometry.js'
 import Mesh from './Mesh.js'
-import TriObject from './Objects/TriObject.js'
+import Vector3 from './Math/Vector3.js'
+import GLRenderer from './GLRenderer.js'
 
 (() => {
-    const DEBUG_MODE = true
-
-    const canvas = document.querySelector('#canvas')
-    const gl = canvas.getContext('webgl2', { preserveDrawingBuffer: true, powerPreference: "high-performance" }) // WebGLRenderingContext
-
-    if (!gl) {
-        alert('Unable to initialize WebGL. Your browser or machine may not support it.')
-        return
-    }
+    const DEBUG_MODE = false
+    
+    const glRenderer = new GLRenderer(vertexSource, fragmentSource)
+    glRenderer.setSize(window.innerWidth, window.innerHeight) // change resolution image
+    document.body.appendChild(glRenderer.gl.canvas)
 
     const performance = window.performance
     const performanceKeys = [];
@@ -47,8 +40,8 @@ import TriObject from './Objects/TriObject.js'
         return matches && matches[0]
     }
 
-    const paramVendor = gl.getParameter(gl.VENDOR)
-    const paramRenderer = gl.getParameter(gl.RENDERER)
+    const paramVendor = glRenderer.gl.getParameter(glRenderer.gl.VENDOR)
+    const paramRenderer = glRenderer.gl.getParameter(glRenderer.gl.RENDERER)
     
     const card = extractValue(/((NVIDIA|AMD|Intel)[^\d]*[^\s]+)/, paramRenderer)
     
@@ -128,31 +121,32 @@ import TriObject from './Objects/TriObject.js'
     const fpsElement = document.querySelector('#textFPS')
 
     // SCENE
-    const shader = new Program(gl, vertexSource, fragmentSource)
-    const scene = new Scene(gl, [ shader ])
+    const scene = new Scene()
 
     /// AXIS
-    const axis = new Axis(gl, {
-        location: new Vector3([ 0, 40, 0 ]),
-        scale: new Vector3([ 50, 50, 50 ])
+    const axis = new Axis({
+        position: new Vector3(0, 55, 0),
+        scale: new Vector3(50, 50, 50)
     })
-    scene.add(axis)
+    //scene.add(axis)
 
     /// CAMERA
-    const camera = new DebugCamera(gl, (canvas.width / 2) / canvas.height, { }, {
-        zNear: 30,
+    const camera = new Camera({
+        position: new Vector3(100, 100, 250)
+    }, {
+        zNear: 1,
         zFar: 1000,
         fieldOfViewRadians: Math.degreeToRadians(45),
         orthographic: false,
         orthographicUnits: 50
     })
-    camera.target = axis
+    camera.target = axis.position
     scene.add(camera)
-    scene.add(new CameraHelper(camera))
-    scene.add(new FrustumHelper(camera))
+    //scene.add(new CameraHelper(camera))
+    //scene.add(new FrustumHelper(camera))
 
-    const debugCamera = new Camera(gl, (canvas.width / 2) / canvas.height, {
-        location: new Vector3([ 200, 400, 800 ])
+    const debugCamera = new Camera({
+        position: new Vector3(200, 800, 800)
     }, {
         zNear: 30,
         zFar: 2000
@@ -160,48 +154,105 @@ import TriObject from './Objects/TriObject.js'
     scene.add(debugCamera)
 
     /// RENDERER
-    const renderer = new Renderer(gl)
 
     /// MONKEY
-    /*loadObj(scene, '../resources/monkey/', 'monkey.obj')
+    loadObj(glRenderer.gl, '../resources/arcade/', 'arcade.obj')
         .then(collection => {
             scene.add(collection)
-            const monkey = collection.objects[0]
-            monkey.rotationSpeed = .2
-            monkey.parent = axis
-            monkey._update = (state, fps) => {
-                axis.mesh.rotation[1] += state.rotationSpeed / fps
-            }
-        })*/
+        })
 
-    const geometry = new Geometry()
-    geometry.setAttribute('position', monkey.vertice(), { size: 3 })
-    geometry.setAttribute('normal', monkey.normal())
-    geometry.setAttribute('color', monkey.color(), { size: 2, normalize: false })
-    geometry.setAttribute('texcoord', monkey.texture(), { size: 2, normalize: false })
-    const material = new Material()
-    const mesh = new Mesh(geometry, material)
-    mesh.scale.set([ 50, 50, 50 ])
-    const object = new TriObject(gl, mesh, 'monkey')
-    object.rotationSpeed = .2
-    object.parent = axis
-    object._update = (state, fps) => {
-        axis.mesh.rotation[1] += state.rotationSpeed / fps
+    setTimeout(async () => {
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        let steps = 100
+        for (let i = steps; i >= 0; i--) {
+            const t = i / 100
+            const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
+            camera.position.set(((100 - 60) * curve) + 60, ((100 - 75) * curve) + 75, 250 * curve)
+            await sleep(5)
+        }
+
+        loadScreen()
+    }, 1000)
+
+    let scrollY = 0
+
+    const canvasScreen = document.createElement('canvas')
+    const width = 1000
+    const height = 750
+    const screenMarginWidth = 180
+    const screenMarginHeight = 150
+    canvasScreen.width = width
+    canvasScreen.height = height
+    const ctx = canvasScreen.getContext("2d")
+
+    const screenImage = new Image()
+    screenImage.src = '../resources/arcade/screen_blank.png'
+
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${ (width - screenMarginWidth * 2) }" min-height="${ height - screenMarginHeight * 2 }">
+    <foreignObject width="100%" height="100%">
+        <div xmlns="http://www.w3.org/1999/xhtml" width="100%" height="100%">${ document.querySelector('#screen').innerHTML }</div>
+    </foreignObject>
+    </svg>`
+    
+    const svgBlob = new Blob( [svg], { type: 'image/svg+xml;charset=utf-8' } );
+    const svgObjectUrl = URL.createObjectURL(svgBlob)
+
+    const img = new Image()
+    img.src = svgObjectUrl
+
+    const loadScreen = () => {
+        const screen = scene.children.filter(object => object.type == 'collection')[0]
+            .children.filter(object => object.material.name == 'Screen')[0]
+
+        ctx.fillRect(0, 0, width, height);
+        ctx.scale(1, -1)
+        ctx.drawImage(img, screenMarginWidth, screenMarginHeight - scrollY, width - screenMarginWidth * 2, (height - screenMarginHeight * 2) * -1 - screenMarginHeight * 2 - scrollY)
+        ctx.scale(1, -1)
+        ctx.drawImage(screenImage, 0, 0)
+        const newScreenImage = new Image()
+        newScreenImage.onload = () => {
+            screen.material.samplers.diffuseMap.setImageTexture(glRenderer.gl, newScreenImage)
+        }
+        newScreenImage.src = canvasScreen.toDataURL("image/png")
     }
-    scene.add(object)
+
+    document.addEventListener('keydown', function(event) {
+        const key = event.key;
+        const scrollLenght = 50
+
+        switch (key) {
+            case "ArrowUp":
+                scrollY-=scrollLenght
+                break;
+            case "ArrowDown":
+                scrollY+=scrollLenght
+                break;
+        }
+
+        const max = height - screenMarginHeight * 2
+
+        if (scrollY < 0) scrollY = 0
+        else if (scrollY >= document.querySelector('#screen>div').scrollHeight - max) scrollY = document.querySelector('#screen>div').scrollHeight - max
+
+        loadScreen()
+    })
 
     /// Light
-    const light001 = new Light(gl, { 
-        location: new Vector3([ 125, 125, -125 ])
+    const light001 = new Light({ 
+        position: new Vector3(125, 125, -125)
     })
-    scene.add(light001)
-    scene.add(new LightHelper(light001))
+    scene.addLight(light001)
+    //scene.add(new LightHelper(light001))
 
-    const light002 = new Light(gl, {
-        location: new Vector3([ -125, 150, 125 ])
+    const light002 = new Light({
+        position: new Vector3(-125, 150, 125)
     })
-    scene.add(light002)
-    scene.add(new LightHelper(light002))
+    scene.addLight(light002)
+    //scene.add(new LightHelper(light002))
 
     if (DEBUG_MODE) overlayDebug.toggle()
 
@@ -219,9 +270,9 @@ import TriObject from './Objects/TriObject.js'
                 fpsElement.value = fps.toFixed(2)
             }
 
-            renderer.renderScissor(scene, [ camera, debugCamera ], fps)
+            glRenderer.renderScissor(scene, [ camera, debugCamera ], fps)
         } else {
-            renderer.render(scene, camera, fps)
+            glRenderer.render(scene, camera, fps)
         }
         
         window.requestAnimationFrame(animate)

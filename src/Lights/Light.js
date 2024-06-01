@@ -1,26 +1,20 @@
-import LightMesh from "./LightMesh.js";
-import BasicObject from "../Objects/BasicObject.js";
+import Object3 from "../Objects/Object3.js";
+import Uniforms from "../Core/Uniforms.js"
 
-`use strict`
-
-export default class DebugLight extends BasicObject {
-    constructor(gl, configs = { }) {
-        const mesh = new LightMesh(configs)
-        super(gl, mesh, 'light')
+export default class Light extends Object3 {
+    constructor(configs = { }) {
+        super(configs)
 
         this.type = 'light'
 
-        this.color = configs.color || [ 1, 1, 1 ]
-        this.itensity = configs.itensity || [ .5 ]
-        this.ambient = configs.ambient || [ 0.05, 0.05, 0.05 ]
-        this.diffuse = configs.diffuse || [ 0.8, 0.8, 0.8 ]
-        this.specular = configs.specular || [ 1.0, 1.0, 1.0 ]
+        this.uniforms = new Uniforms()
 
-        this.constant = [ 1.0 ]
-        this.linear = [ 0.002 ]
+        this.uniforms.add('color', configs.color || [ 1, 1, 1 ], 'vec3')
+        this.uniforms.add('itensity', configs.itensity || [ .5 ], 'float')
+        this.uniforms.add('ambient', configs.ambient || [ 0.05, 0.05, 0.05 ], 'vec3')
+        this.uniforms.add('diffuse', configs.diffuse || [ 0.8, 0.8, 0.8 ], 'vec3')
+        this.uniforms.add('specular', configs.specular || [ 1.0, 1.0, 1.0 ], 'vec3')
+        this.uniforms.add('constant', [ 1.0 ], 'float')
+        this.uniforms.add('linear', [ 0.002 ], 'float')
     }
-
-    init(scene) { }
-
-    _update() { }
 }

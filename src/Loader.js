@@ -1,11 +1,9 @@
 import Collection from "./Collection.js"
 import Geometry from "./Core/Geometry.js"
 import Material from "./Core/Material.js"
+import Vector3 from "./Math/Vector3.js"
 import Mesh from "./Mesh.js"
-import Texture from "./Textures/Texture.js"
-import TriObject from "./Objects/TriObject.js"
-
-`use strict`
+import GLTexture from "./Textures/GLTexture.js"
 
 const objToJson = async (url, file, current = 'objects') => {
 	const data = await fetch(url + file)
@@ -136,8 +134,8 @@ const objToJson = async (url, file, current = 'objects') => {
 	return json
 }
 
-const loadObj = async (scene, url, object, transform = { }) => {
-	const collection = new Collection(object.split('.')[0])
+const loadObj = async (gl, url, object, transform = { }) => {
+	const collection = new Collection()
 	let materials = { }
 	let maxIndex = [ 1, 1, 1 ]
 	let vertexData = [ [], [], [] ]
@@ -182,12 +180,12 @@ const loadObj = async (scene, url, object, transform = { }) => {
 						samplersName.forEach(async (samplerKey, index) => {
 							const name = currentMaterial[samplerKey] || 'empty'
 							if (!Object.keys(textures).includes(name) || textures[name].id != index) {
-								const texture = new Texture(scene.gl)
+								const texture = new GLTexture(gl)
 								texture.id = index
 
-								if (!json.images || !json.images[name]) texture.setEmptyTexture(scene.gl)
-								else if (json.images[name].succeed) texture.setImageTexture(scene.gl, json.images[name].data)
-								else texture.setErrorTexture(scene.gl)
+								if (!json.images || !json.images[name]) texture.setEmptyTexture(gl)
+								else if (json.images[name].succeed) texture.setImageTexture(gl, json.images[name].data)
+								else texture.setErrorTexture(gl)
 	
 								textures[name] = texture
 							}
@@ -242,12 +240,11 @@ const loadObj = async (scene, url, object, transform = { }) => {
 					geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
 
 					const mesh = new Mesh(geometry, materials[currentObject.material])
-					const object = new TriObject(scene.gl, mesh, key)
-					mesh.location = transform.location || new Vector3([ 0, 0, 0 ])
-					mesh.rotation = transform.rotation || new Vector3([ 0, 0, 0 ])
-					mesh.scale = transform.scale || new Vector3([ 25, 25, 25 ])
-					object.init(scene)
-					collection.objects.push(object)
+					mesh.position = transform.position || new Vector3(0, 0, 0)
+					mesh.rotation = transform.rotation || new Vector3(0, 0, 0)
+					mesh.scale = transform.scale || new Vector3(25, 25, 25)
+
+					collection.add(mesh)
 				})
 			}
 		}))

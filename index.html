@@ -7,15 +7,57 @@
     <link rel="stylesheet" href="./resources/style.css">
 
     <link rel="icon" type="image/x-icon" href="./resources/favicon.ico">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font: 24px consolas;
+        }
+    </style>
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+    <div id="screen" style="height: 0; overflow: hidden;">
+        <div style=" padding: 48px;font:24px consolas; color: #FFFFFF;">
+            <h3>Oi 👋, meu nome é Guilherme</h3>
+            <p>Técnico em Desenvolvimento de Sistemas (ETESP)</p>
+            <p>Cursando Sistemas de Informação (USP)</p>
+    
+            <h2 style="text-align: center;">Projects</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr;">
+                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
+                    <h3 style="margin: 0; margin-bottom: 4px;">BaseTech-Inc/Tupa-Server</h2>
+                    <p style="margin: 0">Servidor para a empresa Tupã desenvolvido por @BaseTech-Inc.</p>
+                </div>
+                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
+                    <h3 style="margin: 0; margin-bottom: 4px;">experiment-using-mouse</h3>
+                    <p style="margin: 0">Desafios para ajudar um rato a encontrar um pedaço de queijo em um labirinto.</p>
+                </div>
+                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
+                    <h3 style="margin: 0; margin-bottom: 4px;">snake-game</h3>
+                    <p style="margin: 0">O clássico jogo da cobrinha no console gameboy.</p>
+                </div>
+                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
+                    <h3 style="margin: 0; margin-bottom: 4px;">discord-bot</h3>
+                    <p style="margin: 0">Template para Discord Bots.</p>
+                </div>
+                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
+                    <h3 style="margin: 0; margin-bottom: 4px;">tcm-codezone</h3>
+                    <p style="margin: 0">Projeto desenvolvido para trabalho de conclusão de módulo (TCM).</p>
+                </div>
+            </div>
+    
+            <p style="text-align: center;">created by <a href="https://github.com/guilhermeivo" style="color: #FFFFFF">guilhermeivo</a> <span title="🥄">❤️</span></p>
+        </div>
+    </div>
 
     <overlay-debug></overlay-debug>
 
     <script src="./src/common.js"></script>
-    <script src="./src/Math/v3.js"></script>
-    <script src="./src/Math/m4.js"></script>
     <script type="module" src="./src/app.js"></script>
+
+    <!-- Gabizinha ❤️🥄 -->
 </body>
 </html>

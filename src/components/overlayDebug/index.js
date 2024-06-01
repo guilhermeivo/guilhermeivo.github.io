@@ -1,5 +1,3 @@
-`use strict`
-
 const types = {
     button: {
         id: 'button',

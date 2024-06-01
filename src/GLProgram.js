@@ -1,9 +1,7 @@
-`use strict`
-
-export default class Program {
+export default class GLProgram {
     constructor(gl, vertexShaderSource, fragmentShaderSource) {
         this.gl = gl
-        this.program = this.compile(vertexShaderSource, fragmentShaderSource)
+        this.id = this.compile(vertexShaderSource, fragmentShaderSource)
         this.types = {
             float: 'float',
             vec2: 'vec2',
@@ -27,10 +25,10 @@ export default class Program {
         const vertexShader = this.compileShader(vertexShaderSource, this.gl.VERTEX_SHADER)
         const fragmentShader = this.compileShader(fragmentShaderSource, this.gl.FRAGMENT_SHADER)
 
-        const program = this.createProgram(vertexShader, fragmentShader)
+        const id = this.createProgram(vertexShader, fragmentShader)
         this.deleteShader(vertexShader)
         this.deleteShader(fragmentShader)
-        return program
+        return id
     }
 
     compileShader(source, type) {
@@ -51,29 +49,34 @@ export default class Program {
 
     // criar programa GLSL na GPU
     createProgram(vertexShader, fragmentShader) {
-        const program = this.gl.createProgram()
-        this.gl.attachShader(program, vertexShader) // coordenadas
-        this.gl.attachShader(program, fragmentShader) // cores
-        this.gl.linkProgram(program)
-        const result = this.gl.getProgramParameter(program, this.gl.LINK_STATUS)
+        const id = this.gl.createProgram()
+        this.gl.attachShader(id, vertexShader) // coordenadas
+        this.gl.attachShader(id, fragmentShader) // cores
+        this.gl.linkProgram(id)
+        const result = this.gl.getProgramParameter(id, this.gl.LINK_STATUS)
 
-        if (result) return program
+        if (result) return id
 
-        console.log(this.gl.getProgramInfoLog(program))
-        this.deleteProgram(program)
+        console.log(this.gl.getProgramInfoLog(id))
+        this.deleteProgram(id)
     }
 
     deleteProgram(program) {
         this.gl.deleteProgram(program)
     }
 
+    attributeBind(attribute, target) {
+        this.gl.bindBuffer(target, this.gl.createBuffer())
+        this.gl.bufferData(target, attribute.data, this.gl.STATIC_DRAW)
+    }
+
     // dados retirados de buffers
     setAttribute(attributeName, attribute, indice) {
-        const locationAttribute = this.gl.getAttribLocation(this.program, attributeName)
+        const locationAttribute = this.gl.getAttribLocation(this.id, `a_${ attributeName }`)
 
-        attribute.bind(this.gl)
-        if (indice) indice.bind(this.gl)
-        
+        this.attributeBind(attribute, this.gl.ARRAY_BUFFER)
+        if (indice) this.attributeBind(indice, this.gl.ELEMENT_ARRAY_BUFFER)
+
         this.gl.vertexAttribPointer(
             locationAttribute, 
             attribute.size, 
@@ -85,10 +88,11 @@ export default class Program {
         this.gl.enableVertexAttribArray(locationAttribute)
     }
 
+    
     // valores que permanecem iguais
     setUniform(uniformName, data, dataType) {
         // procurar posição uniform
-        const uniformLocation = this.gl.getUniformLocation(this.program, uniformName)
+        const uniformLocation = this.gl.getUniformLocation(this.id, uniformName)
 
         const types = {
             'float': () => this.gl.uniform1fv(uniformLocation, data), // for float or float array

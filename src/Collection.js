@@ -1,9 +1,8 @@
-`use strict`
+import Object3 from "./Objects/Object3.js"
 
-export default class Collection {
-    constructor(name) {
-        this.name = name || `${ Math.floor(Math.random() * Math.pow(10, 5)) }_${ Date.now() }`
-        this.objects = []
+export default class collection extends Object3 {
+    constructor() {
+        super()
 
         this.type = 'collection'
     }
