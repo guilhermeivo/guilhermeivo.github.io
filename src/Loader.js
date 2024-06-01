@@ -1,8 +1,8 @@
-import Collection from "./Collection.js"
+import Collection from "./Core/Collection.js"
 import Geometry from "./Core/Geometry.js"
 import Material from "./Core/Material.js"
 import Vector3 from "./Math/Vector3.js"
-import Mesh from "./Mesh.js"
+import Mesh from "./Core/Mesh.js"
 import GLTexture from "./Textures/GLTexture.js"
 
 const objToJson = async (url, file, current = 'objects') => {
@@ -243,6 +243,7 @@ const loadObj = async (gl, url, object, transform = { }) => {
 					mesh.position = transform.position || new Vector3(0, 0, 0)
 					mesh.rotation = transform.rotation || new Vector3(0, 0, 0)
 					mesh.scale = transform.scale || new Vector3(25, 25, 25)
+					mesh.name = key
 
 					collection.add(mesh)
 				})

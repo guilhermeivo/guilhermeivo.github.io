@@ -3,60 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGL</title>
+    
+    <link rel="icon" href="./resources/favicon.ico">
+
+    <title>Guilherme | Portfólio</title>
+    <meta name="description" content="Some programming-related projects, developed">
+    <meta name="theme-color" content="#0476ce">
+
+    <meta name="twitter:site" content="@portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Portfolio">
+    <meta name="twitter:description" content="🖱️">
+    <meta property="og:image" content="./cover.png">
+    <meta property="og:image:alt" content="cover">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="600">
+    <meta property="og:site_name" content="Portfolio">
+    <meta property="og:type" content="object">
+    <meta property="og:title" content="Portfolio">
+    <meta property="og:url" content="https://github.com/guilhermeivo">
+    <meta property="og:description" content="Some programming-related projects, developed">
+    
     <link rel="stylesheet" href="./resources/style.css">
-
-    <link rel="icon" type="image/x-icon" href="./resources/favicon.ico">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font: 24px consolas;
-        }
-    </style>
 </head>
-<body>
-    <div id="screen" style="height: 0; overflow: hidden;">
-        <div style=" padding: 48px;font:24px consolas; color: #FFFFFF;">
-            <h3>Oi 👋, meu nome é Guilherme</h3>
+<body data-theme>
+    <div id="screen" style="width: 650px; height: 0; overflow: hidden; font-size: 24px;">
+        <div style="padding: 48px;font:24px consolas; color: #FFFFFF;">
+            <h3>Oi 👋, meu nome é <span>Guilherme</span></h3>
             <p>Técnico em Desenvolvimento de Sistemas (ETESP)</p>
             <p>Cursando Sistemas de Informação (USP)</p>
     
-            <h2 style="text-align: center;">Projects</h2>
+            <h2 style="text-align: center;">Projetos</h2>
             
-            <div style="display: grid; grid-template-columns: 1fr;">
-                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
-                    <h3 style="margin: 0; margin-bottom: 4px;">BaseTech-Inc/Tupa-Server</h2>
-                    <p style="margin: 0">Servidor para a empresa Tupã desenvolvido por @BaseTech-Inc.</p>
-                </div>
-                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
-                    <h3 style="margin: 0; margin-bottom: 4px;">experiment-using-mouse</h3>
-                    <p style="margin: 0">Desafios para ajudar um rato a encontrar um pedaço de queijo em um labirinto.</p>
-                </div>
-                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
-                    <h3 style="margin: 0; margin-bottom: 4px;">snake-game</h3>
-                    <p style="margin: 0">O clássico jogo da cobrinha no console gameboy.</p>
-                </div>
-                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
-                    <h3 style="margin: 0; margin-bottom: 4px;">discord-bot</h3>
-                    <p style="margin: 0">Template para Discord Bots.</p>
-                </div>
-                <div style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px;">
-                    <h3 style="margin: 0; margin-bottom: 4px;">tcm-codezone</h3>
-                    <p style="margin: 0">Projeto desenvolvido para trabalho de conclusão de módulo (TCM).</p>
-                </div>
-            </div>
+            <div id="cards" style="display: grid; grid-template-columns: 1fr;"></div>
     
             <p style="text-align: center;">created by <a href="https://github.com/guilhermeivo" style="color: #FFFFFF">guilhermeivo</a> <span title="🥄">❤️</span></p>
         </div>
     </div>
 
+    <div class="shortcuts">
+        <div>
+            <span>&#x2191;</span>
+            <p>Subir scroll</p>
+        </div>
+        <div>
+            <span>&#x2193;</span>
+            <p>Descer scroll</p>
+        </div>
+        <div>
+            <span>Esc</span>
+            <p>Fechar janela principal</p>
+        </div>
+        <div>
+            <span>&#x2B7E;</span>
+            <p>Navegar entre projetos</p>
+        </div>
+        <div>
+            <span>&#x21B5;</span>
+            <p>Abrir projeto</p>
+        </div>
+    </div>
+
     <overlay-debug></overlay-debug>
 
+    <script>
+        const cardsList = [
+            { title: 'BaseTech-Inc/Tupa-Server', description: 'Servidor para a empresa Tupã desenvolvido por @BaseTech-Inc.', links: ['https://github.com/BaseTech-Inc/Tupa-Server'] },
+            { title: 'experiment-using-mouse', description: 'Desafios para ajudar um rato a encontrar um pedaço de queijo em um labirinto.', links: ['https://github.com/guilhermeivo/experiment-using-mouse'] },
+            { title: 'snake-game', description: 'O clássico jogo da cobrinha no console gameboy.', links: ['https://github.com/guilhermeivo/snake-game'] },
+            { title: 'tcm-codezone', description: 'Projeto desenvolvido para trabalho de conclusão de módulo (TCM).', links: ['https://github.com/guilhermeivo/tcm-codezone'] }
+        ]
+
+        cardsList.forEach(card => {
+            document.querySelector('#cards').insertAdjacentHTML('beforeend', `
+                <a href="${ card.links[0] }" target="_blank" style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px; color: #FFFFFF; text-decoration: none" data-card tabindex="5" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                    <h3 style="margin: 0; margin-bottom: 4px;">${ card.title }</h3>
+                    <p style="margin: 0">${ card.description }</p>
+                </a>
+                `)
+        })
+
+        const onFocusOutCard = event => {
+            for (let card of document.querySelector('#cards').children) {
+                card.style.border = '1px solid #FFFFFF'
+            }
+        }
+        const onFocusCard = event => {
+            for (let card of document.querySelector('#cards').children) {
+                card.style.border = '1px solid #FFFFFF'
+            }
+            event.target.style.border = '1px solid #000000'
+        }
+    </script>
     <script src="./src/common.js"></script>
-    <script type="module" src="./src/app.js"></script>
+    <script defer type="module" src="./src/app.js"></script>
+
+    <noscript>script type is not supported by the page or scripting is disabled in browser.</noscript>
 
     <!-- Gabizinha ❤️🥄 -->
 </body>

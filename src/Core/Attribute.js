@@ -1,4 +1,4 @@
-import { FloatType } from "../constants.js"
+import { FloatType } from "./constants.js"
 
 export default class Attribute {
     constructor(name, data, config = { }) {

@@ -2,9 +2,9 @@
 # www.blender.org
 
 newmtl Button
-Ns 250.000000
+Ns 159.999985
 Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
+Kd 0.763143 0.763143 0.763143
 Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
@@ -18,9 +18,9 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd background.png
-map_Ns roughness_map.png
-map_Bump normal_map.png
+map_Kd background@2.png
+map_Ns roughness_map@2.png
+map_Bump normal_map@2.png
 
 newmtl Metal
 Ns 490.000000
@@ -33,7 +33,7 @@ d 1.000000
 illum 3
 
 newmtl Plastic
-Ns 360.000000
+Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.000000 0.000000 0.000000
 Ks 0.600000 0.600000 0.600000
@@ -41,7 +41,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Bump normal_map.png
+map_Bump normal_map@2.png
 
 newmtl Screen
 Ns 640.000000
@@ -61,7 +61,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd background.png
+map_Kd background@2.png
 
 newmtl Silver
 Ns 490.000000

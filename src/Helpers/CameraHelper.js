@@ -1,7 +1,7 @@
 import Geometry from "../Core/Geometry.js";
 import Material from "../Core/Material.js";
 import Lines from "../Objects/Lines.js";
-import { UnsignedByte } from "../constants.js";
+import { UnsignedByte } from "../Core/constants.js";
 
 export default class CameraHelper extends Lines {
     constructor(cameraElement) {

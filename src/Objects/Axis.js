@@ -1,7 +1,7 @@
 import Geometry from "../Core/Geometry.js";
 import Lines from "./Lines.js";
 import Material from "../Core/Material.js";
-import { UnsignedByte } from "../constants.js";
+import { UnsignedByte } from "../Core/constants.js";
 
 export default class AxisObject extends Lines {
     constructor(transformation = { }) {

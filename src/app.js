@@ -2,24 +2,22 @@
 
 import vertexSource from './shaders/vertexSource.js'
 import fragmentSource from './shaders/fragmentSource.js'
-import Scene from './Scene.js'
+import Scene from './Core/Scene.js'
 
 import './components/overlayDebug/index.js'
 import FrustumHelper from './Helpers/FrustumHelper.js'
 import Light from './Lights/Light.js'
 import { loadObj } from './Loader.js'
 import Axis from './Objects/Axis.js'
-import DebugCamera from './Cameras/DebugCamera.js'
 import Camera from './Cameras/Camera.js'
 import CameraHelper from './Helpers/CameraHelper.js'
 import LightHelper from './Helpers/LightHelper.js'
 
-import monkey from '../resources/monkey/monkey.js'
-import Material from './Core/Material.js'
-import Geometry from './Core/Geometry.js'
-import Mesh from './Mesh.js'
 import Vector3 from './Math/Vector3.js'
 import GLRenderer from './GLRenderer.js'
+
+import Screen from './Arcade/Screen.js'
+import Button from './Arcade/Button.js'
 
 (() => {
     const DEBUG_MODE = false
@@ -77,44 +75,6 @@ import GLRenderer from './GLRenderer.js'
                 value: paramVendor,
                 readonly: 'readonly'
             }
-        },{
-            label: 'camera_x',
-            type: 'range',
-            configs: { 
-                min: '-750',
-                max: '750',
-                value: '250'
-            }
-        }, {
-            label: 'camera_y',
-            type: 'range',
-            configs: { 
-                min: '-750',
-                max: '750',
-                value: '100'
-            }
-        }, {
-            label: 'camera_z',
-            type: 'range',
-            configs: { 
-                min: '-750',
-                max: '750',
-                value: '100'
-            }
-        }, {
-            label: 'camera_orthographic',
-            type: 'checkbox',
-            configs: {
-                checked: 'checked'
-            }
-        }, {
-            label: 'camera_units',
-            type: 'range',
-            configs: { 
-                min: '0',
-                max: '500',
-                value: '65'
-            }
         }
     ])
 
@@ -125,7 +85,7 @@ import GLRenderer from './GLRenderer.js'
 
     /// AXIS
     const axis = new Axis({
-        position: new Vector3(0, 55, 0),
+        position: new Vector3(0, 60, 0),
         scale: new Vector3(50, 50, 50)
     })
     //scene.add(axis)
@@ -153,92 +113,101 @@ import GLRenderer from './GLRenderer.js'
     })
     scene.add(debugCamera)
 
-    /// RENDERER
+    const screenArcade = new Screen(
+        '../resources/arcade/screen_blank.png',
+        1000, 750,
+        180, 150
+    )
+    const buttonRotateRight = new Button()
+    const buttonRotateLeft = new Button()
+    const buttonFire = new Button()
+    const buttonThrust = new Button()
+    const buttonHyperSpace = new Button()
 
-    /// MONKEY
+    /// ARCADE
     loadObj(glRenderer.gl, '../resources/arcade/', 'arcade.obj')
-        .then(collection => {
+        .then(async collection => {
             scene.add(collection)
+            screenArcade.open()
+            loadScreen()
+
+            buttonRotateRight.init(collection.children.filter(object => object.name == 'Button.RotateRight')[0])
+            buttonRotateLeft.init(collection.children.filter(object => object.name == 'Button.RotateLeft')[0])
+            buttonFire.init(collection.children.filter(object => object.name == 'Button.Fire')[0])
+            buttonThrust.init(collection.children.filter(object => object.name == 'Button.Thrust')[0])
+            buttonHyperSpace.init(collection.children.filter(object => object.name == 'Button.HyperSpace')[0])
+
+            // animation
+            let steps = 100
+            for (let i = steps; i >= 0; i--) {
+                const t = i / steps
+                const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
+                // ((initialPosition - finalPosition) * curve) + finalPosition
+                camera.position.set(((100 - 60) * curve) + 60, ((100 - 75) * curve) + 75, 250 * curve)
+                await new Promise(resolve => setTimeout(resolve, 5))
+            }
         })
 
-    setTimeout(async () => {
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        
-        let steps = 100
-        for (let i = steps; i >= 0; i--) {
-            const t = i / 100
-            const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
-            camera.position.set(((100 - 60) * curve) + 60, ((100 - 75) * curve) + 75, 250 * curve)
-            await sleep(5)
-        }
+    /// SCREEN
+    const loadScreen = async () => {
+        await screenArcade.update(document.querySelector('#screen'))
 
-        loadScreen()
-    }, 1000)
-
-    let scrollY = 0
-
-    const canvasScreen = document.createElement('canvas')
-    const width = 1000
-    const height = 750
-    const screenMarginWidth = 180
-    const screenMarginHeight = 150
-    canvasScreen.width = width
-    canvasScreen.height = height
-    const ctx = canvasScreen.getContext("2d")
-
-    const screenImage = new Image()
-    screenImage.src = '../resources/arcade/screen_blank.png'
-
-    const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="${ (width - screenMarginWidth * 2) }" min-height="${ height - screenMarginHeight * 2 }">
-    <foreignObject width="100%" height="100%">
-        <div xmlns="http://www.w3.org/1999/xhtml" width="100%" height="100%">${ document.querySelector('#screen').innerHTML }</div>
-    </foreignObject>
-    </svg>`
-    
-    const svgBlob = new Blob( [svg], { type: 'image/svg+xml;charset=utf-8' } );
-    const svgObjectUrl = URL.createObjectURL(svgBlob)
-
-    const img = new Image()
-    img.src = svgObjectUrl
-
-    const loadScreen = () => {
         const screen = scene.children.filter(object => object.type == 'collection')[0]
-            .children.filter(object => object.material.name == 'Screen')[0]
+            .children.filter(object => object.name == 'Screen')[0]
 
-        ctx.fillRect(0, 0, width, height);
-        ctx.scale(1, -1)
-        ctx.drawImage(img, screenMarginWidth, screenMarginHeight - scrollY, width - screenMarginWidth * 2, (height - screenMarginHeight * 2) * -1 - screenMarginHeight * 2 - scrollY)
-        ctx.scale(1, -1)
-        ctx.drawImage(screenImage, 0, 0)
-        const newScreenImage = new Image()
-        newScreenImage.onload = () => {
-            screen.material.samplers.diffuseMap.setImageTexture(glRenderer.gl, newScreenImage)
-        }
-        newScreenImage.src = canvasScreen.toDataURL("image/png")
+        screenArcade.draw()
+            .then(image => {
+                screen.material.samplers.diffuseMap.setImageTexture(glRenderer.gl, image)
+            })
     }
 
-    document.addEventListener('keydown', function(event) {
-        const key = event.key;
-        const scrollLenght = 50
-
-        switch (key) {
-            case "ArrowUp":
-                scrollY-=scrollLenght
-                break;
-            case "ArrowDown":
-                scrollY+=scrollLenght
-                break;
+    document.addEventListener('keydown', event => {
+        switch (event.key) {
+            case 'Escape':
+                buttonHyperSpace.down()
+                screenArcade.close()
+                break
+            case 'Tab':
+                buttonThrust.down()
+                break
+            case 'Enter':
+                if ('card' in document.activeElement.dataset) {
+                    console.log(document.activeElement.tabIndex)
+                }
+                buttonFire.down()
+                break
+            case 'ArrowUp':
+                buttonRotateLeft.down()
+                screenArcade.scrollUp()
+                break
+            case 'ArrowDown':
+                buttonRotateRight.down()
+                screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight)
+                break
+            default:
+                return
         }
+        setTimeout(loadScreen, 10)
+    })
 
-        const max = height - screenMarginHeight * 2
-
-        if (scrollY < 0) scrollY = 0
-        else if (scrollY >= document.querySelector('#screen>div').scrollHeight - max) scrollY = document.querySelector('#screen>div').scrollHeight - max
-
-        loadScreen()
+    document.addEventListener('keyup', event => {
+        switch (event.key) {
+            case 'Escape':
+                buttonHyperSpace.up()
+                break
+            case 'Tab':
+                buttonThrust.up()
+                break
+            case 'Enter':
+                buttonFire.up()
+                break
+            case 'ArrowUp':
+                buttonRotateLeft.up()
+                break
+            case 'ArrowDown':
+                buttonRotateRight.up()
+                break
+        }
     })
 
     /// Light

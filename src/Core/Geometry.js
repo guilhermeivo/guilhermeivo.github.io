@@ -1,4 +1,4 @@
-import { FloatType } from "../constants.js"
+import { FloatType } from "./constants.js"
 import Attribute from "./Attribute.js"
 
 export default class Geometry {
