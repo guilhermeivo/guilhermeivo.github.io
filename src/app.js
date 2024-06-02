@@ -28,9 +28,9 @@ import Button from './Arcade/Button.js'
         return
     }
 
-    document.querySelector('.shortcuts').style.display = 'block'
+    window['DEBUG_MODE'] = false
 
-    const DEBUG_MODE = false
+    document.querySelector('.shortcuts').style.display = 'block'
     
     const glRenderer = new GLRenderer()
     const programId = glRenderer.createProgram(vertexSource, fragmentSource)
@@ -136,8 +136,8 @@ import Button from './Arcade/Button.js'
     })
     camera.target = axis.position
     scene.add(camera)
-    //scene.add(new CameraHelper(camera))
-    //scene.add(new FrustumHelper(camera))
+    scene.add(new CameraHelper(camera))
+    scene.add(new FrustumHelper(camera))
 
     const debugCamera = new Camera({
         position: new Vector3(200, 800, 800)
@@ -311,15 +311,19 @@ import Button from './Arcade/Button.js'
         position: new Vector3(125, 125, -125)
     })
     scene.addLight(light001)
-    //scene.add(new LightHelper(light001))
+    scene.add(new LightHelper(light001))
 
     const light002 = new Light({
         position: new Vector3(-125, 150, 125)
     })
     scene.addLight(light002)
-    //scene.add(new LightHelper(light002))
+    scene.add(new LightHelper(light002))
 
-    if (DEBUG_MODE) overlayDebug.toggle()
+    window.addEventListener('resize', () => {
+        glRenderer.setSize(window.innerWidth, window.innerHeight)
+    })
+
+    if (window['DEBUG_MODE']) overlayDebug.toggle()
 
     let lastTimeFps = 0
     let lastTimeSecond = 0
@@ -329,7 +333,12 @@ import Button from './Arcade/Button.js'
         
         let fps = 1000 / deltaTime
 
-        if (DEBUG_MODE) {
+        if (window['DEBUG_MODE']) {
+            if (!overlayDebug.state.isOpen) {
+                glRenderer.isInitialized = false
+                overlayDebug.toggle()
+            }
+
             if (timeStamp - lastTimeSecond >= 1000) {
                 lastTimeSecond = timeStamp
                 fpsElement.value = fps.toFixed(2)
@@ -338,6 +347,11 @@ import Button from './Arcade/Button.js'
             glRenderer.setProgram(programId)
             glRenderer.renderScissor(scene, [ camera, debugCamera ], fps)
         } else {
+            if (overlayDebug.state.isOpen) {
+                glRenderer.isInitialized = false
+                overlayDebug.toggle()
+            }
+
             glRenderer.setProgram(programPickingId)
             glRenderer.render(scene, camera, fps)
             

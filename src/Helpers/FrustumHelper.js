@@ -15,6 +15,7 @@ export default class FrustumHelper extends Lines {
         super(geometry, material)
         
         this.camera = cameraElement
+        this.debug = true
     }
 
     onBeforeRender() {

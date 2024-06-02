@@ -52,8 +52,11 @@ export default class GLRenderer {
         if (!this.isInitialized) {
             this.gl.enable(this.gl.DEPTH_TEST)
             this.gl.enable(this.gl.CULL_FACE)
+            this.gl.disable(this.gl.SCISSOR_TEST)
             this.isInitialized = true
         }
+
+        this.gl.viewport(0, 0, this.width, this.height)
 
         this.gl.clearColor(0, 0, 0, 0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
@@ -89,25 +92,27 @@ export default class GLRenderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
         cameras[1].aspect = (this.width / 2) / this.height
-        this.renderScene(scene, cameras[1], fps)
+        this.renderScene(scene, cameras[1], fps, true)
     }
 
-    renderScene(scene, camera, fps) {
+    renderScene(scene, camera, fps, debugMode = false) {
         const objects = scene.children
 
-        this.renderObjects(objects, scene, camera, fps)
+        this.renderObjects(objects, scene, camera, fps, debugMode)
     }
 
-    renderObjects(objects, scene, camera, fps) {
+    renderObjects(objects, scene, camera, fps, debugMode) {
         objects.forEach(object => {
-            this.renderObject(object, scene, camera, fps)
+            this.renderObject(object, scene, camera, fps, debugMode)
         })
     }
 
-    renderObject(object, scene, camera, fps) {
+    renderObject(object, scene, camera, fps, debugMode) {
         if (object.type == 'collection') {
-            this.renderObjects(object.children, scene, camera, fps)
+            this.renderObjects(object.children, scene, camera, fps, debugMode)
         }
+
+        if (!debugMode && object.debug) return
 
         // init
         if (!this.program.existVao(object.id) && (object.type == 'mesh' || object.type == 'line')) {

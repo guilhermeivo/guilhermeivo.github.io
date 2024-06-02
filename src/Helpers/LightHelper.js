@@ -15,6 +15,7 @@ export default class LightHelper extends Lines {
         super(geometry, material)
 
         this.parent = lightElement
+        this.debug = true
     }
 }
 
