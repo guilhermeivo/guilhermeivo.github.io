@@ -49,32 +49,32 @@ export default class Screen {
         if (this.scrollHeight < 0) this.scrollHeight = 0
     }
 
-    async update(content) {
+    update(content) {
         let value = content.innerHTML
         if (!this.opened) {
-            value = `<div style="padding: 48px;font:24px consolas; color: #FFFFFF;"><h1>_</h1></div>`
-        } 
+            value = this.errorScreen()
+        }
 
-        const svg = `
+        const aSvgImage = `
+        data:image/svg+xml,
         <svg xmlns="http://www.w3.org/2000/svg" width="${ (this.width - this.marginX * 2) }" min-height="${ this.height - this.marginY * 2 }">
-        <foreignObject width="100%" height="100%">
-            <div xmlns="http://www.w3.org/1999/xhtml" width="100%" height="100%">${ value }</div>
-        </foreignObject>
+            <foreignObject width="100%" height="100%">
+                <div xmlns="http://www.w3.org/1999/xhtml" width="100%" height="100%">
+                    ${ value }
+                </div>
+            </foreignObject>
         </svg>`
-        
-        const svgBlob = new Blob( [svg], { type: 'image/svg+xml;charset=utf-8' } )
-        const svgObjectUrl = URL.createObjectURL(svgBlob)
 
         return new Promise((resolve, reject) => {
             this.imageBg.onload = () => {
                 resolve(this.imageBg)
             }
             this.imageBg.onerror = reject
-            this.imageBg.src = svgObjectUrl
+            this.imageBg.src = aSvgImage
         })
     }
 
-    async draw() {
+    draw() {
         this.ctx.fillRect(0, 0, this.width, this.height)
         this.ctx.scale(1, -1)
         this.ctx.drawImage(this.imageBg, this.marginX, this.marginY - this.scrollHeight, this.width - this.marginX * 2, (this.height - this.marginY * 2) * -1 - this.marginY * 2 - this.scrollHeight)
@@ -82,13 +82,21 @@ export default class Screen {
         this.ctx.drawImage(this.image, 0, 0)
 
         return new Promise((resolve, reject) => {
-            const newScreenImage = new Image()
-            newScreenImage.setAttribute('crossOrigin', 'anonymous')
-            newScreenImage.onload = () => {
-                resolve(newScreenImage)
+            try {
+                const newScreenImage = new Image()
+                newScreenImage.onload = () => {
+                    resolve(newScreenImage)
+                }
+                newScreenImage.onerror = reject
+                newScreenImage.src = this.ctx.canvas.toDataURL()
+            } catch (error) {
+                this.close()
+                reject(error)
             }
-            newScreenImage.onerror = reject
-            newScreenImage.src = this.ctx.canvas.toDataURL("image/png")
         })
+    }
+
+    errorScreen() {
+        return `<div style="padding: 48px;font:24px monospace; color: rgb(255, 255, 255);"><h1>_</h1></div>`
     }
 }

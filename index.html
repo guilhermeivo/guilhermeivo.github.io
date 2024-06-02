@@ -28,7 +28,7 @@
 </head>
 <body data-theme>
     <div id="screen" style="width: 650px; height: 0; overflow: hidden; font-size: 24px;">
-        <div style="padding: 48px;font:24px consolas; color: #FFFFFF;">
+        <div style="padding: 48px;font:24px monospace; color: rgb(255, 255, 255);">
             <h3>Oi 👋, meu nome é <span>Guilherme</span></h3>
             <p>Técnico em Desenvolvimento de Sistemas (ETESP)</p>
             <p>Cursando Sistemas de Informação (USP)</p>
@@ -37,7 +37,7 @@
             
             <div id="cards" style="display: grid; grid-template-columns: 1fr;"></div>
     
-            <p style="text-align: center;">created by <a href="https://github.com/guilhermeivo" style="color: #FFFFFF">guilhermeivo</a> <span title="🥄">❤️</span></p>
+            <p style="text-align: center;">created by <a href="https://github.com/guilhermeivo" style="color: rgb(255, 255, 255)">guilhermeivo</a> <span title="🥄">❤️</span></p>
         </div>
     </div>
 
@@ -76,7 +76,7 @@
 
         cardsList.forEach(card => {
             document.querySelector('#cards').insertAdjacentHTML('beforeend', `
-                <a href="${ card.links[0] }" target="_blank" style="border: 1px solid #FFFFFF; padding: 4px; margin-bottom: 8px; color: #FFFFFF; text-decoration: none" data-card tabindex="5" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                <a href="${ card.links[0] }" target="_blank" style="border: 1px solid rgb(255, 255, 255); padding: 4px; margin-bottom: 8px; color: rgb(255, 255, 255); text-decoration: none" data-card tabindex="5" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
                     <h3 style="margin: 0; margin-bottom: 4px;">${ card.title }</h3>
                     <p style="margin: 0">${ card.description }</p>
                 </a>
@@ -85,14 +85,14 @@
 
         const onFocusOutCard = event => {
             for (let card of document.querySelector('#cards').children) {
-                card.style.border = '1px solid #FFFFFF'
+                card.style.border = '1px solid rgb(255, 255, 255)'
             }
         }
         const onFocusCard = event => {
             for (let card of document.querySelector('#cards').children) {
-                card.style.border = '1px solid #FFFFFF'
+                card.style.border = '1px solid rgb(255, 255, 255)'
             }
-            event.target.style.border = '1px solid #000000'
+            event.target.style.border = '1px solid rgb(0, 0, 0)'
         }
     </script>
     <script src="./src/common.js"></script>

@@ -156,16 +156,16 @@ import Button from './Arcade/Button.js'
         })
 
     /// SCREEN
-    const loadScreen = async () => {
-        await screenArcade.update(document.querySelector('#screen'))
+    const loadScreen = () => {
+        screenArcade.update(document.querySelector('#screen')).then(() => {
+            const screen = scene.children.filter(object => object.type == 'collection')[0]
+                .children.filter(object => object.name == 'Screen')[0]
 
-        const screen = scene.children.filter(object => object.type == 'collection')[0]
-            .children.filter(object => object.name == 'Screen')[0]
-
-        screenArcade.draw()
-            .then(image => {
-                screen.material.samplers.diffuseMap.setImageTexture(glRenderer.gl, image)
-            })
+            screenArcade.draw()
+                .then(image => {
+                    screen.material.samplers.diffuseMap.setImageTexture(glRenderer.gl, image)
+                })
+        })
     }
 
     document.addEventListener('keydown', event => {
