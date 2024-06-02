@@ -1,11 +1,13 @@
 import Vector3 from "../Math/Vector3.js"
 
 export default class Button {
-    constructor() {
+    constructor(callback) {
         this.object = null
         this.inClick = false
         this.inAnimation = false
         this.position = 0
+
+        this.event = callback
     }
 
     init(object) {
@@ -52,5 +54,11 @@ export default class Button {
             this.object.position.set(0, ((this.object.position.elements[1] - -0.4) * curve) + -0.4, 0)
             await new Promise(resolve => setTimeout(resolve, 1))
         }
+    }
+
+    click(args) {
+        this.down()
+
+        if (this.event) this.event(args)
     }
 }

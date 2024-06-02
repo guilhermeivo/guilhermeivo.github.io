@@ -19,6 +19,8 @@ export default class GLProgram {
             uvec3: 'uvec3',
             uvec4: 'uvec4'
         }
+
+        this.vaos = []
     }
  
     compile(vertexShaderSource, fragmentShaderSource) {
@@ -116,5 +118,18 @@ export default class GLProgram {
         }
 
         if (types[dataType]) types[dataType]()
+    }
+
+    existVao(id) {
+        return this.vaos.filter(vao => vao.id == id).length
+    }
+
+    getVao(id) {
+        if (!this.existVao(id)) return -1
+        else return this.vaos.filter(vao => vao.id == id)[0].value
+    }
+
+    setVao(id, value) {
+        this.vaos.push({ id: id, value: value })
     }
 }

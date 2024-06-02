@@ -13,6 +13,8 @@ export default class Object3 {
         this.scale = transformation.scale || new Vector3(1, 1, 1)
 
         this.worldMatrix = new Matrix4()
+
+        this.id = 0
     }
 
     add(object) {

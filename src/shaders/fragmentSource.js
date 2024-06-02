@@ -45,6 +45,8 @@ uniform Light u_lights[NUMBER_LIGHTS];
 
 uniform vec3 u_ambientLight;
 
+uniform vec4 u_id;
+
 float gamma = 1.15;
 
 out vec4 outColor;

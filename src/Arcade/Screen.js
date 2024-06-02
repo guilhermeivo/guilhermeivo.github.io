@@ -83,6 +83,7 @@ export default class Screen {
 
         return new Promise((resolve, reject) => {
             const newScreenImage = new Image()
+            newScreenImage.setAttribute('crossOrigin', 'anonymous')
             newScreenImage.onload = () => {
                 resolve(newScreenImage)
             }

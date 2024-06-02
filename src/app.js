@@ -2,6 +2,10 @@
 
 import vertexSource from './shaders/vertexSource.js'
 import fragmentSource from './shaders/fragmentSource.js'
+
+import pickingVertexSource from './shaders/pickingVertexSource.js'
+import pickingFragmentSource from './shaders/pickingFragmentSource.js'
+
 import Scene from './Core/Scene.js'
 
 import './components/overlayDebug/index.js'
@@ -22,12 +26,15 @@ import Button from './Arcade/Button.js'
 (() => {
     const DEBUG_MODE = false
     
-    const glRenderer = new GLRenderer(vertexSource, fragmentSource)
+    const glRenderer = new GLRenderer()
+    const programId = glRenderer.createProgram(vertexSource, fragmentSource)
+    const programPickingId = glRenderer.createProgram(pickingVertexSource, pickingFragmentSource)
+    
     glRenderer.setSize(window.innerWidth, window.innerHeight) // change resolution image
     document.body.appendChild(glRenderer.gl.canvas)
 
     const performance = window.performance
-    const performanceKeys = [];
+    const performanceKeys = []
     for (var value in performance) {
         performanceKeys.push(value)
     }
@@ -118,11 +125,11 @@ import Button from './Arcade/Button.js'
         1000, 750,
         180, 150
     )
-    const buttonRotateRight = new Button()
-    const buttonRotateLeft = new Button()
+    const buttonRotateRight = new Button(() => { screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight) })
+    const buttonRotateLeft = new Button(() => { screenArcade.scrollUp() })
     const buttonFire = new Button()
     const buttonThrust = new Button()
-    const buttonHyperSpace = new Button()
+    const buttonHyperSpace = new Button(() => { screenArcade.close() })
 
     /// ARCADE
     loadObj(glRenderer.gl, '../resources/arcade/', 'arcade.obj')
@@ -164,25 +171,19 @@ import Button from './Arcade/Button.js'
     document.addEventListener('keydown', event => {
         switch (event.key) {
             case 'Escape':
-                buttonHyperSpace.down()
-                screenArcade.close()
+                buttonHyperSpace.click()
                 break
             case 'Tab':
-                buttonThrust.down()
+                buttonThrust.click()
                 break
             case 'Enter':
-                if ('card' in document.activeElement.dataset) {
-                    console.log(document.activeElement.tabIndex)
-                }
-                buttonFire.down()
+                buttonFire.click()
                 break
             case 'ArrowUp':
-                buttonRotateLeft.down()
-                screenArcade.scrollUp()
+                buttonRotateLeft.click()
                 break
             case 'ArrowDown':
-                buttonRotateRight.down()
-                screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight)
+                buttonRotateRight.click()
                 break
             default:
                 return
@@ -206,6 +207,83 @@ import Button from './Arcade/Button.js'
                 break
             case 'ArrowDown':
                 buttonRotateRight.up()
+                break
+        }
+    })
+
+    let mouseX = -1
+    let mouseY = -1
+
+    glRenderer.gl.canvas.addEventListener('mousemove', event => {
+        const rect = glRenderer.gl.canvas.getBoundingClientRect()
+        mouseX = event.clientX - rect.left
+        mouseY = event.clientY - rect.top
+    })
+
+    let currentObjectOver = null
+
+    const getMouseOver = () => {
+        if (!scene.children.filter(object => object.type == 'collection').length) return
+
+        const pixelX = mouseX * glRenderer.gl.canvas.width / glRenderer.gl.canvas.clientWidth
+        const pixelY = glRenderer.gl.canvas.height - mouseY * glRenderer.gl.canvas.height / glRenderer.gl.canvas.clientHeight - 1
+
+        const data = new Uint8Array(4)
+        glRenderer.gl.readPixels(
+            pixelX,            // x
+            pixelY,            // y
+            1,                 // width
+            1,                 // height
+            glRenderer.gl.RGBA,           // format
+            glRenderer.gl.UNSIGNED_BYTE,  // type
+            data)             // typed array to hold result
+        const id = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)
+
+        scene.getById(scene.children.filter(object => object.type == 'collection')[0].children, id)
+            .then(value => currentObjectOver = value)
+    }
+
+    document.addEventListener('mousedown', event => {
+        if (!currentObjectOver) return
+        if (event.buttons != 1) return
+
+        switch (currentObjectOver.name) {
+            case 'Button.RotateRight':
+                buttonRotateRight.click()
+                break
+            case 'Button.RotateLeft':
+                buttonRotateLeft.click()
+                break
+            case 'Button.Fire':
+                buttonFire.click()
+                break
+            case 'Button.Thrust':
+                buttonThrust.click()
+                break
+            case 'Button.HyperSpace':
+                buttonHyperSpace.click()
+                break
+        }
+        setTimeout(loadScreen, 10)
+    })
+    document.addEventListener('mouseup', event => {
+        if (!currentObjectOver) return
+
+        switch (currentObjectOver.name) {
+            case 'Button.RotateRight':
+                buttonRotateRight.up()
+                break
+            case 'Button.RotateLeft':
+                buttonRotateLeft.up()
+                break
+            case 'Button.Fire':
+                buttonFire.up()
+                break
+            case 'Button.Thrust':
+                buttonThrust.up()
+                break
+            case 'Button.HyperSpace':
+                buttonHyperSpace.up()
                 break
         }
     })
@@ -239,8 +317,15 @@ import Button from './Arcade/Button.js'
                 fpsElement.value = fps.toFixed(2)
             }
 
+            glRenderer.setProgram(programId)
             glRenderer.renderScissor(scene, [ camera, debugCamera ], fps)
         } else {
+            glRenderer.setProgram(programPickingId)
+            glRenderer.render(scene, camera, fps)
+            
+            getMouseOver()
+
+            glRenderer.setProgram(programId)
             glRenderer.render(scene, camera, fps)
         }
         

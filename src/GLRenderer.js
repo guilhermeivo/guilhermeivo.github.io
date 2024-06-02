@@ -2,7 +2,7 @@ import GLTexture from "./Textures/GLTexture.js"
 import GLProgram from "./GLProgram.js"
 
 export default class GLRenderer {
-    constructor(vertexShaderSource, fragmentShaderSource) {
+    constructor() {
         const domElement = document.createElement('canvas')
         domElement.id = 'canvas'
         this.gl = domElement.getContext(
@@ -15,13 +15,26 @@ export default class GLRenderer {
             return
         }
 
-        this.program = new GLProgram(this.gl, vertexShaderSource, fragmentShaderSource)
+        this.program = null
+
+        this.programs = []
 
         this.width = this.gl.canvas.width
         this.height = this.gl.canvas.height
 
         this.lastUsedVertexArray = null
         this.lastUsedTextureId = null
+    }
+
+    createProgram(vertexShaderSource, fragmentShaderSource) {
+        this.programs.push(new GLProgram(this.gl, vertexShaderSource, fragmentShaderSource))
+        this.setProgram(this.programs.length - 1)
+        return this.programs.length - 1
+    }
+
+    setProgram(id) {
+        this.program = this.programs[id]
+        this.gl.useProgram(this.program.id)
     }
 
     setSize(width, height) {
@@ -97,11 +110,11 @@ export default class GLRenderer {
         }
 
         // init
-        if (!object.isInitialized && (object.type == 'mesh' || object.type == 'line')) {
+        if (!this.program.existVao(object.id) && (object.type == 'mesh' || object.type == 'line')) {
             // vbo & ebo
-            if (!object.vao) object.vao = this.gl.createVertexArray()
+            if (!object.vao) this.program.setVao(object.id, this.gl.createVertexArray())
 
-            this.useVao(object.vao)
+            this.useVao(this.program.getVao(object.id))
 
             const attributes = object.geometry.attributes
 
@@ -137,21 +150,17 @@ export default class GLRenderer {
             object.isInitialized = true
 
             object.geometry.attributes.forEach(attribute => {
-                attribute.data = null
-                delete attribute.data
+                //attribute.data = null
+                //delete attribute.data
             })
-
-            object.geometry.attributes = null
-            delete object.geometry.attributes
         }
 
         object.onBeforeRender(scene, camera, fps)
 
         // draw
-        if (!object.isInitialized) return
+        if (!this.program.existVao(object.id)) return
 
-        this.gl.useProgram(this.program.id)
-        this.useVao(object.vao)
+        this.useVao(this.program.getVao(object.id))
 
         Object.keys(object.material.samplers).forEach((key, index) => {
             const currentSampler = object.material.samplers[key]
@@ -159,6 +168,13 @@ export default class GLRenderer {
             this.useTexture(this.gl.TEXTURE0 + currentSampler.id, currentSampler.data)
             this.program.setUniform(`${ key }`, currentSampler.id, this.program.types.sampler)
         })
+
+        this.program.setUniform('u_id', [
+            ((object.id >>  0) & 0xFF) / 0xFF,
+            ((object.id >>  8) & 0xFF) / 0xFF,
+            ((object.id >> 16) & 0xFF) / 0xFF,
+            ((object.id >> 24) & 0xFF) / 0xFF,
+        ], this.program.types.vec4)
 
         this.program.setUniform('u_projection', camera.projectionMatrix.elements, this.program.types.mat4)
         this.program.setUniform('u_view', camera.viewMatrix.elements, this.program.types.mat4)
