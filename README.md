@@ -3,7 +3,7 @@
 </h1>
 
 <h1 align="center">
-    <img alt="Cover" src=".github/cover.png" />
+    <img alt="Cover" src=".github/banner.png" />
 </h1>
 
 <img src="https://github.githubassets.com/images/mona-whisper.gif" align="right" />
