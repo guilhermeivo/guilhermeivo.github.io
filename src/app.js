@@ -185,6 +185,8 @@ import Button from './Arcade/Button.js'
     }
 
     document.addEventListener('keydown', event => {
+        event.preventDefault()
+
         switch (event.key) {
             case 'Escape':
                 buttonHyperSpace.click()
