@@ -95,11 +95,6 @@ button {
     border: 1px solid #0476ce;
 }
 
-.shortcuts.mobile {
-    position: relative;
-    font-size: 24px;
-}
-
 .shortcuts > div {
     margin: 12px 0;
 }

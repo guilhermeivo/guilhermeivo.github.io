@@ -93,6 +93,39 @@ import Button from './Arcade/Button.js'
 
     const fpsElement = document.querySelector('#textFPS')
 
+    let isSimpleMode = false
+    const switchMode = () => {
+        if (!isSimpleMode) {
+            isSimpleMode = true
+            document.querySelector('#screen').style.height = ''
+            document.querySelector('#screen').style.minHeight = '100vh'
+            document.querySelector('#screen').style.overflow = ''
+            document.querySelector('#screen').style.width = '100%'
+            document.querySelector('#screen').style.fontSize = '21px'
+            document.querySelector('#screen>div').style.fontSize = '21px'
+            document.querySelector('#screen>div').style.maxWidth = '720px'
+            document.querySelector('#screen>div').style.padding = '12px'
+            document.querySelector('.shortcuts').style.display = 'none'
+            document.querySelector('#screen').style.display = 'flex'
+            document.querySelector('#screen').style.justifyContent = 'center'
+        } else {
+            isSimpleMode = false
+            document.querySelector('#screen').style.height = '0'
+            document.querySelector('#screen').style.minHeight = ''
+            document.querySelector('#screen').style.overflow = 'hidden'
+            document.querySelector('#screen').style.width = '650px'
+            document.querySelector('#screen').style.fontSize = '24px'
+            document.querySelector('#screen>div').style.fontSize = '24px'
+            document.querySelector('#screen>div').style.maxWidth = ''
+            document.querySelector('#screen>div').style.padding = '48px'
+            document.querySelector('#screen').style.display = ''
+            document.querySelector('#screen').style.justifyContent = ''
+            document.querySelector('.shortcuts').style.display = 'block'
+
+            animate(0)
+        }
+    }
+
     const screenArcade = new Screen(
         '../resources/arcade/screen_blank.png',
         1000, 750,
@@ -129,7 +162,7 @@ import Button from './Arcade/Button.js'
         position: new Vector3(100, 100, 250)
     }, {
         zNear: 1,
-        zFar: 1000,
+        zFar: 500,
         fieldOfViewRadians: Math.degreeToRadians(45),
         orthographic: false,
         orthographicUnits: 50
@@ -143,7 +176,7 @@ import Button from './Arcade/Button.js'
         position: new Vector3(200, 800, 800)
     }, {
         zNear: 30,
-        zFar: 1000
+        zFar: 2000
     })
     scene.add(debugCamera)
 
@@ -185,13 +218,12 @@ import Button from './Arcade/Button.js'
     }
 
     document.addEventListener('keydown', event => {
-        event.preventDefault()
-
         switch (event.key) {
             case 'Escape':
                 buttonHyperSpace.click()
                 break
             case 'Tab':
+                event.preventDefault()
                 buttonThrust.click()
                 break
             case 'Enter':
@@ -202,6 +234,9 @@ import Button from './Arcade/Button.js'
                 break
             case 'ArrowDown':
                 buttonRotateRight.click()
+                break
+            case 'c':
+                switchMode()
                 break
             default:
                 return
@@ -330,6 +365,8 @@ import Button from './Arcade/Button.js'
     let lastTimeFps = 0
     let lastTimeSecond = 0
     function animate(timeStamp) {
+        if (isSimpleMode) return
+
         let deltaTime = timeStamp - lastTimeFps
         lastTimeFps = timeStamp
         
