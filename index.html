@@ -27,7 +27,7 @@
     <link rel="stylesheet" href="./resources/style.css">
 </head>
 <body data-theme>
-    <div id="screen" style="width: 650px; height: 0; overflow: hidden; font-size: 24px;">
+    <div id="screen" style="width: 650px; height: 0; overflow: hidden; font-size: 24px; color: rgb(255, 255, 255); background: rgb(0,0,0);">
         <div style="padding: 48px;font:24px monospace; color: rgb(255, 255, 255);">
             <h3>Oi 👋, meu nome é <span>Guilherme</span></h3>
             <p>Técnico em Desenvolvimento de Sistemas (ETESP)</p>
@@ -42,23 +42,23 @@
     </div>
 
     <div class="shortcuts">
-        <div>
+        <div id="scrollUp">
             <span>&#x2191;</span>
             <p>Subir scroll</p>
         </div>
-        <div>
+        <div id="scrollDown">
             <span>&#x2193;</span>
             <p>Descer scroll</p>
         </div>
-        <div>
+        <div id="closeWindow">
             <span>Esc</span>
             <p>Fechar janela principal</p>
         </div>
-        <div>
-            <span>&#x2B7E;</span>
+        <div id="navigate">
+            <span>Tab</span>
             <p>Navegar entre projetos</p>
         </div>
-        <div>
+        <div id="openLink">
             <span>&#x21B5;</span>
             <p>Abrir projeto</p>
         </div>
@@ -67,6 +67,16 @@
     <overlay-debug></overlay-debug>
 
     <script>
+        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            document.querySelector('#screen>div').insertAdjacentHTML('afterbegin', 'para uma melhor experiência acessar pelo computador 😊 <br/><br/><hr/><br/>')
+            document.querySelector('#screen').style.height = ''
+            document.querySelector('#screen').style.overflow = ''
+            document.querySelector('#screen').style.width = '100%'
+            document.querySelector('#screen').style.fontSize = '21px'
+            document.querySelector('#screen>div').style.fontSize = '21px'
+            document.querySelector('#screen>div').style.padding = '12px'
+        }
+
         const cardsList = [
             { title: 'BaseTech-Inc/Tupa-Server', description: 'Servidor para a empresa Tupã desenvolvido por @BaseTech-Inc.', links: ['https://github.com/BaseTech-Inc/Tupa-Server'] },
             { title: 'experiment-using-mouse', description: 'Desafios para ajudar um rato a encontrar um pedaço de queijo em um labirinto.', links: ['https://github.com/guilhermeivo/experiment-using-mouse'] },
@@ -74,11 +84,11 @@
             { title: 'tcm-codezone', description: 'Projeto desenvolvido para trabalho de conclusão de módulo (TCM).', links: ['https://github.com/guilhermeivo/tcm-codezone'] }
         ]
 
-        cardsList.forEach(card => {
+        cardsList.forEach((card, index) => {
             document.querySelector('#cards').insertAdjacentHTML('beforeend', `
-                <a href="${ card.links[0] }" target="_blank" style="border: 1px solid rgb(255, 255, 255); padding: 4px; margin-bottom: 8px; color: rgb(255, 255, 255); text-decoration: none" data-card tabindex="5" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
-                    <h3 style="margin: 0; margin-bottom: 4px;">${ card.title }</h3>
-                    <p style="margin: 0">${ card.description }</p>
+                <a href="${ card.links[0] }" target="_blank" style="border: 1px solid rgb(255, 255, 255); padding: 4px; margin-bottom: 8px; color: rgb(255, 255, 255); text-decoration: none" data-card tabindex="${ index }" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                    <h3 style="margin: 0; margin-bottom: 4px; padding: 0;">${ card.title }</h3>
+                    <p style="margin: 0; padding: 0;">${ card.description }</p>
                 </a>
                 `)
         })
@@ -95,7 +105,7 @@
             event.target.style.border = '1px solid rgb(0, 0, 0)'
         }
     </script>
-    <script src="./src/common.js"></script>
+    <script defer src="./src/common.js"></script>
     <script defer type="module" src="./src/app.js"></script>
 
     <noscript>script type is not supported by the page or scripting is disabled in browser.</noscript>

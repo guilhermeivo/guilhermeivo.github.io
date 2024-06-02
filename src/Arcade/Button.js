@@ -57,7 +57,7 @@ export default class Button {
     }
 
     click(args) {
-        this.down()
+        if (this.object) this.down()
 
         if (this.event) this.event(args)
     }

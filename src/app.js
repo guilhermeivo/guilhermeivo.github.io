@@ -24,6 +24,12 @@ import Screen from './Arcade/Screen.js'
 import Button from './Arcade/Button.js'
 
 (() => {
+    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        return
+    }
+
+    document.querySelector('.shortcuts').style.display = 'block'
+
     const DEBUG_MODE = false
     
     const glRenderer = new GLRenderer()
@@ -87,6 +93,27 @@ import Button from './Arcade/Button.js'
 
     const fpsElement = document.querySelector('#textFPS')
 
+    const screenArcade = new Screen(
+        '../resources/arcade/screen_blank.png',
+        1000, 750,
+        180, 150
+    )
+    let actualFocus = 0
+    const cards = document.querySelector("#cards")
+    const buttonRotateRight = new Button(() => { screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight) })
+    const buttonRotateLeft = new Button(() => { screenArcade.scrollUp() })
+    const buttonFire = new Button(() => {
+        let focusElement = actualFocus - 1
+        if (focusElement < 0) focusElement = cards.children.length - 1
+        cards.children[focusElement].click()
+    })
+    const buttonThrust = new Button(() => {
+        cards.children[actualFocus].focus()
+        actualFocus++
+        if (actualFocus >= cards.children.length) actualFocus = 0
+    })
+    const buttonHyperSpace = new Button(() => { screenArcade.close() })
+
     // SCENE
     const scene = new Scene()
 
@@ -120,17 +147,6 @@ import Button from './Arcade/Button.js'
     })
     scene.add(debugCamera)
 
-    const screenArcade = new Screen(
-        '../resources/arcade/screen_blank.png',
-        1000, 750,
-        180, 150
-    )
-    const buttonRotateRight = new Button(() => { screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight) })
-    const buttonRotateLeft = new Button(() => { screenArcade.scrollUp() })
-    const buttonFire = new Button()
-    const buttonThrust = new Button()
-    const buttonHyperSpace = new Button(() => { screenArcade.close() })
-
     /// ARCADE
     loadObj(glRenderer.gl, '../resources/arcade/', 'arcade.obj')
         .then(async collection => {
@@ -157,7 +173,7 @@ import Button from './Arcade/Button.js'
 
     /// SCREEN
     const loadScreen = () => {
-        screenArcade.update(document.querySelector('#screen')).then(() => {
+        screenArcade.update(document.querySelector('#screen'), document.querySelector('#screen>div').scrollHeight).then(() => {
             const screen = scene.children.filter(object => object.type == 'collection')[0]
                 .children.filter(object => object.name == 'Screen')[0]
 
@@ -244,6 +260,8 @@ import Button from './Arcade/Button.js'
     }
 
     document.addEventListener('mousedown', event => {
+        event.preventDefault()
+        
         if (!currentObjectOver) return
         if (event.buttons != 1) return
 

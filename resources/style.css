@@ -1,6 +1,5 @@
 * {
     font-family: monospace;
-    color: #1C1C1C;
 }
 
 body {
@@ -51,13 +50,8 @@ button {
     margin-right: 4px;
 }
 
-@media only screen and (max-width: 810px) {
-    .shortcuts {
-        display: none;
-    }
-}
-
 .shortcuts {
+    display: none;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -69,6 +63,9 @@ button {
     display: flex;
     align-items: center;
     margin: 4px 0;
+    outline: none;
+    user-select: none;
+    cursor: pointer;
 }
 
 .shortcuts > div span {
@@ -84,7 +81,6 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    user-select: none;
     margin-right: 12px;
     transition: .2s cubic-bezier(1, 0, 1, 1);
 }
@@ -97,4 +93,13 @@ button {
 .shortcuts > div span:hover {
     transition: .2s ease-in;
     border: 1px solid #0476ce;
+}
+
+.shortcuts.mobile {
+    position: relative;
+    font-size: 24px;
+}
+
+.shortcuts > div {
+    margin: 12px 0;
 }

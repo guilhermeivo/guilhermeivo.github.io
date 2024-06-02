@@ -49,7 +49,7 @@ export default class Screen {
         if (this.scrollHeight < 0) this.scrollHeight = 0
     }
 
-    update(content) {
+    update(content, maxScroll = 0) {
         let value = content.innerHTML
         if (!this.opened) {
             value = this.errorScreen()
@@ -57,9 +57,9 @@ export default class Screen {
 
         const aSvgImage = `
         data:image/svg+xml,
-        <svg xmlns="http://www.w3.org/2000/svg" width="${ (this.width - this.marginX * 2) }" min-height="${ this.height - this.marginY * 2 }">
+        <svg xmlns="http://www.w3.org/2000/svg" width="${ (this.width - this.marginX * 2) }" height="${ maxScroll }">
             <foreignObject width="100%" height="100%">
-                <div xmlns="http://www.w3.org/1999/xhtml" width="100%" height="100%">
+                <div xmlns="http://www.w3.org/1999/xhtml">
                     ${ value }
                 </div>
             </foreignObject>
@@ -77,7 +77,9 @@ export default class Screen {
     draw() {
         this.ctx.fillRect(0, 0, this.width, this.height)
         this.ctx.scale(1, -1)
-        this.ctx.drawImage(this.imageBg, this.marginX, this.marginY - this.scrollHeight, this.width - this.marginX * 2, (this.height - this.marginY * 2) * -1 - this.marginY * 2 - this.scrollHeight)
+        this.ctx.drawImage(this.imageBg, 
+            this.marginX, this.marginY - this.scrollHeight, 
+            this.width - this.marginX * 2, (this.height - this.marginY * 2) * -1 - this.marginY * 2 - this.scrollHeight)
         this.ctx.scale(1, -1)
         this.ctx.drawImage(this.image, 0, 0)
 
