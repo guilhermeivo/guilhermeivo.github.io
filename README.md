@@ -1,6 +1,12 @@
-# Class Diagram
-<img title="class_diagram" alt="class_diagram" src="/resources/class_diagram.jpg">
+<h1 align="center">
+  🕹️ guilhermeivo.github.io/
+</h1>
 
-# Links
+<h1 align="center">
+    <img alt="Cover" src=".github/cover.png" />
+</h1>
 
-[Opengl materials](http://devernay.free.fr/cours/opengl/materials.html)
+<img src="https://github.githubassets.com/images/mona-whisper.gif" align="right" />
+
+## License
+This project is under license. See the [`LICENSE`](./LICENSE) file for details.
