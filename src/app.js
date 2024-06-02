@@ -108,6 +108,7 @@ import Button from './Arcade/Button.js'
             document.querySelector('.shortcuts').style.display = 'none'
             document.querySelector('#screen').style.display = 'flex'
             document.querySelector('#screen').style.justifyContent = 'center'
+            document.querySelector('#canvas').style.display = 'none'
         } else {
             isSimpleMode = false
             document.querySelector('#screen').style.height = '0'
@@ -121,6 +122,7 @@ import Button from './Arcade/Button.js'
             document.querySelector('#screen').style.display = ''
             document.querySelector('#screen').style.justifyContent = ''
             document.querySelector('.shortcuts').style.display = 'block'
+            document.querySelector('#canvas').style.display = ''
 
             animate(0)
         }
@@ -152,7 +154,7 @@ import Button from './Arcade/Button.js'
 
     /// AXIS
     const axis = new Axis({
-        position: new Vector3(0, 60, 0),
+        position: new Vector3(0, 57, 0),
         scale: new Vector3(50, 50, 50)
     })
     //scene.add(axis)
@@ -199,7 +201,7 @@ import Button from './Arcade/Button.js'
                 const t = i / steps
                 const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
                 // ((initialPosition - finalPosition) * curve) + finalPosition
-                camera.position.set(((100 - 45) * curve) + 45, ((100 - 65) * curve) + 65, 250 * curve)
+                camera.position.set(((100 - 37) * curve) + 37, ((100 - 60) * curve) + 60, 250 * curve)
                 await new Promise(resolve => setTimeout(resolve, 5))
             }
         })
