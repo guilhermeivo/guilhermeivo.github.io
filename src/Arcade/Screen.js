@@ -99,6 +99,6 @@ export default class Screen {
     }
 
     errorScreen() {
-        return `<div style="padding: 48px;font:24px monospace; color: rgb(255, 255, 255);"><h1>_</h1></div>`
+        return `<div style="padding: 48px; font: 24px monospace; color: rgb(255, 255, 255);"><h1>_</h1></div>`
     }
 }

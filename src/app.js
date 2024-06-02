@@ -143,7 +143,7 @@ import Button from './Arcade/Button.js'
         position: new Vector3(200, 800, 800)
     }, {
         zNear: 30,
-        zFar: 2000
+        zFar: 1000
     })
     scene.add(debugCamera)
 
@@ -166,7 +166,7 @@ import Button from './Arcade/Button.js'
                 const t = i / steps
                 const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
                 // ((initialPosition - finalPosition) * curve) + finalPosition
-                camera.position.set(((100 - 60) * curve) + 60, ((100 - 75) * curve) + 75, 250 * curve)
+                camera.position.set(((100 - 45) * curve) + 45, ((100 - 65) * curve) + 65, 250 * curve)
                 await new Promise(resolve => setTimeout(resolve, 5))
             }
         })
