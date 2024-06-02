@@ -74,6 +74,7 @@
         if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             document.querySelector('#screen>div').insertAdjacentHTML('afterbegin', 'para uma melhor experiência acessar pelo computador 😊 <br/><br/><hr/><br/>')
             document.querySelector('#screen').style.height = ''
+            document.querySelector('#screen').style.minHeight = '100vh'
             document.querySelector('#screen').style.overflow = ''
             document.querySelector('#screen').style.width = '100%'
             document.querySelector('#screen').style.fontSize = '21px'
