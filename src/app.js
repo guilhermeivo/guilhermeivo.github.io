@@ -39,13 +39,6 @@ import Button from './Arcade/Button.js'
     glRenderer.setSize(window.innerWidth, window.innerHeight) // change resolution image
     document.body.appendChild(glRenderer.gl.canvas)
 
-    const performance = window.performance
-    const performanceKeys = []
-    for (var value in performance) {
-        performanceKeys.push(value)
-    }
-    // console.log(performanceKeys)
-
     function extractValue(reg, str) {
         const matches = str.match(reg)
         return matches && matches[0]
@@ -55,15 +48,6 @@ import Button from './Arcade/Button.js'
     const paramRenderer = glRenderer.gl.getParameter(glRenderer.gl.RENDERER)
     
     const card = extractValue(/((NVIDIA|AMD|Intel)[^\d]*[^\s]+)/, paramRenderer)
-    
-    // const tokens = card.split(' ')
-    // tokens.shift()
-    
-    // const manufacturer = extractValue(/(NVIDIA|AMD|Intel)/g, card)
-    const manufacturer = 'AMD'
-    // const cardVersion = tokens.pop()
-    // const brand = tokens.join(' ')
-    const integrated = manufacturer === 'Intel'
 
     const overlayDebug = document.querySelector('overlay-debug')
     overlayDebug.addAllContents([
@@ -97,32 +81,14 @@ import Button from './Arcade/Button.js'
     const switchMode = () => {
         if (!isSimpleMode) {
             isSimpleMode = true
-            document.querySelector('#screen').style.height = ''
-            document.querySelector('#screen').style.minHeight = '100vh'
-            document.querySelector('#screen').style.overflow = ''
-            document.querySelector('#screen').style.width = '100%'
-            document.querySelector('#screen').style.fontSize = '21px'
-            document.querySelector('#screen>div').style.fontSize = '21px'
-            document.querySelector('#screen>div').style.maxWidth = '570px'
-            document.querySelector('#screen>div').style.padding = '12px'
+            document.querySelector('#screen').classList.add('simplified')
             document.querySelector('.shortcuts').style.display = 'none'
-            document.querySelector('#screen').style.display = 'flex'
-            document.querySelector('#screen').style.justifyContent = 'center'
             document.querySelector('#canvas').style.display = 'none'
         } else {
             isSimpleMode = false
-            document.querySelector('#screen').style.height = '0'
-            document.querySelector('#screen').style.minHeight = ''
-            document.querySelector('#screen').style.overflow = 'hidden'
-            document.querySelector('#screen').style.width = '650px'
-            document.querySelector('#screen').style.fontSize = '24px'
-            document.querySelector('#screen>div').style.fontSize = '24px'
-            document.querySelector('#screen>div').style.maxWidth = ''
-            document.querySelector('#screen>div').style.padding = '48px'
-            document.querySelector('#screen').style.display = ''
-            document.querySelector('#screen').style.justifyContent = ''
+            document.querySelector('#screen').classList.remove('simplified')
             document.querySelector('.shortcuts').style.display = 'block'
-            document.querySelector('#canvas').style.display = ''
+            document.querySelector('#canvas').style.display = 'block'
 
             animate(0)
         }
@@ -135,19 +101,34 @@ import Button from './Arcade/Button.js'
     )
     let actualFocus = 0
     const cards = document.querySelector("#cards")
-    const buttonRotateRight = new Button(() => { screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight) })
-    const buttonRotateLeft = new Button(() => { screenArcade.scrollUp() })
+    const buttonRotateRight = new Button(() => { 
+        if (!screenArcade.opened) return
+        
+        screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight) 
+    })
+    const buttonRotateLeft = new Button(() => { 
+        if (!screenArcade.opened) return
+
+        screenArcade.scrollUp() 
+    })
     const buttonFire = new Button(() => {
+        if (!screenArcade.opened) return
+
         let focusElement = actualFocus - 1
         if (focusElement < 0) focusElement = cards.children.length - 1
         cards.children[focusElement].click()
     })
     const buttonThrust = new Button(() => {
+        if (!screenArcade.opened) return
+
         cards.children[actualFocus].focus()
         actualFocus++
         if (actualFocus >= cards.children.length) actualFocus = 0
     })
-    const buttonHyperSpace = new Button(() => { screenArcade.close() })
+    const buttonHyperSpace = new Button(() => { 
+        if (screenArcade.opened) screenArcade.close() 
+        else screenArcade.open() 
+    })
 
     // SCENE
     const scene = new Scene()
@@ -157,7 +138,7 @@ import Button from './Arcade/Button.js'
         position: new Vector3(0, 57, 0),
         scale: new Vector3(50, 50, 50)
     })
-    //scene.add(axis)
+    scene.add(axis)
 
     /// CAMERA
     const camera = new Camera({
@@ -165,9 +146,7 @@ import Button from './Arcade/Button.js'
     }, {
         zNear: 1,
         zFar: 500,
-        fieldOfViewRadians: Math.degreeToRadians(45),
-        orthographic: false,
-        orthographicUnits: 50
+        fieldOfViewRadians: Math.degreeToRadians(45)
     })
     camera.target = axis.position
     scene.add(camera)
@@ -219,6 +198,7 @@ import Button from './Arcade/Button.js'
         })
     }
 
+    // EVENTS
     document.addEventListener('keydown', event => {
         switch (event.key) {
             case 'Escape':
@@ -229,6 +209,7 @@ import Button from './Arcade/Button.js'
                 buttonThrust.click()
                 break
             case 'Enter':
+                event.preventDefault()
                 buttonFire.click()
                 break
             case 'ArrowUp':
@@ -238,6 +219,7 @@ import Button from './Arcade/Button.js'
                 buttonRotateRight.click()
                 break
             case 'c':
+            case 'C':
                 switchMode()
                 break
             default:
@@ -298,13 +280,71 @@ import Button from './Arcade/Button.js'
             .then(value => currentObjectOver = value)
     }
 
-    document.addEventListener('mousedown', event => {
+    const getScreenMouseClick = () => {
+        if (!screenArcade.opened) return
+
+        const pixelX = mouseX * glRenderer.gl.canvas.width / glRenderer.gl.canvas.clientWidth
+        const pixelY = glRenderer.gl.canvas.height - mouseY * glRenderer.gl.canvas.height / glRenderer.gl.canvas.clientHeight - 1
+
+        let widthData = 16
+        let heightData = 16
+
+        const data = new Uint8Array(widthData * heightData * 4)
+        glRenderer.gl.readPixels(
+            pixelX,            // x
+            pixelY,            // y
+            widthData,                 // width
+            heightData,                 // height
+            glRenderer.gl.RGBA,           // format
+            glRenderer.gl.UNSIGNED_BYTE,  // type
+            data)             // typed array to hold result
+
+        let values = []
+        for (let i = 0; i < widthData * heightData * 4; i+=4) {
+            if (data[i + 0] == data[i + 1] && data[i + 0] == data[i + 2]) {
+                if (!values.filter(value => value.number == data[i + 0]).length) {
+                    values.push({ number: data[i + 0], amount: 1 })
+                } else {
+                    values.filter(value => value.number == data[i + 0])[0].amount++
+                }
+            }
+        }
+        if (!values.length) return
+
+        values.sort((a, b) => b.amount - a.amount)
+        if (values[0].amount < 8) return
+
+        let smallestDistance = 255
+        let value = document.querySelector('#cards').children[0]
+        for (let card of document.querySelector('#cards').children) {
+            const r = card.style.background.replace(/[^\d,]/g, '').split(',')[0]
+            if (smallestDistance > Math.abs(r - values[0].number)) {
+                smallestDistance = Math.abs(r - values[0].number)
+                value = card
+            }
+        }
+        if (smallestDistance > 16 / 2) return
+
+        return value
+    }
+
+    glRenderer.gl.canvas.addEventListener('mousedown', event => {
         event.preventDefault()
         
         if (!currentObjectOver) return
         if (event.buttons != 1) return
 
         switch (currentObjectOver.name) {
+            case 'Screen':
+                const value = getScreenMouseClick()
+                if (!value) return
+
+                cards.children[value.tabIndex].focus()
+                actualFocus = value.tabIndex + 1
+                if (actualFocus >= cards.children.length) actualFocus = 0
+                buttonFire.click()
+                
+                break
             case 'Button.RotateRight':
                 buttonRotateRight.click()
                 break
@@ -323,7 +363,7 @@ import Button from './Arcade/Button.js'
         }
         setTimeout(loadScreen, 10)
     })
-    document.addEventListener('mouseup', event => {
+    glRenderer.gl.canvas.addEventListener('mouseup', event => {
         if (!currentObjectOver) return
 
         switch (currentObjectOver.name) {
