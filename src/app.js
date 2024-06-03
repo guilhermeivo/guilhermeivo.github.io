@@ -251,16 +251,41 @@ import Button from './Arcade/Button.js'
     let mouseX = -1
     let mouseY = -1
 
-    glRenderer.gl.canvas.addEventListener('mousemove', event => {
+    let currentObjectOver = null
+
+    document.addEventListener('mousemove', event => {
+        if (!screenArcade.opened) return
+
         const rect = glRenderer.gl.canvas.getBoundingClientRect()
         mouseX = event.clientX - rect.left
         mouseY = event.clientY - rect.top
-    })
 
-    let currentObjectOver = null
+        if (!currentObjectOver) return
+
+        switch (currentObjectOver.name) {
+            case 'Button.RotateLeft':
+            case 'Button.Fire':
+            case 'Button.Thrust':
+            case 'Button.HyperSpace':
+            case 'Button.RotateRight':
+                document.querySelector('#canvas').style.cursor = 'pointer'
+                break
+            case 'Screen':
+                const value = getScreenMouseClick()
+                if (value) {
+                    document.querySelector('#canvas').style.cursor = 'pointer'
+                    break
+                }
+            default:
+                if (document.querySelector('#canvas').style.cursor != 'auto')
+                    document.querySelector('#canvas').style.cursor = 'auto'
+                break
+        }
+    })
 
     const getMouseOver = () => {
         if (!scene.children.filter(object => object.type == 'collection').length) return
+        if (!screenArcade.opened) return
 
         const pixelX = mouseX * glRenderer.gl.canvas.width / glRenderer.gl.canvas.clientWidth
         const pixelY = glRenderer.gl.canvas.height - mouseY * glRenderer.gl.canvas.height / glRenderer.gl.canvas.clientHeight - 1
