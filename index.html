@@ -65,16 +65,16 @@
             <p>Descer scroll</p>
         </div>
         <div>
-            <span>Esc</span>
-            <p>Fechar janela principal</p>
-        </div>
-        <div>
             <span>Tab</span>
             <p>Navegar entre projetos</p>
         </div>
         <div>
             <span>&#x21B5;</span>
             <p>Abrir projeto</p>
+        </div>
+        <div>
+            <span>Esc</span>
+            <p>Fechar janela principal</p>
         </div>
     </div>
 
@@ -100,7 +100,7 @@
 
         cardsList.forEach((card, index) => {
             document.querySelector('#cards').insertAdjacentHTML('beforeend', `
-                <a href="${ card.links[0] }" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); background: rgba(${ 16 * index + 16 }, ${ 16 * index + 16 }, ${ 16 * index + 16 }); padding: 4px; text-decoration: none" data-card tabindex="${ index }" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                <a href="${ card.links[0] }" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); background: rgba(${ 16 * index + 16 }, ${ 16 * index + 16 }, ${ 16 * index + 16 }); padding: 4px; text-decoration: none" data-card tabindex="${ index + 1 }" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
                     <h3 style="display: block; font-size: 28px; margin-top: 0; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">${ card.title }</h3>
                     <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">${ card.description }</p>
                 </a>

@@ -24,6 +24,13 @@ export default class GLRenderer {
 
         this.lastUsedVertexArray = null
         this.lastUsedTextureId = null
+
+        this.onResizeHandler = this.onResizeHandler.bind(this)
+        window.addEventListener('resize', this.onResizeHandler)
+    }
+
+    onResizeHandler() {
+        this.setSize(window.innerWidth, window.innerHeight)
     }
 
     createProgram(vertexShaderSource, fragmentShaderSource) {
