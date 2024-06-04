@@ -13,7 +13,7 @@
     <meta name="twitter:site" content="@portfolio">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Portfolio">
-    <meta name="twitter:description" content="🖱️">
+    <meta name="twitter:description" content="🕹️">
     <meta property="og:image" content="./cover.png">
     <meta property="og:image:alt" content="cover">
     <meta property="og:image:width" content="1200">
@@ -27,17 +27,27 @@
     <link rel="stylesheet" href="./resources/style.css">
 </head>
 <body data-theme>
-    <div id="screen" style="width: 650px; height: 0; overflow: hidden; font: 24px monospace; color: rgb(255, 255, 255); background: rgb(0,0,0);">
-        <div style="padding: 48px; font: 24px monospace; color: rgb(255, 255, 255);">
-            <h3>Oi 👋, meu nome é <span>Guilherme</span></h3>
-            <p>Técnico em Desenvolvimento de Sistemas (ETESP)</p>
-            <p>Cursando Sistemas de Informação (USP)</p>
+    <div id="screen">
+        <div style="padding: 48px;">
+            <h3 style="display: block; font-size: 28px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">
+                Oi 👋, meu nome é <span>Guilherme</span>
+            </h3>
+            <p style="display: block; font-size: 24px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                Técnico em Desenvolvimento de Sistemas (ETESP)
+            </p>
+            <p style="display: block; font-size: 24px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                Cursando Sistemas de Informação (USP)
+            </p>
     
-            <h2 style="text-align: center;">Projetos</h2>
+            <h2 style="display: block; font-size: 36px; margin-top: 20px;  margin-bottom: 20px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
+                Projetos
+            </h2>
             
             <div id="cards" style="display: grid; grid-template-columns: 1fr;"></div>
     
-            <p style="text-align: center;">criado por <a href="https://github.com/guilhermeivo" style="color: rgb(255, 255, 255)">guilhermeivo</a> <span title="🥄">❤️</span></p>
+            <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
+                criado por <a href="https://github.com/guilhermeivo" style="color: rgb(255, 255, 255)">guilhermeivo</a> <span title="🥄">❤️</span>
+            </p>
         </div>
     </div>
 
@@ -55,10 +65,6 @@
             <p>Descer scroll</p>
         </div>
         <div>
-            <span>Esc</span>
-            <p>Fechar janela principal</p>
-        </div>
-        <div>
             <span>Tab</span>
             <p>Navegar entre projetos</p>
         </div>
@@ -66,24 +72,23 @@
             <span>&#x21B5;</span>
             <p>Abrir projeto</p>
         </div>
+        <div>
+            <span>Esc</span>
+            <p>Fechar janela principal</p>
+        </div>
     </div>
 
     <overlay-debug></overlay-debug>
 
     <script>
         if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            document.querySelector('#screen>div').insertAdjacentHTML('afterbegin', 'para uma melhor experiência acessar pelo computador 😊 <br/><br/><hr/><br/>')
-            document.querySelector('#screen').style.height = ''
-            document.querySelector('#screen').style.minHeight = '100vh'
-            document.querySelector('#screen').style.overflow = ''
-            document.querySelector('#screen').style.width = '100%'
-            document.querySelector('#screen').style.fontSize = '21px'
-            document.querySelector('#screen>div').style.fontSize = '21px'
-            document.querySelector('#screen>div').style.maxWidth = '720px'
-            document.querySelector('#screen>div').style.padding = '12px'
+            document.querySelector('#screen>div').insertAdjacentHTML('afterbegin', `
+                <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                para uma melhor experiência acessar pelo computador 😊 <br/><br/><hr/><br/>
+                </p>
+                `)
+            document.querySelector('#screen').classList.add('simplified')
             document.querySelector('.shortcuts').style.display = 'none'
-            document.querySelector('#screen').style.display = 'flex'
-            document.querySelector('#screen').style.justifyContent = 'center'
         }
 
         const cardsList = [
@@ -95,9 +100,9 @@
 
         cardsList.forEach((card, index) => {
             document.querySelector('#cards').insertAdjacentHTML('beforeend', `
-                <a href="${ card.links[0] }" target="_blank" style="border: 1px solid rgb(255, 255, 255); padding: 4px; margin-bottom: 8px; color: rgb(255, 255, 255); text-decoration: none" data-card tabindex="${ index }" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
-                    <h3 style="margin: 0; margin-bottom: 4px; padding: 0;">${ card.title }</h3>
-                    <p style="margin: 0; padding: 0;">${ card.description }</p>
+                <a href="${ card.links[0] }" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); background: rgba(${ 16 * index + 16 }, ${ 16 * index + 16 }, ${ 16 * index + 16 }); padding: 4px; text-decoration: none" data-card tabindex="${ index + 1 }" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                    <h3 style="display: block; font-size: 28px; margin-top: 0; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">${ card.title }</h3>
+                    <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">${ card.description }</p>
                 </a>
                 `)
         })
