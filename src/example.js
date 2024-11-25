@@ -33,7 +33,7 @@ import LightHelper from './Helpers/LightHelper.js'
 
     /// Light
     const light001 = new Light({ 
-        position: new Vector3(5, 5, -5)
+        position: new Vector3(2.5, 7, 4.3)
     })
     scene.addLight(light001)
 

@@ -71,13 +71,13 @@ import GLTexture from './Textures/GLTexture.js'
 
     /// Light
     const light001 = new Light({ 
-        position: new Vector3(125, 125, -125)
+        position: new Vector3(125, 150, -125)
     })
     scene.addLight(light001)
     scene.add(new LightHelper(light001))
 
     const light002 = new Light({
-        position: new Vector3(-125, 150, 125)
+        position: new Vector3(-125, 125, 125)
     })
     scene.addLight(light002)
     scene.add(new LightHelper(light002))
@@ -183,6 +183,9 @@ import GLTexture from './Textures/GLTexture.js'
             buttonFire.init(collection.children.filter(object => object.name == 'Button.Fire')[0])
             buttonThrust.init(collection.children.filter(object => object.name == 'Button.Thrust')[0])
             buttonHyperSpace.init(collection.children.filter(object => object.name == 'Button.HyperSpace')[0])
+
+            collection.children.filter(object => object.name == 'Screen')[0].shadow = 1
+            //collection.children.filter(object => object.name == 'Display')[0].shadow = 1
 
             // animation
             let steps = 100 // TODO: influenced by FPS

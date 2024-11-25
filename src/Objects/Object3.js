@@ -15,6 +15,8 @@ export default class Object3 {
         this.worldMatrix = new Matrix4()
 
         this.id = 0
+
+        this.shadow = 0
     }
 
     add(object) {

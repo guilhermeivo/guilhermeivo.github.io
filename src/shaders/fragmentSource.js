@@ -49,11 +49,14 @@ uniform Light u_lights[NUMBER_LIGHTS];
 uniform vec3 u_ambientLight;
 
 uniform vec4 u_id;
+uniform float u_bias;
+uniform int u_shadow; 
 
 float gamma = 1.15; // gamma correction
 
 out vec4 outColor;
 
+// viewDirection = surfaceToViewDirection
 vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     vec3 lightDirection = normalize(light.surfaceToLight - v_fragmentPosition); // lightDirection or surfaceToLightDirection
     vec3 halfVector = normalize(lightDirection + viewDirection);
@@ -76,7 +79,26 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     // AMBIENT
     vec3 effectiveAmbient = light.ambient * u_material.ambient * u_ambientLight;
 
-    return (u_material.emissive + effectiveAmbient + effectiveDiffuse + effectiveSpecular) / attenuation;
+    // SHADOW
+    // divide by w to get the correct value.
+    vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
+    float currentDepth = projectedTexcoord.z + u_bias;
+
+    bool inRange =
+        projectedTexcoord.x >= 0.0 &&
+        projectedTexcoord.x <= 1.0 &&
+        projectedTexcoord.y >= 0.0 &&
+        projectedTexcoord.y <= 1.0;
+
+    // the 'r' channel has the depth values
+    float projectedDepth = texture(projectedTexture, projectedTexcoord.xy).r;
+    float shadowLight = (inRange && projectedDepth <= currentDepth) ? 0.75 : 1.0; 
+
+    if (u_shadow > 0) {
+        return (u_material.emissive + effectiveAmbient + effectiveDiffuse + effectiveSpecular) / attenuation;
+    } else {
+        return shadowLight * (u_material.emissive + effectiveAmbient + effectiveDiffuse + effectiveSpecular) / attenuation; 
+    }
 }
 
 void main() {
@@ -91,31 +113,14 @@ void main() {
     // color = ambientColor * lightAmbient + diffuseColor * sumOfLightCalculations
     vec3 outputColor = vec3(0.0);
     for(int i = 0; i < NUMBER_LIGHTS; i++)
-        outputColor += CalcLight(u_lights[i], normal, surfaceToViewDirection); 
+        outputColor += CalcLight(u_lights[i], normal, surfaceToViewDirection);  
 
-    // planar projection
-    // divide by w to get the correct value.
-    vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
-    bool inRange =
-        projectedTexcoord.x >= 0.0 &&
-        projectedTexcoord.x <= 1.0 &&
-        projectedTexcoord.y >= 0.0 &&
-        projectedTexcoord.y <= 1.0;
-
-    // the 'r' channel has the depth values
-    vec4 projectedTexColor = texture(projectedTexture, projectedTexcoord.xy);
     vec4 texColor = vec4(pow(outputColor.rgb, vec3(1.0 / gamma)), effectiveOpacity);
-    
-    float projectedAmount = inRange ? 1.0 : 0.0;
 
     if (v_color == vec4(0,0,0,1)) {
-        outColor = mix(
-            texColor, 
-            projectedTexColor, projectedAmount);
+        outColor = vec4(texColor.rgb, texColor.a);
     } else {
-        outColor = mix(
-            texColor * v_color, 
-            projectedTexColor, projectedAmount);
+        outColor = vec4(texColor.rgb * v_color.rgb, texColor.a);
     }
 }
 `

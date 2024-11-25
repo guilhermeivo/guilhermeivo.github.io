@@ -30,6 +30,7 @@ export default class GLRenderer {
         this.lineProgramId = this.createProgram(lineVertexSource, lineFragmentSource)
         this.pickingProgramId = this.createProgram(pickingVertexSource, pickingFragmentSource) // to check mouse over in canvas
         this.object3ProgramId = this.createProgram(vertexSource, fragmentSource)
+        this.colorProgramId = this.createProgram(lineVertexSource, lineFragmentSource)
 
         this.width = this.gl.canvas.width
         this.height = this.gl.canvas.height
@@ -40,74 +41,70 @@ export default class GLRenderer {
         window.addEventListener('resize', this.onResizeHandler)
 
         // planar projection mapping
-        const settings = {
-            posX: 2.5,
-            posY: 4.8,
-            posZ: 4.3,
-            targetX: 2.5,
-            targetY: 0,
-            targetZ: 3.5,
-            projWidth: 1,
-            projHeight: 1,
-            perspective: true,
-            fieldOfView: 45,
+        this.settings = {
+            posX: 125,
+            posY: 150,
+            posZ: -125,
+            targetX: 10,
+            targetY: 40,
+            targetZ: 0,
+            projWidth: 50,
+            projHeight: 90,
+            perspective: false,
+            fieldOfView: 15,
+            bias: -0.006,
+            zNear: 150,
+            zFar: 250
         }
 
-        this.textureWorldMatrix = new Matrix4()
         this.textureMatrix = new Matrix4()
+        this.textureMatrix.identity()
         this.mat = new Matrix4()
-        this.textureProjectionMatrix = new Matrix4()
+        this.mat.identity()
 
-        this.textureWorldMatrix.lookAt(
-            [settings.posX, settings.posY, settings.posZ],          // position
-            [settings.targetX, settings.targetY, settings.targetZ], // target
-            [0, 1, 0],                                              // up
-        )
+        this.lightWorldMatrix = new Matrix4()
+        this.lightProjectionMatrix = new Matrix4()
 
-        settings.perspective
-            ? this.textureProjectionMatrix.perspective(
-                Math.degreeToRadians(settings.fieldOfView),
-                settings.projWidth / settings.projHeight,
-                0.1,  // near
-                200)  // far
-            : this.textureProjectionMatrix.orthographic(
-                -settings.projWidth / 2,   // left
-                settings.projWidth / 2,   // right
-                -settings.projHeight / 2,  // bottom
-                settings.projHeight / 2,  // top
-                0.1,                      // near
-                200)                      // far
-
-        this.textureMatrix.translate(new Vector3(0.5, 0.5, 0.5))
-        this.textureMatrix.scale(new Vector3(0.5, 0.5, 0.5))
-        this.textureMatrix.multiply(this.textureProjectionMatrix)
-
-        this.textureWorldMatrix.invert(this.textureWorldMatrix)
-        this.textureMatrix.multiply(this.textureWorldMatrix)
-
-        this.textureWorldMatrix.invert(this.textureWorldMatrix)
-        this.textureProjectionMatrix.invert(this.textureProjectionMatrix)
-        this.mat.multiply(this.textureWorldMatrix)
-        this.mat.multiply(this.textureProjectionMatrix)
         this.projectionHelper = new ProjectionHelper()
-        this.projectionHelper.updateWorld(this.mat)
 
-        function loadImageTexture(gl, url) {
-            const texture = gl.createTexture()
-            gl.bindTexture(gl.TEXTURE_2D, texture)
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                          new Uint8Array([0, 0, 255, 255]))
-            const image = new Image()
-            image.src = url
-            image.addEventListener('load', function() {
-              gl.bindTexture(gl.TEXTURE_2D, texture)
-              gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-              gl.generateMipmap(gl.TEXTURE_2D)
-            })
-            return texture
-          }
-           
-        this.imageTexture = loadImageTexture(this.gl, 'resources/f-texture.png');
+        // depth texture
+        function loadDepthTexture(gl, size) {
+            const depthTexture = gl.createTexture()
+            gl.bindTexture(gl.TEXTURE_2D, depthTexture)
+            gl.texImage2D(
+                gl.TEXTURE_2D,      // target
+                0,                  // mip level
+                gl.DEPTH_COMPONENT32F, // internal format
+                size,   // width
+                size,   // height
+                0,                  // border
+                gl.DEPTH_COMPONENT, // format
+                gl.FLOAT,           // type
+                null)               // data
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+            return depthTexture
+        }
+
+        function loadDepthFrameBuffer(gl, depthTexture) {
+            const depthFramebuffer = gl.createFramebuffer()
+            gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer)
+            gl.framebufferTexture2D(
+                gl.FRAMEBUFFER,       // target
+                gl.DEPTH_ATTACHMENT,  // attachment point
+                gl.TEXTURE_2D,        // texture target
+                depthTexture,         // texture
+                0)                    // mip level
+            return depthFramebuffer
+        }
+        
+        this.depthTextureSize = 1024 * 2
+        this.depthTexture = loadDepthTexture(this.gl, this.depthTextureSize)
+        
+        this.depthFramebuffer = loadDepthFrameBuffer(this.gl, this.depthTexture)
     }
 
     onResizeHandler() {
@@ -145,17 +142,69 @@ export default class GLRenderer {
             this.isInitialized = true
         }
 
-        camera.aspect = this.width / this.height
+        // calc lights matrix4
+        this.lightWorldMatrix.lookAt(
+            [this.settings.posX, this.settings.posY, this.settings.posZ],          // position
+            [this.settings.targetX, this.settings.targetY, this.settings.targetZ], // target
+            [0, 1, 0],                                              // up
+        )
+
+        this.settings.perspective
+            ? this.lightProjectionMatrix.perspective(
+                Math.degreeToRadians(this.settings.fieldOfView),
+                this.settings.projWidth / this.settings.projHeight,
+                this.settings.zNear,  // near
+                this.settings.zFar)  // far
+            : this.lightProjectionMatrix.orthographic(
+                -this.settings.projWidth / 2,   // left
+                this.settings.projWidth / 2,   // right
+                -this.settings.projHeight / 2,  // bottom
+                this.settings.projHeight / 2,  // top
+                this.settings.zNear,                      // near
+                this.settings.zFar)                      // far
+
+        // depth buffer
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.depthFramebuffer)
+        this.gl.viewport(0, 0, this.depthTextureSize, this.depthTextureSize)
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
+
+        this.lightWorldMatrix.invert(this.lightWorldMatrix)
+        this.renderScene(scene, { // config with "new camera"
+            projectionMatrix: this.lightProjectionMatrix,
+            viewMatrix: this.lightWorldMatrix,
+            position: new Vector3(this.settings.posX, this.settings.posY, this.settings.posZ) // is not used in the shader line
+        }, this.colorProgramId, fps, debugMode)
+
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null) // unbind framebuffer
 
         this.gl.viewport(0, 0, this.width, this.height)
 
         this.gl.clearColor(0, 0, 0, 0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 
-        this.renderScene(scene, camera, fps, debugMode)
+        // calc textureMatrix
+        this.textureMatrix.identity()
+        this.textureMatrix.translate(new Vector3(0.5, 0.5, 0.5))
+        this.textureMatrix.scale(new Vector3(0.5, 0.5, 0.5))
+        this.textureMatrix.multiply(this.lightProjectionMatrix)
+
+        this.textureMatrix.multiply(this.lightWorldMatrix)
+
+        this.lightWorldMatrix.invert(this.lightWorldMatrix)   // return to default
+
+        this.lightProjectionMatrix.invert(this.lightProjectionMatrix)
+        this.mat.identity()
+        this.mat.multiply(this.lightWorldMatrix)
+        this.mat.multiply(this.lightProjectionMatrix)
+
+        camera.aspect = this.width / this.height
+
+        this.renderScene(scene, camera, this.object3ProgramId, fps, debugMode)
+
         if (this.projectionHelper.id == 0) {
             scene.add(this.projectionHelper)
         }
+        this.projectionHelper.updateWorld(this.mat)
     }
 
     renderScissor(scene, cameras, fps, pickingMode = false) {
@@ -167,7 +216,43 @@ export default class GLRenderer {
             this.isInitialized = true
         }
 
+        // calc lights matrix4
+        this.lightWorldMatrix.lookAt(
+            [this.settings.posX, this.settings.posY, this.settings.posZ],          // position
+            [this.settings.targetX, this.settings.targetY, this.settings.targetZ], // target
+            [0, 1, 0],                                              // up
+        )
+
+        this.settings.perspective
+            ? this.lightProjectionMatrix.perspective(
+                Math.degreeToRadians(this.settings.fieldOfView),
+                this.settings.projWidth / this.settings.projHeight,
+                this.settings.zNear,  // near
+                this.settings.zFar)  // far
+            : this.lightProjectionMatrix.orthographic(
+                -this.settings.projWidth / 2,   // left
+                this.settings.projWidth / 2,   // right
+                -this.settings.projHeight / 2,  // bottom
+                this.settings.projHeight / 2,  // top
+                this.settings.zNear,                      // near
+                this.settings.zFar)                      // far
+
+        // depth buffer
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.depthFramebuffer)
+        this.gl.viewport(0, 0, this.depthTextureSize, this.depthTextureSize)
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
+
+        this.lightWorldMatrix.invert(this.lightWorldMatrix)
+        this.renderScene(scene, { // config with "new camera"
+            projectionMatrix: this.lightProjectionMatrix,
+            viewMatrix: this.lightWorldMatrix,
+            position: new Vector3(this.settings.posX, this.settings.posY, this.settings.posZ) // is not used in the shader line
+        }, this.colorProgramId, fps)
+
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null) // unbind framebuffer
+
         // config display
+        // left
         const leftWidth = this.width / 2 | 0
         this.gl.viewport(0, 0, leftWidth, this.height)
         this.gl.scissor(0, 0, leftWidth, this.height)
@@ -175,9 +260,25 @@ export default class GLRenderer {
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
-        cameras[0].aspect = (this.width / 2) / this.height
-        this.renderScene(scene, cameras[0], fps)
+        // calc textureMatrix
+        this.textureMatrix.identity()
+        this.textureMatrix.translate(new Vector3(0.5, 0.5, 0.5))
+        this.textureMatrix.scale(new Vector3(0.5, 0.5, 0.5))
+        this.textureMatrix.multiply(this.lightProjectionMatrix)
 
+        this.textureMatrix.multiply(this.lightWorldMatrix)
+
+        this.lightWorldMatrix.invert(this.lightWorldMatrix)   // return to default
+
+        this.lightProjectionMatrix.invert(this.lightProjectionMatrix)
+        this.mat.identity()
+        this.mat.multiply(this.lightWorldMatrix)
+        this.mat.multiply(this.lightProjectionMatrix)
+
+        cameras[0].aspect = (this.width / 2) / this.height
+        this.renderScene(scene, cameras[0], this.object3ProgramId, fps)
+
+        // right
         const rightWidth = this.width - leftWidth
         this.gl.viewport(leftWidth, 0, rightWidth, this.height)
         this.gl.scissor(leftWidth, 0, rightWidth, this.height)
@@ -186,29 +287,37 @@ export default class GLRenderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
         cameras[1].aspect = (this.width / 2) / this.height
-        this.renderScene(scene, cameras[1], fps, true)
+        this.renderScene(scene, cameras[1], this.object3ProgramId, fps, true)
+
+        if (this.projectionHelper.id == 0) {
+            scene.add(this.projectionHelper)
+        }
+        this.projectionHelper.updateWorld(this.mat)
     }
 
-    renderScene(scene, camera, fps, debugMode = false) {
+    renderScene(scene, camera, programId, fps, debugMode = false) {
         const objects = scene.children
 
-        this.renderObjects(objects, scene, camera, fps, debugMode)
+        this.renderObjects(objects, scene, camera, programId, fps, debugMode)
     }
 
-    renderObjects(objects, scene, camera, fps, debugMode) {
+    renderObjects(objects, scene, camera, programId, fps, debugMode) {
         objects.forEach(object => {
-            this.renderObject(object, scene, camera, fps, debugMode)
+            this.renderObject(
+                object, scene, camera, 
+                programId, // default program id
+                fps, debugMode)
         })
     }
 
-    renderObject(object, scene, camera, fps, debugMode) {
+    renderObject(object, scene, camera, programId, fps, debugMode) {
         if (object.type == 'collection') {
-            this.renderObjects(object.children, scene, camera, fps, debugMode)
+            this.renderObjects(object.children, scene, camera, programId, fps, debugMode)
         }
 
         if (!debugMode && object.debug) return
 
-        this.setProgram(this.object3ProgramId)
+        this.setProgram(programId)
         if (object.type == 'mesh' || object.type == 'object3') {
             if (this.pickingMode) {
                 this.setProgram(this.pickingProgramId)
@@ -277,7 +386,7 @@ export default class GLRenderer {
         })
 
         this.gl.activeTexture(this.gl.TEXTURE0 + unit)
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.imageTexture)
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.depthTexture)
         this.program.setUniform('projectedTexture', unit, this.program.types.sampler)
         
         this.program.setUniform('u_id', [
@@ -286,6 +395,9 @@ export default class GLRenderer {
             ((object.id >> 16) & 0xFF) / 0xFF,
             ((object.id >> 24) & 0xFF) / 0xFF,
         ], this.program.types.vec4)
+
+        this.program.setUniform('u_bias', [this.settings.bias], this.program.types.float)
+        this.program.setUniform('u_shadow', [object.shadow], this.program.types.int)
 
         this.program.setUniform('u_projection', camera.projectionMatrix.elements, this.program.types.mat4)
         this.program.setUniform('u_view', camera.viewMatrix.elements, this.program.types.mat4)
