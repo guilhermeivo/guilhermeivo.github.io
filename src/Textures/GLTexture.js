@@ -1,13 +1,20 @@
+window.maxId = 0
+
 export default class GLTexture {
     constructor(gl, textureTarget = gl.TEXTURE_2D) {
-        this.id = 0
-        this.data = null
+        this.name = ''
+        this.id = -1
         this.target = textureTarget
         this.data = gl.createTexture()
     }
 
+    setId(id = window.maxId) {
+        this.id = id;
+        if (id >= window.maxId) window.maxId = id + 1
+    }
+
     setImageTexture(gl, image) {
-        this.bind(gl, this.id)
+        this.bind(gl)
 
         this.createTextureWithImage(gl, image)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
@@ -18,21 +25,21 @@ export default class GLTexture {
     }
 
     setEmptyTexture(gl) {
-        this.bind(gl, this.id)
+        this.bind(gl)
         this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
 
         return this.data
     }
 
     setTexture(gl) {
-        this.bind(gl, this.id)
+        this.bind(gl)
         this.createTextureWithPixels(gl, 1, 1, new Uint8Array([255, 255, 255, 255]))
 
         return this.data
     }
 
     setErrorTexture(gl) {
-        this.bind(gl, this.id)
+        this.bind(gl)
             
         const alignment = 1
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, alignment)
@@ -80,12 +87,7 @@ export default class GLTexture {
             image)
     }
 
-    bind(gl, textureUnit) {
-        gl.activeTexture(gl.TEXTURE0 + textureUnit)
-        gl.bindTexture(gl.TEXTURE_2D, this.data)
-    }
-
-    unbind(gl) {
-        gl.bindTexture(this.target, null)
+    bind(gl) {
+        gl.bindTexture(this.target, this.data)
     }
 }

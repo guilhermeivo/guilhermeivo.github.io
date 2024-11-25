@@ -14,10 +14,10 @@ export default class Material {
         this.uniforms.add('illum', config.illum || [ 2 ], 'float')
 
         this.samplers = {
-            diffuseMap: null,
-            specularMap: null,
-            normalMap: null,
-            opacityMap: null,
+            diffuseMap: null, // 0
+            specularMap: null, // 1
+            normalMap: null, // 2
+            opacityMap: null, // 3
         }
     }
 

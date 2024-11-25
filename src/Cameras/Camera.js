@@ -32,16 +32,15 @@ export default class Camera extends Object3 {
         this.projectionViewMatrix.identity()
         
         // perspective or projection matrix
-        /*this.projectionMatrix = this.orthographic 
-        ? m4.orthographic(
+        this.orthographic 
+        ? this.projectionMatrix.orthographic(
             -this.orthographicUnits * this.aspect,  // left
             this.orthographicUnits * this.aspect,   // right
             -this.orthographicUnits,           // bottom
             this.orthographicUnits,            // top
             this.zNear,
             this.zFar)
-        : m4.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)*/
-        this.projectionMatrix.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
+        : this.projectionMatrix.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
 
         // camera matrix
         this.cameraMatrix.lookAt(

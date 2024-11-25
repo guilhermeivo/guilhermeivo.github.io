@@ -23,6 +23,7 @@ import GLRenderer from './GLRenderer.js'
 import Screen from './Arcade/Screen.js'
 import Button from './Arcade/Button.js'
 import GLInfo from './GLInfo.js'
+import GLTexture from './Textures/GLTexture.js'
 
 (() => {
     if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
@@ -63,7 +64,7 @@ import GLInfo from './GLInfo.js'
     scene.add(new FrustumHelper(camera))
 
     const debugCamera = new Camera({
-        position: new Vector3(200, 800, 800)
+        position: new Vector3(100, 10, 25)
     }, {
         zNear: 30,
         zFar: 2000
@@ -171,7 +172,7 @@ import GLInfo from './GLInfo.js'
         if (screenArcade.opened) screenArcade.close() 
         else screenArcade.open() 
     })
-
+    
     /// ARCADE
     loadObj(glRenderer.gl, '../resources/arcade/', 'arcade.obj')
         .then(async collection => {
@@ -479,8 +480,7 @@ import GLInfo from './GLInfo.js'
             
             getMouseOver()
 
-            glRenderer.setProgram(programId)
-            glRenderer.render(scene, camera, fps)
+            glRenderer.render(scene, camera, fps, programId)
         }
         
         window.requestAnimationFrame(animate)

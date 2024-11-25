@@ -1,5 +1,9 @@
 import GLTexture from "./Textures/GLTexture.js"
 import GLProgram from "./GLProgram.js"
+import colorVertexSource from "./shaders/colorVertexSource.js"
+import colorFragmentSource from "./shaders/colorFragmentSource.js"
+import Matrix4 from "./Math/Matrix4.js"
+import Vector3 from "./Math/Vector3.js"
 
 export default class GLRenderer {
     constructor() {
@@ -23,10 +27,52 @@ export default class GLRenderer {
         this.height = this.gl.canvas.height
 
         this.lastUsedVertexArray = null
-        this.lastUsedTextureId = null
 
         this.onResizeHandler = this.onResizeHandler.bind(this)
         window.addEventListener('resize', this.onResizeHandler)
+
+        // planar texture
+
+        function loadImageTexture(gl, url) {
+            const texture = gl.createTexture()
+            gl.bindTexture(gl.TEXTURE_2D, texture)
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+                          new Uint8Array([0, 0, 255, 255]))
+            const image = new Image();
+            image.src = url;
+            image.addEventListener('load', function() {
+                gl.bindTexture(gl.TEXTURE_2D, texture)
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+                gl.generateMipmap(gl.TEXTURE_2D)
+            })
+            return texture
+        }
+        
+        this.imageTexture = loadImageTexture(this.gl, 'resources/f-texture.png');
+
+        const settings = {
+            posX: 3.5,
+            posY: 4.4,
+            posZ: 4.7,
+            targetX: 0.8,
+            targetY: 0,
+            targetZ: 4.7,
+            projWidth: 2,
+            projHeight: 2,
+        }
+
+        this.textureWorldMatrix = new Matrix4()
+        this.textureWorldMatrix.lookAt(
+            [settings.posX, settings.posY, settings.posZ],          // position
+            [settings.targetX, settings.targetY, settings.targetZ], // target
+            [0, 1, 0],                                              // up
+        )
+        this.textureWorldMatrix.scale(
+            new Vector3(settings.projWidth, settings.projHeight, 1)
+        )
+        this.textureWorldMatrix.invert(this.textureWorldMatrix)
+
+        this.colorProgramId = this.createProgram(colorVertexSource, colorFragmentSource)
     }
 
     onResizeHandler() {
@@ -55,12 +101,21 @@ export default class GLRenderer {
         this.gl.viewport(0, 0, this.width, this.height)
     }
 
-    render(scene, camera, fps) {
+    render(scene, camera, fps, programId = null) {
         if (!this.isInitialized) {
-            this.gl.enable(this.gl.DEPTH_TEST)
+            this.gl.enable(this.gl.DEPTH_TEST) // teste de profundidade
             this.gl.enable(this.gl.CULL_FACE)
             this.gl.disable(this.gl.SCISSOR_TEST)
             this.isInitialized = true
+        }
+
+        camera.aspect = this.width / this.height
+
+        if (programId != null) {
+            this.setProgram(this.colorProgramId)
+            this.renderScene(scene, camera, fps)
+
+            this.setProgram(programId)
         }
 
         this.gl.viewport(0, 0, this.width, this.height)
@@ -68,7 +123,6 @@ export default class GLRenderer {
         this.gl.clearColor(0, 0, 0, 0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 
-        camera.aspect = this.width / this.height
         this.renderScene(scene, camera, fps)
     }
 
@@ -143,17 +197,12 @@ export default class GLRenderer {
             Object.keys(object.material.samplers).forEach((key, index) => {
                 if (!object.material.samplers[key]) {
                     object.material.samplers[key] = new GLTexture(this.gl)
-                    object.material.samplers[key].id = index
                     object.material.samplers[key].setEmptyTexture(this.gl)
+                    
+                    // unbind
+                    //this.gl.activeTexture(this.gl.TEXTURE0)
+                    //this.gl.bindTexture(this.gl.TEXTURE_2D, null)
                 }
-            })
-
-            Object.keys(object.material.samplers).forEach((key, index) => {
-                const currentSampler = object.material.samplers[key]
-                
-                this.useTexture(this.gl.TEXTURE0 + currentSampler.id, currentSampler.data)
-                
-                this.program.setUniform(`${ key }`, currentSampler.id, this.program.types.sampler)
             })
 
             if (object.geometry.indice) object.counter = object.geometry.indice.data.length
@@ -170,17 +219,24 @@ export default class GLRenderer {
         object.onBeforeRender(scene, camera, fps)
 
         // draw
+        if (!this.imageTexture) return
         if (!this.program.existVao(object.id)) return
 
         this.useVao(this.program.getVao(object.id))
 
-        Object.keys(object.material.samplers).forEach((key, index) => {
-            const currentSampler = object.material.samplers[key]
-                
-            this.useTexture(this.gl.TEXTURE0 + currentSampler.id, currentSampler.data)
-            this.program.setUniform(`${ key }`, currentSampler.id, this.program.types.sampler)
+        // load samplers
+        let unit = 0
+        Object.keys(object.material.samplers).forEach(key => {
+            this.gl.activeTexture(this.gl.TEXTURE0 + unit)
+            this.gl.bindTexture(this.gl.TEXTURE_2D, object.material.samplers[key].data)
+            this.program.setUniform(key, unit, this.program.types.sampler)
+            unit++
         })
 
+        this.gl.activeTexture(this.gl.TEXTURE0 + unit)
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.imageTexture)
+        this.program.setUniform('projectedTexture', unit, this.program.types.sampler)
+        
         this.program.setUniform('u_id', [
             ((object.id >>  0) & 0xFF) / 0xFF,
             ((object.id >>  8) & 0xFF) / 0xFF,
@@ -193,6 +249,9 @@ export default class GLRenderer {
         this.program.setUniform('u_world', object.worldMatrix.elements, this.program.types.mat4)
 
         this.program.setUniform('u_viewWorldPosition', camera.position.elements, this.program.types.vec3)
+
+        // planar projection
+        this.program.setUniform('u_textureMatrix', this.textureWorldMatrix.elements, this.program.types.mat4)
 
         if (object.material) {
             if (object.type == 'mesh') {
@@ -237,7 +296,7 @@ export default class GLRenderer {
             const count = object.counter
             this.gl.drawElements(primitiveType, count, indexType, offset)
         }
-
+        
         object.onAfterRender(scene, camera, fps)
     }
 
@@ -245,15 +304,6 @@ export default class GLRenderer {
         if (vao !== this.lastUsedVertexArray) {
             this.lastUsedVertexArray = vao
             this.gl.bindVertexArray(vao)
-        }
-    }
-
-    useTexture(id, data) {
-        if (id !== this.lastUsedTextureId) {
-            this.lastUsedVertexArray = id
-
-            this.gl.activeTexture(id)
-            this.gl.bindTexture(this.gl.TEXTURE_2D, data)
         }
     }
 }

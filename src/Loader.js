@@ -181,7 +181,7 @@ const loadObj = async (gl, url, object, transform = { }) => {
 							const name = currentMaterial[samplerKey] || 'empty'
 							if (!Object.keys(textures).includes(name) || textures[name].id != index) {
 								const texture = new GLTexture(gl)
-								texture.id = index
+								texture.setId(index);
 
 								if (!json.images || !json.images[name]) texture.setEmptyTexture(gl)
 								else if (json.images[name].succeed) texture.setImageTexture(gl, json.images[name].data)

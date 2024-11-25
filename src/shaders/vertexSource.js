@@ -14,10 +14,13 @@ uniform mat4 u_world; // or model matrix
 
 uniform vec3 u_viewWorldPosition;
 
+uniform mat4 u_textureMatrix;
+
 out vec3 v_normal;
 out vec4 v_color;
 out vec3 v_surfaceToView;
 out vec2 v_texcoord;
+out vec4 v_projectedTexcoord;
 out vec3 v_fragmentPosition;  
 
 void main() {
@@ -31,5 +34,7 @@ void main() {
 	v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
 	v_fragmentPosition = vec3(u_world * vec4(a_position.xyz, 1.0));
 	v_normal = mat3(u_world) * a_normal;
+
+	v_projectedTexcoord = u_textureMatrix * worldPosition; // for planar projection
 }
 `

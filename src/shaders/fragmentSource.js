@@ -7,6 +7,7 @@ precision highp float;
 // Passed in from the vertex shader
 in vec4 v_color;
 in vec2 v_texcoord;
+in vec4 v_projectedTexcoord;
 in vec3 v_normal;
 in vec3 v_fragmentPosition; 
 
@@ -38,7 +39,9 @@ struct Material {
 
 uniform sampler2D diffuseMap;
 uniform sampler2D specularMap;
+uniform sampler2D normalMap;
 uniform sampler2D opacityMap;
+uniform sampler2D projectedTexture;
 
 uniform Material u_material;
 uniform Light u_lights[NUMBER_LIGHTS];
@@ -47,7 +50,7 @@ uniform vec3 u_ambientLight;
 
 uniform vec4 u_id;
 
-float gamma = 1.15;
+float gamma = 1.15; // gamma correction
 
 out vec4 outColor;
 
@@ -56,14 +59,15 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     vec3 halfVector = normalize(lightDirection + viewDirection);
 
     float fakeLight = dot(lightDirection, normal) * light.itensity + .5;
-    float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
+    float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0); // blinn-phong
 
     float distance = length(light.surfaceToLight - v_fragmentPosition); 
-    float attenuation = (light.constant + light.linear * distance); 
+    float attenuation = light.constant + (light.linear * distance); 
 
     // SPECULAR
     vec4 specularMapColor = texture(specularMap, v_texcoord);
-    vec3 effectiveSpecular = light.specular * u_material.specular * pow(specularLight, u_material.shininess) * light.color * specularMapColor.rgb;
+    vec3 effectiveSpecular = light.specular * u_material.specular * pow(specularLight, u_material.shininess) * 
+        light.color * specularMapColor.rgb; // color;
 
     // DIFFUSE
     vec4 diffuseMapColor = texture(diffuseMap, v_texcoord);
@@ -89,6 +93,29 @@ void main() {
     for(int i = 0; i < NUMBER_LIGHTS; i++)
         outputColor += CalcLight(u_lights[i], normal, surfaceToViewDirection); 
 
-    outColor = vec4(pow(outputColor.rgb, vec3(1.0 / gamma)), effectiveOpacity);
+    // planar projection
+    // divide by w to get the correct value.
+    vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
+    bool inRange =
+        projectedTexcoord.x >= 0.0 &&
+        projectedTexcoord.x <= 1.0 &&
+        projectedTexcoord.y >= 0.0 &&
+        projectedTexcoord.y <= 1.0;
+
+    // the 'r' channel has the depth values
+    vec4 projectedTexColor = texture(projectedTexture, projectedTexcoord.xy);
+    vec4 texColor = vec4(pow(outputColor.rgb, vec3(1.0 / gamma)), effectiveOpacity);
+    
+    float projectedAmount = inRange ? 1.0 : 0.0;
+
+    if (v_color == vec4(0,0,0,1)) {
+        outColor = mix(
+            texColor, 
+            projectedTexColor, projectedAmount);
+    } else {
+        outColor = mix(
+            texColor * v_color, 
+            projectedTexColor, projectedAmount);
+    }
 }
 `

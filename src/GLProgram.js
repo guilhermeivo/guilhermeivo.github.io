@@ -17,7 +17,8 @@ export default class GLProgram {
             uint: 'uint',
             uvec2: 'uvec2',
             uvec3: 'uvec3',
-            uvec4: 'uvec4'
+            uvec4: 'uvec4',
+            sampler: 'sampler'
         }
 
         this.vaos = []
@@ -75,6 +76,10 @@ export default class GLProgram {
     // dados retirados de buffers
     setAttribute(attributeName, attribute, indice) {
         const locationAttribute = this.gl.getAttribLocation(this.id, `a_${ attributeName }`)
+
+        if (locationAttribute < 0) {
+            return
+        }
 
         this.attributeBind(attribute, this.gl.ARRAY_BUFFER)
         if (indice) this.attributeBind(indice, this.gl.ELEMENT_ARRAY_BUFFER)

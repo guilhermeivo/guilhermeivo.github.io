@@ -47,6 +47,7 @@ button {
 }
 
 #overlay--debug > div > *, overlay-debug form > div > * {
+    margin: 0;
     margin-right: 4px;
 }
 
