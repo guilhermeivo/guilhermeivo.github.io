@@ -3,7 +3,7 @@ in vec4 a_position;
  
 uniform mat4 u_projection;
 uniform mat4 u_view;
-uniform mat4 u_world;
+uniform mat4 u_world; // or model matrix
  
 void main() {
   // Multiply the position by the matrices.

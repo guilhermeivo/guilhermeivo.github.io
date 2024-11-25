@@ -34,8 +34,6 @@ import GLTexture from './Textures/GLTexture.js'
     
     /// RENDERER
     const glRenderer = new GLRenderer()
-    const programId = glRenderer.createProgram(vertexSource, fragmentSource)
-    const programPickingId = glRenderer.createProgram(pickingVertexSource, pickingFragmentSource) // to check mouse over in canvas
     
     glRenderer.setSize(window.innerWidth, window.innerHeight) // change resolution image (1x, 2x)
     document.body.appendChild(glRenderer.gl.canvas)
@@ -64,7 +62,7 @@ import GLTexture from './Textures/GLTexture.js'
     scene.add(new FrustumHelper(camera))
 
     const debugCamera = new Camera({
-        position: new Vector3(100, 10, 25)
+        position: new Vector3(100, 100, 250)
     }, {
         zNear: 30,
         zFar: 2000
@@ -467,7 +465,6 @@ import GLTexture from './Textures/GLTexture.js'
                 fpsElement.value = fps.toFixed(2)
             }
 
-            glRenderer.setProgram(programId)
             glRenderer.renderScissor(scene, [ camera, debugCamera ], fps)
         } else {
             if (overlayDebug.state.isOpen) {
@@ -475,12 +472,9 @@ import GLTexture from './Textures/GLTexture.js'
                 overlayDebug.toggle()
             }
 
-            glRenderer.setProgram(programPickingId)
-            glRenderer.render(scene, camera, fps)
-            
+            glRenderer.render(scene, camera, fps, true)
             getMouseOver()
-
-            glRenderer.render(scene, camera, fps, programId)
+            glRenderer.render(scene, camera, fps, false)
         }
         
         window.requestAnimationFrame(animate)

@@ -1,9 +1,14 @@
 import GLTexture from "./Textures/GLTexture.js"
 import GLProgram from "./GLProgram.js"
-import colorVertexSource from "./shaders/colorVertexSource.js"
-import colorFragmentSource from "./shaders/colorFragmentSource.js"
+import lineVertexSource from "./shaders/lineVertexSource.js"
+import lineFragmentSource from "./shaders/lineFragmentSource.js"
 import Matrix4 from "./Math/Matrix4.js"
 import Vector3 from "./Math/Vector3.js"
+import vertexSource from "./shaders/vertexSource.js"
+import fragmentSource from "./shaders/fragmentSource.js"
+import pickingVertexSource from "./shaders/pickingVertexSource.js"
+import pickingFragmentSource from "./shaders/pickingFragmentSource.js"
+import ProjectionHelper from "./Helpers/ProjectionHelper.js"
 
 export default class GLRenderer {
     constructor() {
@@ -20,8 +25,11 @@ export default class GLRenderer {
         }
 
         this.program = null
-
         this.programs = []
+
+        this.lineProgramId = this.createProgram(lineVertexSource, lineFragmentSource)
+        this.pickingProgramId = this.createProgram(pickingVertexSource, pickingFragmentSource) // to check mouse over in canvas
+        this.object3ProgramId = this.createProgram(vertexSource, fragmentSource)
 
         this.width = this.gl.canvas.width
         this.height = this.gl.canvas.height
@@ -31,48 +39,75 @@ export default class GLRenderer {
         this.onResizeHandler = this.onResizeHandler.bind(this)
         window.addEventListener('resize', this.onResizeHandler)
 
-        // planar texture
+        // planar projection mapping
+        const settings = {
+            posX: 2.5,
+            posY: 4.8,
+            posZ: 4.3,
+            targetX: 2.5,
+            targetY: 0,
+            targetZ: 3.5,
+            projWidth: 1,
+            projHeight: 1,
+            perspective: true,
+            fieldOfView: 45,
+        }
+
+        this.textureWorldMatrix = new Matrix4()
+        this.textureMatrix = new Matrix4()
+        this.mat = new Matrix4()
+        this.textureProjectionMatrix = new Matrix4()
+
+        this.textureWorldMatrix.lookAt(
+            [settings.posX, settings.posY, settings.posZ],          // position
+            [settings.targetX, settings.targetY, settings.targetZ], // target
+            [0, 1, 0],                                              // up
+        )
+
+        settings.perspective
+            ? this.textureProjectionMatrix.perspective(
+                Math.degreeToRadians(settings.fieldOfView),
+                settings.projWidth / settings.projHeight,
+                0.1,  // near
+                200)  // far
+            : this.textureProjectionMatrix.orthographic(
+                -settings.projWidth / 2,   // left
+                settings.projWidth / 2,   // right
+                -settings.projHeight / 2,  // bottom
+                settings.projHeight / 2,  // top
+                0.1,                      // near
+                200)                      // far
+
+        this.textureMatrix.translate(new Vector3(0.5, 0.5, 0.5))
+        this.textureMatrix.scale(new Vector3(0.5, 0.5, 0.5))
+        this.textureMatrix.multiply(this.textureProjectionMatrix)
+
+        this.textureWorldMatrix.invert(this.textureWorldMatrix)
+        this.textureMatrix.multiply(this.textureWorldMatrix)
+
+        this.textureWorldMatrix.invert(this.textureWorldMatrix)
+        this.textureProjectionMatrix.invert(this.textureProjectionMatrix)
+        this.mat.multiply(this.textureWorldMatrix)
+        this.mat.multiply(this.textureProjectionMatrix)
+        this.projectionHelper = new ProjectionHelper()
+        this.projectionHelper.updateWorld(this.mat)
 
         function loadImageTexture(gl, url) {
             const texture = gl.createTexture()
             gl.bindTexture(gl.TEXTURE_2D, texture)
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
                           new Uint8Array([0, 0, 255, 255]))
-            const image = new Image();
-            image.src = url;
+            const image = new Image()
+            image.src = url
             image.addEventListener('load', function() {
-                gl.bindTexture(gl.TEXTURE_2D, texture)
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-                gl.generateMipmap(gl.TEXTURE_2D)
+              gl.bindTexture(gl.TEXTURE_2D, texture)
+              gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
+              gl.generateMipmap(gl.TEXTURE_2D)
             })
             return texture
-        }
-        
+          }
+           
         this.imageTexture = loadImageTexture(this.gl, 'resources/f-texture.png');
-
-        const settings = {
-            posX: 3.5,
-            posY: 4.4,
-            posZ: 4.7,
-            targetX: 0.8,
-            targetY: 0,
-            targetZ: 4.7,
-            projWidth: 2,
-            projHeight: 2,
-        }
-
-        this.textureWorldMatrix = new Matrix4()
-        this.textureWorldMatrix.lookAt(
-            [settings.posX, settings.posY, settings.posZ],          // position
-            [settings.targetX, settings.targetY, settings.targetZ], // target
-            [0, 1, 0],                                              // up
-        )
-        this.textureWorldMatrix.scale(
-            new Vector3(settings.projWidth, settings.projHeight, 1)
-        )
-        this.textureWorldMatrix.invert(this.textureWorldMatrix)
-
-        this.colorProgramId = this.createProgram(colorVertexSource, colorFragmentSource)
     }
 
     onResizeHandler() {
@@ -101,7 +136,8 @@ export default class GLRenderer {
         this.gl.viewport(0, 0, this.width, this.height)
     }
 
-    render(scene, camera, fps, programId = null) {
+    render(scene, camera, fps, pickingMode = false, debugMode = false) {
+        this.pickingMode = pickingMode
         if (!this.isInitialized) {
             this.gl.enable(this.gl.DEPTH_TEST) // teste de profundidade
             this.gl.enable(this.gl.CULL_FACE)
@@ -111,22 +147,19 @@ export default class GLRenderer {
 
         camera.aspect = this.width / this.height
 
-        if (programId != null) {
-            this.setProgram(this.colorProgramId)
-            this.renderScene(scene, camera, fps)
-
-            this.setProgram(programId)
-        }
-
         this.gl.viewport(0, 0, this.width, this.height)
 
         this.gl.clearColor(0, 0, 0, 0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 
-        this.renderScene(scene, camera, fps)
+        this.renderScene(scene, camera, fps, debugMode)
+        if (this.projectionHelper.id == 0) {
+            scene.add(this.projectionHelper)
+        }
     }
 
-    renderScissor(scene, cameras, fps) {
+    renderScissor(scene, cameras, fps, pickingMode = false) {
+        this.pickingMode = pickingMode
         if (!this.isInitialized) {
             this.gl.enable(this.gl.DEPTH_TEST)
             this.gl.enable(this.gl.CULL_FACE)
@@ -175,6 +208,17 @@ export default class GLRenderer {
 
         if (!debugMode && object.debug) return
 
+        this.setProgram(this.object3ProgramId)
+        if (object.type == 'mesh' || object.type == 'object3') {
+            if (this.pickingMode) {
+                this.setProgram(this.pickingProgramId)
+            }
+        } else if (object.type == 'line') {
+            if (this.pickingMode) return
+
+            this.setProgram(this.lineProgramId)
+        }
+
         // init
         if (!this.program.existVao(object.id) && (object.type == 'mesh' || object.type == 'line')) {
             // vbo & ebo
@@ -219,7 +263,6 @@ export default class GLRenderer {
         object.onBeforeRender(scene, camera, fps)
 
         // draw
-        if (!this.imageTexture) return
         if (!this.program.existVao(object.id)) return
 
         this.useVao(this.program.getVao(object.id))
@@ -251,7 +294,7 @@ export default class GLRenderer {
         this.program.setUniform('u_viewWorldPosition', camera.position.elements, this.program.types.vec3)
 
         // planar projection
-        this.program.setUniform('u_textureMatrix', this.textureWorldMatrix.elements, this.program.types.mat4)
+        this.program.setUniform('u_textureMatrix', this.textureMatrix.elements, this.program.types.mat4)
 
         if (object.material) {
             if (object.type == 'mesh') {
@@ -280,23 +323,21 @@ export default class GLRenderer {
             }
         }
 
-        let primitiveType = this.gl.TRIANGLES
         const offset = 0
 
-        if (object.type == 'mesh') {
-            primitiveType = this.gl.TRIANGLES
+        if (object.type == 'mesh' || object.type == 'object3') {
+            const primitiveType = this.gl.TRIANGLES
 
             const count = object.counter / 3
             this.gl.drawArrays(primitiveType, offset, count)
-        }
-        else if (object.type == 'line') {
-            primitiveType = this.gl.LINES
+        } else if (object.type == 'line') {
+            const primitiveType = this.gl.LINES
 
             const indexType = this.gl.UNSIGNED_INT
             const count = object.counter
             this.gl.drawElements(primitiveType, count, indexType, offset)
         }
-        
+
         object.onAfterRender(scene, camera, fps)
     }
 

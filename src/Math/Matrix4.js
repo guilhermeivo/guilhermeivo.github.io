@@ -43,7 +43,7 @@ export default class Matrix4 {
 		]
 	}
 
-	unit = () => {
+	zero = () => {
 		this.elements = [
 			0, 0, 0, 0,
 			0, 0, 0, 0,

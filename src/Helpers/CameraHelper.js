@@ -7,8 +7,8 @@ export default class CameraHelper extends Lines {
     constructor(cameraElement) {
         const geometry = new Geometry()
         geometry.setAttribute('position', camera.vertice())
-        geometry.setAttribute('color', camera.color(), { type: UnsignedByte })
-        geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
+        //geometry.setAttribute('color', camera.color(), { type: UnsignedByte })
+        //geometry.setAttribute('texcoord', camera.texture(), { size: 2 })
         geometry.setIndice(camera.indices())
         const material = new Material()
 
@@ -48,12 +48,6 @@ const camera = {
         camera._vertice.forEach((v, ndx) => {
             camera._vertice[ndx] *= 20
         })
-        for (let i = 0; i < camera._vertice.length / 3; i++) {
-            camera._color.push(1, 1, 1, 1)
-            for (let j = 0; j < 2; j++) {
-                camera._texture.push(1)
-            }
-        }
     },
 
     _vertice: [
@@ -82,19 +76,5 @@ const camera = {
     indices: () => {
         camera.configuration()
         return new Uint32Array(camera._indices)
-    },
-
-    _color: [],
-
-    color: () => {
-        camera.configuration()
-        return new Uint8Array(camera._color)
-    },
-
-    _texture: [],
-
-    texture: () => {
-        camera.configuration()
-        return new Float32Array(camera._texture)
     }
 }
