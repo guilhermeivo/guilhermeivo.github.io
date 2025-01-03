@@ -56,16 +56,28 @@ float gamma = 1.15; // gamma correction
 
 out vec4 outColor;
 
+bool blinn = true;
+
 // viewDirection = surfaceToViewDirection
 vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
+    /// Blinn-Phong
+    // aproximacao para iluminacao
     vec3 lightDirection = normalize(light.surfaceToLight - v_fragmentPosition); // lightDirection or surfaceToLightDirection
-    vec3 halfVector = normalize(lightDirection + viewDirection);
+
+    float specularLight = 0.0;
+    if (blinn) { // remover para melhorar desempenho
+        vec3 halfVector = normalize(lightDirection + viewDirection);
+        specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
+    } else {
+        vec3 reflectDirection = reflect(-lightDirection, normal);
+        specularLight = clamp(dot(viewDirection, reflectDirection), 0.0, 1.0);
+    }
+    ///
 
     float fakeLight = dot(lightDirection, normal) * light.itensity + .5;
-    float specularLight = clamp(dot(normal, halfVector), 0.0, 1.0); // blinn-phong
 
     float distance = length(light.surfaceToLight - v_fragmentPosition); 
-    float attenuation = light.constant + (light.linear * distance); 
+    float attenuation = light.constant + (light.linear * distance);  // gamma correction
 
     // SPECULAR
     vec4 specularMapColor = texture(specularMap, v_texcoord);
