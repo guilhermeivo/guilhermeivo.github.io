@@ -30,14 +30,34 @@ button {
 
 #overlay--debug, overlay-debug {
     position: absolute;
-    left: 10px;
-    top: 10px;
+    /*left: 10px;
+    top: 10px;*/
     background: #ecf0f1;
     padding: 8px 24px;
     display: flex;
     flex-direction: column;
+    border-radius: 8px;
 
     display: none;
+
+    #menu {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid black;
+        margin-bottom: 12px;
+
+        .icon {
+            padding: 6px;
+            cursor: pointer;
+        }
+
+        span {
+            margin: 12px 0;
+            user-select: none;
+            font-weight: bold;
+        }
+    }
 }
 
 #overlay--debug > div, overlay-debug form > div {

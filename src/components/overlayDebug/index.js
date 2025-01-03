@@ -87,14 +87,23 @@ export default customElements.define('overlay-debug',
 
             this.rendered = false
             this.state = { 
-                isOpen: false
+                isOpen: false,
+                isMouseDown: false,
+                offset: [ 10, 10 ],
+                title: this.hasAttribute('title') ? this.getAttribute('title') : ''
             }
+
+            this.onMouseDownHandler = this.onMouseDownHandler.bind(this)
+            this.onMouseUpHandler = this.onMouseUpHandler.bind(this)
+            this.onMouseMove = this.onMouseMove.bind(this)
+            this.onCloseHandler = this.onCloseHandler.bind(this)
         }
 
         connectedCallback() {
             if (!this.rendered) {
                 this.render()
                 this.rendered = true
+                this.addEventsListeners()
             }
         }
     
@@ -163,6 +172,62 @@ export default customElements.define('overlay-debug',
             preview.textContent = setLabel(window[`DEBUG_${ target.id.split(target.type)[1].toUpperCase() }`], target.max)
         }
 
+        addEventsListeners() {
+            if (this.querySelector('#menu')) {
+                this.querySelector('#menu').addEventListener('mousedown', this.onMouseDownHandler, true)
+                this.querySelector('#close').addEventListener('click', this.onCloseHandler)
+            }
+        }
+
+        onMouseDownHandler(event) {
+            this.state.isDown = true
+            this.state.offset = [
+                this.offsetLeft - event.clientX,
+                this.offsetTop - event.clientY
+            ]
+
+            if (this.querySelector('#menu')) {
+                this.querySelector('#menu').style.cursor = 'grabbing'
+            }
+
+            document.addEventListener('mouseup', this.onMouseUpHandler, true)
+            document.addEventListener('mousemove', this.onMouseMove, true)
+        }
+
+        onMouseUpHandler(event) {
+            this.state.isDown = false
+
+            if (this.querySelector('#menu')) {
+                this.querySelector('#menu').style.cursor = 'grab'
+            }
+
+            this.querySelector('#menu').removeEventListener('mousedown', this.onMouseDownHandler)
+            document.removeEventListener('mouseup', this.onMouseUpHandler)
+            document.removeEventListener('mousemove', this.onMouseMove)
+        }
+
+        onMouseMove(event) {
+            if (this.state.isDown) {
+                event.preventDefault()
+                const mousePosition = {
+                    x: event.clientX,
+                    y: event.clientY
+                }
+                const position = [
+                    mousePosition.x + this.state.offset[0],
+                    mousePosition.y + this.state.offset[1]
+                ]
+
+                if (position[0] < 0) position[0] = 0
+                if (position[1] < 0) position[1] = 0
+                if (position[0] > window.innerWidth - this.offsetWidth) position[0] = window.innerWidth - this.offsetWidth
+                if (position[1] > window.innerHeight - this.offsetHeight) position[1] = window.innerHeight - this.offsetHeight
+
+                this.style.left = position[0] + 'px'
+                this.style.top  = position[1] + 'px'
+            }
+        }
+
         removeEventsListeners() {
             this.querySelectorAll('input').forEach(element => {
                 element.removeEventListener('change', this.saveValue)
@@ -177,7 +242,41 @@ export default customElements.define('overlay-debug',
             this.state.isOpen = !this.state.isOpen
         }
 
+        onCloseHandler() {
+            this.querySelector('form').style.display == 'none' ?
+                this.querySelector('form').style.display = 'block' :
+                this.querySelector('form').style.display = 'none'
+        }
+
         render() {
-            this.appendDOM(`<form></form>`)
+            this.appendDOM(`
+                ${
+                    this.state.title ?
+                        (() => {
+                            return (`
+                                <div id="menu">
+                                    <span class="icon" id="close">
+                                        <svg height="10" width="10" xmlns="http://www.w3.org/2000/svg">
+                                            <polygon points="0,0 10,0 5,10" style="fill:black;" />
+                                        </svg> 
+                                    </span>
+                                    <span>${ this.state.title }</span>
+                                    <span class="icon">
+                                        <svg height="12" width="12" xmlns="http://www.w3.org/2000/svg">
+                                        </svg> 
+                                    </span>
+                                </div>
+                            `)
+                        })() :
+                        ''
+                }
+                <form></form>
+            `)
+
+            this.style.left = this.state.offset[0] + 'px';
+            this.style.top  = this.state.offset[1] + 'px';
+            if (this.querySelector('#menu')) {
+                this.querySelector('#menu').style.cursor = 'grab'
+            }
         }
     })
