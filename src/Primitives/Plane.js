@@ -6,7 +6,7 @@ import Mesh from "../Core/Mesh.js"
 import GLTexture from "../Textures/GLTexture.js"
 
 export default class Plane extends Mesh {
-    constructor(gl) {
+    constructor(gl, transformation) {
         const width = 15
         const height = 15
 
@@ -44,7 +44,7 @@ export default class Plane extends Mesh {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
         material.defineSampler('diffuseMap', texture)
 
-        super(geometry, material)
+        super(geometry, material, transformation)
 
         this.vertice = [...plane.vertice(width, height)]
         this.color = [...plane.color()]

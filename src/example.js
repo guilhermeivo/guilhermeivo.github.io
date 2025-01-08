@@ -29,21 +29,27 @@ import LightHelper from './Helpers/LightHelper.js'
 
     /// CAMERA
     const debugCamera = new DebugCamera()
+    debugCamera.target = new Vector3(0, 15/2-2, 0)
     scene.add(debugCamera)
 
     /// Light
     const light001 = new Light({ 
-        position: new Vector3(2.5, 7, 4.3)
+        position: new Vector3(5, 7, 4.3)
     })
     scene.addLight(light001)
+    scene.add(new LightHelper(light001))
 
     const light002 = new Light({
         position: new Vector3(-5, 10, 5)
     })
     scene.addLight(light002)
+    scene.add(new LightHelper(light002))
 
     scene.add(new Plane(glRenderer.gl))
-    scene.add(new Monkey())
+    scene.add(new Monkey({
+        position: new Vector3(0, 15/2, 0),
+        scale: new Vector3(3, 3, 3)
+    }))
 
     window['DEBUG_MODE'] = true
 
@@ -88,24 +94,24 @@ import LightHelper from './Helpers/LightHelper.js'
             type: 'range',
             configs: { 
                 value: 2.75,
-                max: 25,
-                min: -25
+                max: 50,
+                min: -50
             }
         }, {
             label: 'Camera_Y',
             type: 'range',
             configs: { 
-                value: 5,
-                max: 25,
-                min: -25
+                value: 8,
+                max: 50,
+                min: -50
             }
         }, {
             label: 'Camera_Z',
             type: 'range',
             configs: { 
                 value: 25,
-                max: 25,
-                min: -25
+                max: 50,
+                min: -50
             }
         }, {
             label: 'Camera_Orthographic',
@@ -139,23 +145,11 @@ import LightHelper from './Helpers/LightHelper.js'
         
         let fps = 1000 / deltaTime
 
-        if (window['DEBUG_MODE']) {
-            if (!overlayDebug.state.isOpen) {
-                glRenderer.isInitialized = false
-                overlayDebug.toggle()
-            }
-
-            if (timeStamp - lastTimeFpsView >= 1000) { // time to update the FPS view
-                lastTimeFpsView = timeStamp
-                fpsElement.value = fps.toFixed(2)
-            }
-        } else {
-            if (overlayDebug.state.isOpen) {
-                glRenderer.isInitialized = false
-                overlayDebug.toggle()
-            }
+        if (timeStamp - lastTimeFpsView >= 1000) { // time to update the FPS view
+            lastTimeFpsView = timeStamp
+            fpsElement.value = fps.toFixed(2)
         }
-
+        
         glRenderer.render(scene, debugCamera, fps, false, true)
         window.requestAnimationFrame(animate)
     }

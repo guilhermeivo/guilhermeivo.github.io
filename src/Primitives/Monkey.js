@@ -7,7 +7,7 @@ import Vector3 from "../Math/Vector3.js"
 import Object3 from "../Objects/Object3.js"
 
 export default class Monkey extends Mesh {
-    constructor() {
+    constructor(transformation) {
         const geometry = new Geometry()
         geometry.setAttribute('position', monkey.vertice(), { size: 3 })
         
@@ -26,8 +26,6 @@ export default class Monkey extends Mesh {
         geometry.setAttribute('texcoord', monkey.texture(), { size: 2, normalize: false })
         const material = new Material()
 
-        super(geometry, material, {
-            position: new Vector3(2, 3, 4)
-        })
+        super(geometry, material, transformation)
     }
 }

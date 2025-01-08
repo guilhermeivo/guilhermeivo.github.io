@@ -1,3 +1,5 @@
+const NUM_OF_LAYERS = 6
+
 export default class GLShadowMap {
     constructor(gl, size) {
         this.gl = gl
@@ -5,7 +7,7 @@ export default class GLShadowMap {
 
         this.loadDepthBuffer(this.gl, size)
         this.loadCubeMap(this.gl, size)
-        const error = this.loadDepthFrameBuffer(this.gl)
+        this.loadDepthFrameBuffer(this.gl)
     }
 
     loadDepthBuffer(gl, size) {
@@ -37,7 +39,7 @@ export default class GLShadowMap {
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_R, gl.CLAMP_TO_EDGE)
     
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < NUM_OF_LAYERS; i++) {
             gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, gl.R32F, size, size, 0, gl.RED, gl.FLOAT, null)
         }
 
@@ -53,6 +55,9 @@ export default class GLShadowMap {
             gl.TEXTURE_2D,        // texture target
             this.depthTexture,    // texture
             0)                    // mip level
+
+        gl.drawBuffers([gl.NONE])
+        gl.readBuffer(gl.NONE)
 
         const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER)
         

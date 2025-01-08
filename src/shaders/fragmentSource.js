@@ -1,6 +1,8 @@
 // calcula uma cor para cada pixel da primitiva
 export default `#version 300 es
 
+#define USE_BLINN
+
 // definindo a precisão média como alta
 precision highp float;
 
@@ -65,13 +67,13 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     vec3 lightDirection = normalize(light.surfaceToLight - v_fragmentPosition); // lightDirection or surfaceToLightDirection
 
     float specularLight = 0.0;
-    if (blinn) { // remover para melhorar desempenho
+    #if defined(USE_BLINN)
         vec3 halfVector = normalize(lightDirection + viewDirection);
         specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
-    } else {
+    #elif
         vec3 reflectDirection = reflect(-lightDirection, normal);
         specularLight = clamp(dot(viewDirection, reflectDirection), 0.0, 1.0);
-    }
+    #endif
     ///
 
     float fakeLight = dot(lightDirection, normal) * light.itensity + .5;
