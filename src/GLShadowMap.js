@@ -1,18 +1,19 @@
 const NUM_OF_LAYERS = 6
 
 export default class GLShadowMap {
-    constructor(gl, size) {
+    constructor(gl) {
         this.gl = gl
-        this.size = size
 
-        this.loadDepthBuffer(this.gl, size)
-        this.loadCubeMap(this.gl, size)
+        this.size = 512
+
+        this.loadDepthBuffer(this.gl, this.size)
+        this.loadCubeMap(this.gl, this.size)
         this.loadDepthFrameBuffer(this.gl)
     }
 
     loadDepthBuffer(gl, size) {
-        this.depthTexture = gl.createTexture()
-        gl.bindTexture(gl.TEXTURE_2D, this.depthTexture)
+        this.depthMap = gl.createTexture()
+        gl.bindTexture(gl.TEXTURE_2D, this.depthMap)
         gl.texImage2D(
             gl.TEXTURE_2D,         // target
             0,                     // mip level
@@ -24,8 +25,8 @@ export default class GLShadowMap {
             null)                  // data
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, null)
     }
@@ -47,13 +48,13 @@ export default class GLShadowMap {
     }
 
     loadDepthFrameBuffer(gl) {
-        this.depthFramebuffer = gl.createFramebuffer()
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.depthFramebuffer)
+        this.depthMapFBO = gl.createFramebuffer()
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.depthMapFBO)
         gl.framebufferTexture2D(
             gl.FRAMEBUFFER,       // target
             gl.DEPTH_ATTACHMENT,  // attachment point
             gl.TEXTURE_2D,        // texture target
-            this.depthTexture,    // texture
+            this.depthMap,        // texture
             0)                    // mip level
 
         gl.drawBuffers([gl.NONE])
@@ -62,7 +63,7 @@ export default class GLShadowMap {
         const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER)
         
         if (status != gl.FRAMEBUFFER_COMPLETE) {
-            printf("FB error, status: 0x%x\n", status)
+            console.log("FB error, status: 0x%x\n", status)
             return false
         }
 

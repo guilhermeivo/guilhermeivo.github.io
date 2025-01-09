@@ -10,6 +10,8 @@ import fragmentSource from "./shaders/fragmentSource.js"
 import pickingVertexSource from "./shaders/pickingVertexSource.js"
 import pickingFragmentSource from "./shaders/pickingFragmentSource.js"
 import ProjectionHelper from "./Helpers/ProjectionHelper.js"
+import shadowVertexSource from "./shaders/shadowVertexSource.js"
+import shadowFragmentSource from "./shaders/shadowFragmentSource.js"
 
 export default class GLRenderer {
     constructor() {
@@ -31,7 +33,7 @@ export default class GLRenderer {
         this.lineProgramId = this.createProgram(lineVertexSource, lineFragmentSource)
         this.pickingProgramId = this.createProgram(pickingVertexSource, pickingFragmentSource) // to check mouse over in canvas
         this.object3ProgramId = this.createProgram(vertexSource, fragmentSource)
-        this.colorProgramId = this.createProgram(lineVertexSource, lineFragmentSource)
+        this.shadowProgramId = this.createProgram(shadowVertexSource, shadowFragmentSource)
 
         this.width = this.gl.canvas.width
         this.height = this.gl.canvas.height
@@ -43,23 +45,23 @@ export default class GLRenderer {
 
         // planar projection mapping
         this.settings = {
-            posX: 125,
-            posY: 150,
-            posZ: -125,
-            targetX: 10,
-            targetY: 40,
+            posX: 6,
+            posY: 10,
+            posZ: -4.3,
+            targetX: 0,
+            targetY: 3.5,
             targetZ: 0,
-            projWidth: 50,
-            projHeight: 90,
+            projWidth: 25,
+            projHeight: 25,
             perspective: false,
             fieldOfView: 15,
-            bias: -0.006,
-            zNear: 150,
-            zFar: 250
+            bias: 0.001,
+            zNear: 1.0,
+            zFar: 20.0
         }
 
-        this.textureMatrix = new Matrix4()
-        this.textureMatrix.identity()
+        this.lightSpaceMatrix = new Matrix4()
+        this.lightSpaceMatrix.identity()
         this.mat = new Matrix4()
         this.mat.identity()
 
@@ -68,9 +70,7 @@ export default class GLRenderer {
 
         this.projectionHelper = new ProjectionHelper()
 
-        // create depth texture
-        this.depthTextureSize = 1024 * 2
-        this.glShadowMap = new GLShadowMap(this.gl, this.depthTextureSize)
+        this.glShadowMap = new GLShadowMap(this.gl)
     }
 
     onResizeHandler() {
@@ -99,6 +99,52 @@ export default class GLRenderer {
         this.gl.viewport(0, 0, this.width, this.height)
     }
 
+    renderShadow(scene, fps, debugMode) {
+        // 1. Render to depth map
+        // depth buffer
+        this.gl.cullFace(this.gl.FRONT) // peter panning correction
+
+        this.gl.viewport(0, 0, this.glShadowMap.size, this.glShadowMap.size)
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.glShadowMap.depthMapFBO)
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
+
+        // calc lights matrix4
+        this.settings.perspective
+            ? this.lightProjectionMatrix.perspective(
+                Math.degreeToRadians(this.settings.fieldOfView),
+                this.settings.projWidth / this.settings.projHeight,
+                this.settings.zNear,  // near
+                this.settings.zFar)   // far
+            : this.lightProjectionMatrix.orthographic(
+                -this.settings.projWidth / 2,  // left
+                this.settings.projWidth / 2,   // right
+                -this.settings.projHeight / 2, // bottom
+                this.settings.projHeight / 2,  // top
+                this.settings.zNear,           // near
+                this.settings.zFar)            // far
+
+        this.lightWorldMatrix.lookAt(
+            [this.settings.posX, this.settings.posY, this.settings.posZ],          // position
+            [this.settings.targetX, this.settings.targetY, this.settings.targetZ], // target
+            [0.0, 1.0, 0.0])                                                       // up
+        this.lightWorldMatrix.invert(this.lightWorldMatrix)
+
+        this.renderScene(scene, { // config with "new camera"
+            projectionMatrix: this.lightProjectionMatrix,
+            viewMatrix: this.lightWorldMatrix,
+            position: new Vector3(this.settings.posX, this.settings.posY, this.settings.posZ) // is not used in the shader line
+        }, this.shadowProgramId, fps, debugMode)
+
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null) // unbind framebuffer
+
+        // calc lightSpaceMatrix
+        this.lightSpaceMatrix.identity()
+        this.lightSpaceMatrix.multiply(this.lightProjectionMatrix)
+        this.lightSpaceMatrix.multiply(this.lightWorldMatrix)
+
+        this.gl.cullFace(this.gl.BACK)
+    }
+
     render(scene, camera, fps, pickingMode = false, debugMode = false) {
         this.pickingMode = pickingMode
         if (!this.isInitialized) {
@@ -108,53 +154,15 @@ export default class GLRenderer {
             this.isInitialized = true
         }
 
-        // calc lights matrix4
-        this.lightWorldMatrix.lookAt(
-            [this.settings.posX, this.settings.posY, this.settings.posZ],          // position
-            [this.settings.targetX, this.settings.targetY, this.settings.targetZ], // target
-            [0, 1, 0],                                              // up
-        )
+        if (!this.pickingMode) {
+            this.renderShadow(scene, fps, debugMode)
+        }
 
-        this.settings.perspective
-            ? this.lightProjectionMatrix.perspective(
-                Math.degreeToRadians(this.settings.fieldOfView),
-                this.settings.projWidth / this.settings.projHeight,
-                this.settings.zNear,  // near
-                this.settings.zFar)  // far
-            : this.lightProjectionMatrix.orthographic(
-                -this.settings.projWidth / 2,   // left
-                this.settings.projWidth / 2,   // right
-                -this.settings.projHeight / 2,  // bottom
-                this.settings.projHeight / 2,  // top
-                this.settings.zNear,                      // near
-                this.settings.zFar)                      // far
-
-        // depth buffer
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.glShadowMap.depthFramebuffer)
-        this.gl.viewport(0, 0, this.depthTextureSize, this.depthTextureSize)
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
-
-        this.lightWorldMatrix.invert(this.lightWorldMatrix)
-        this.renderScene(scene, { // config with "new camera"
-            projectionMatrix: this.lightProjectionMatrix,
-            viewMatrix: this.lightWorldMatrix,
-            position: new Vector3(this.settings.posX, this.settings.posY, this.settings.posZ) // is not used in the shader line
-        }, this.colorProgramId, fps, debugMode)
-
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null) // unbind framebuffer
-
+        // 2. Render scene
         this.gl.viewport(0, 0, this.width, this.height)
 
         this.gl.clearColor(0, 0, 0, 0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
-
-        // calc textureMatrix
-        this.textureMatrix.identity()
-        this.textureMatrix.translate(new Vector3(0.5, 0.5, 0.5))
-        this.textureMatrix.scale(new Vector3(0.5, 0.5, 0.5))
-        this.textureMatrix.multiply(this.lightProjectionMatrix)
-
-        this.textureMatrix.multiply(this.lightWorldMatrix)
 
         this.lightWorldMatrix.invert(this.lightWorldMatrix)   // return to default
 
@@ -182,40 +190,7 @@ export default class GLRenderer {
             this.isInitialized = true
         }
 
-        // calc lights matrix4
-        this.lightWorldMatrix.lookAt(
-            [this.settings.posX, this.settings.posY, this.settings.posZ],          // position
-            [this.settings.targetX, this.settings.targetY, this.settings.targetZ], // target
-            [0, 1, 0],                                              // up
-        )
-
-        this.settings.perspective
-            ? this.lightProjectionMatrix.perspective(
-                Math.degreeToRadians(this.settings.fieldOfView),
-                this.settings.projWidth / this.settings.projHeight,
-                this.settings.zNear,  // near
-                this.settings.zFar)  // far
-            : this.lightProjectionMatrix.orthographic(
-                -this.settings.projWidth / 2,   // left
-                this.settings.projWidth / 2,   // right
-                -this.settings.projHeight / 2,  // bottom
-                this.settings.projHeight / 2,  // top
-                this.settings.zNear,                      // near
-                this.settings.zFar)                      // far
-
-        // depth buffer
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, glShadowMap.depthFramebuffer)
-        this.gl.viewport(0, 0, this.depthTextureSize, this.depthTextureSize)
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
-
-        this.lightWorldMatrix.invert(this.lightWorldMatrix)
-        this.renderScene(scene, { // config with "new camera"
-            projectionMatrix: this.lightProjectionMatrix,
-            viewMatrix: this.lightWorldMatrix,
-            position: new Vector3(this.settings.posX, this.settings.posY, this.settings.posZ) // is not used in the shader line
-        }, this.colorProgramId, fps)
-
-        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null) // unbind framebuffer
+        this.renderShadow(scene, fps, false)
 
         // config display
         // left
@@ -225,14 +200,6 @@ export default class GLRenderer {
         this.gl.clearColor(0, 0, 0, 0)
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
-
-        // calc textureMatrix
-        this.textureMatrix.identity()
-        this.textureMatrix.translate(new Vector3(0.5, 0.5, 0.5))
-        this.textureMatrix.scale(new Vector3(0.5, 0.5, 0.5))
-        this.textureMatrix.multiply(this.lightProjectionMatrix)
-
-        this.textureMatrix.multiply(this.lightWorldMatrix)
 
         this.lightWorldMatrix.invert(this.lightWorldMatrix)   // return to default
 
@@ -271,7 +238,7 @@ export default class GLRenderer {
         objects.forEach(object => {
             this.renderObject(
                 object, scene, camera, 
-                programId, // default program id
+                programId,
                 fps, debugMode)
         })
     }
@@ -352,7 +319,7 @@ export default class GLRenderer {
         })
 
         this.gl.activeTexture(this.gl.TEXTURE0 + unit)
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.glShadowMap.depthTexture)
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.glShadowMap.depthMap)
         this.program.setUniform('projectedTexture', unit, this.program.types.sampler)
         
         this.program.setUniform('u_id', [
@@ -372,7 +339,7 @@ export default class GLRenderer {
         this.program.setUniform('u_viewWorldPosition', camera.position.elements, this.program.types.vec3)
 
         // planar projection
-        this.program.setUniform('u_textureMatrix', this.textureMatrix.elements, this.program.types.mat4)
+        this.program.setUniform('u_lightSpaceMatrix', this.lightSpaceMatrix.elements, this.program.types.mat4)
 
         if (object.material) {
             if (object.type == 'mesh') {

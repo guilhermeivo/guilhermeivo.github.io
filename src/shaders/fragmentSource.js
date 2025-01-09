@@ -2,6 +2,8 @@
 export default `#version 300 es
 
 #define USE_BLINN
+#define USE_PCF
+//#define RENDER_DEPTH_BUFFER
 
 // definindo a precisão média como alta
 precision highp float;
@@ -9,13 +11,13 @@ precision highp float;
 // Passed in from the vertex shader
 in vec4 v_color;
 in vec2 v_texcoord;
-in vec4 v_projectedTexcoord;
+in vec4 v_fragmentPositionLightSpace;
 in vec3 v_normal;
 in vec3 v_fragmentPosition; 
 
 in vec3 v_surfaceToView;
 
-#define NUMBER_LIGHTS 2  
+#define NUMBER_LIGHTS 1 
 struct Light {
 	vec3 surfaceToLight;
 	vec3 color;
@@ -58,7 +60,34 @@ float gamma = 1.15; // gamma correction
 
 out vec4 outColor;
 
-bool blinn = true;
+float CalcShadow(vec3 normal, vec3 lightDirection) {
+    vec3 projectedCoords = v_fragmentPositionLightSpace.xyz / v_fragmentPositionLightSpace.w;
+    projectedCoords = projectedCoords * 0.5 + 0.5;
+
+    // fora do frustum
+    if (projectedCoords.z > 1.0) return 0.0;
+    
+    float closestDepth = texture(projectedTexture, projectedCoords.xy).r; 
+    float currentDepth = projectedCoords.z;
+    
+    float bias = max(0.05 * (1.0 - dot(normal, lightDirection)), u_bias);
+    
+    #if defined(USE_PCF)
+        float shadow = 0.0;
+        vec2 texelSize = vec2(1.0, 1.0) / vec2(textureSize(projectedTexture, 0));
+        for (int x = -1; x <= 1; ++x) {
+            for (int y = -1; y <= 1; ++y){
+                float pcfDepth = texture(projectedTexture, projectedCoords.xy + vec2(x, y) * texelSize).r; 
+                shadow += currentDepth - bias > pcfDepth  ? 0.75 : 0.0;        
+            }    
+        }
+        shadow /= 9.0;
+    #else
+        float shadow = currentDepth - bias > closestDepth  ? 0.75 : 0.0;
+    #endif
+
+    return shadow;
+}
 
 // viewDirection = surfaceToViewDirection
 vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
@@ -70,7 +99,7 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     #if defined(USE_BLINN)
         vec3 halfVector = normalize(lightDirection + viewDirection);
         specularLight = clamp(dot(normal, halfVector), 0.0, 1.0);
-    #elif
+    #else
         vec3 reflectDirection = reflect(-lightDirection, normal);
         specularLight = clamp(dot(viewDirection, reflectDirection), 0.0, 1.0);
     #endif
@@ -94,24 +123,18 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     vec3 effectiveAmbient = light.ambient * u_material.ambient * u_ambientLight;
 
     // SHADOW
-    // divide by w to get the correct value.
-    vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
-    float currentDepth = projectedTexcoord.z + u_bias;
+    float shadowLight = 1.0 - CalcShadow(normal, lightDirection); 
 
-    bool inRange =
-        projectedTexcoord.x >= 0.0 &&
-        projectedTexcoord.x <= 1.0 &&
-        projectedTexcoord.y >= 0.0 &&
-        projectedTexcoord.y <= 1.0;
-
-    // the 'r' channel has the depth values
-    float projectedDepth = texture(projectedTexture, projectedTexcoord.xy).r;
-    float shadowLight = (inRange && projectedDepth <= currentDepth) ? 0.75 : 1.0; 
+    #if defined(RENDER_DEPTH_BUFFER)
+        return vec3(shadowLight);
+    #endif
 
     if (u_shadow > 0) {
-        return (u_material.emissive + effectiveAmbient + effectiveDiffuse + effectiveSpecular) / attenuation;
+        return 
+            pow(u_material.diffuse * fakeLight * diffuseMapColor.rgb, vec3(1.0 / gamma)) + 
+            (u_material.specular * pow(specularLight, u_material.shininess) * specularMapColor.rgb); 
     } else {
-        return shadowLight * (u_material.emissive + effectiveAmbient + effectiveDiffuse + effectiveSpecular) / attenuation; 
+        return (effectiveAmbient + shadowLight * (u_material.emissive + effectiveDiffuse + effectiveSpecular)) / attenuation; 
     }
 }
 

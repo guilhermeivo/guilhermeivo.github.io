@@ -34,20 +34,24 @@ import LightHelper from './Helpers/LightHelper.js'
 
     /// Light
     const light001 = new Light({ 
-        position: new Vector3(5, 7, 4.3)
+        position: new Vector3(6, 10, -4.3)
     })
     scene.addLight(light001)
     scene.add(new LightHelper(light001))
 
-    const light002 = new Light({
+    /*const light002 = new Light({
         position: new Vector3(-5, 10, 5)
     })
     scene.addLight(light002)
-    scene.add(new LightHelper(light002))
+    scene.add(new LightHelper(light002))*/
 
     scene.add(new Plane(glRenderer.gl))
+    scene.add(new Plane(glRenderer.gl, {
+        position: new Vector3(-15/2, 15/2, 0),
+        rotation: new Vector3(0, 0, Math.degreeToRadians(-90))
+    }))
     scene.add(new Monkey({
-        position: new Vector3(0, 15/2, 0),
+        position: new Vector3(0, 3.5, 0),
         scale: new Vector3(3, 3, 3)
     }))
 

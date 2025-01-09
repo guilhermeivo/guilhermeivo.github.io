@@ -46,7 +46,7 @@ const camera = {
             camera._indices.push(coneBaseIndex + i, coneBaseIndex + (i + 1) % numSegments)
         }
         camera._vertice.forEach((v, ndx) => {
-            camera._vertice[ndx] *= 20
+            camera._vertice[ndx] *= 1
         })
     },
 

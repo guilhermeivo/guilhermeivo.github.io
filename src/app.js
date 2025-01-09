@@ -43,17 +43,19 @@ import GLTexture from './Textures/GLTexture.js'
 
     /// AXIS
     const axis = new Axis({
-        position: new Vector3(0, 57, 0),
-        scale: new Vector3(50, 50, 50)
+        position: new Vector3(0, 11, 0),
+        scale: new Vector3(1, 1, 1)
     })
     scene.add(axis)
 
     /// CAMERA
+    const startCamera = [25, 25, 75]
+
     const camera = new Camera({
-        position: new Vector3(100, 100, 250)
+        position: new Vector3(startCamera[0], startCamera[1], startCamera[2])
     }, {
         zNear: 1,
-        zFar: 500,
+        zFar: 100,
         fieldOfViewRadians: Math.degreeToRadians(45)
     })
     camera.target = axis.position
@@ -62,7 +64,7 @@ import GLTexture from './Textures/GLTexture.js'
     scene.add(new FrustumHelper(camera))
 
     const debugCamera = new Camera({
-        position: new Vector3(100, 100, 250)
+        position: new Vector3(startCamera[0], startCamera[1], startCamera[2])
     }, {
         zNear: 30,
         zFar: 2000
@@ -71,16 +73,16 @@ import GLTexture from './Textures/GLTexture.js'
 
     /// Light
     const light001 = new Light({ 
-        position: new Vector3(125, 150, -125)
+        position: new Vector3(6, 15, -4.3)
     })
     scene.addLight(light001)
     scene.add(new LightHelper(light001))
 
-    const light002 = new Light({
+    /*const light002 = new Light({
         position: new Vector3(-125, 125, 125)
     })
     scene.addLight(light002)
-    scene.add(new LightHelper(light002))
+    scene.add(new LightHelper(light002))*/
 
     // DEBUG CONFIGURATION
     window['DEBUG_MODE'] = false
@@ -185,16 +187,15 @@ import GLTexture from './Textures/GLTexture.js'
             buttonHyperSpace.init(collection.children.filter(object => object.name == 'Button.HyperSpace')[0])
 
             collection.children.filter(object => object.name == 'Screen')[0].shadow = 1
-            //collection.children.filter(object => object.name == 'Display')[0].shadow = 1
 
             // animation
             let steps = 100 // TODO: influenced by FPS
             for (let i = steps; i >= 0; i--) {
                 const t = i / steps
                 camera.position.set(
-                    Math.easeInOutQuad(t, 100, 37), 
-                    Math.easeInOutQuad(t, 100, 60), 
-                    Math.easeInOutQuad(t, 250, 0))
+                    Math.easeInOutQuad(t, startCamera[0], 10), 
+                    Math.easeInOutQuad(t, startCamera[1], 13), 
+                    Math.easeInOutQuad(t, startCamera[2], 0))
                 await new Promise(resolve => setTimeout(resolve, 5))
             }
         })
@@ -267,8 +268,8 @@ import GLTexture from './Textures/GLTexture.js'
         let value = document.querySelector('#cards').children[0]
         for (let card of document.querySelector('#cards').children) {
             const r = card.style.background.replace(/[^\d,]/g, '').split(',')[0]
-            if (smallestDistance > Math.abs(r - values[0].number)) {
-                smallestDistance = Math.abs(r - values[0].number)
+            if (smallestDistance > Math.abs(r - values[0].number + 16)) {
+                smallestDistance = Math.abs(r - values[0].number + 16)
                 value = card
             }
         }
