@@ -38,6 +38,8 @@ export default class GLRenderer {
         this.width = this.gl.canvas.width
         this.height = this.gl.canvas.height
 
+        this.materialName = null
+
         this.lastUsedVertexArray = null
 
         this.onResizeHandler = this.onResizeHandler.bind(this)
@@ -45,9 +47,9 @@ export default class GLRenderer {
 
         // planar projection mapping
         this.settings = {
-            posX: 6,
-            posY: 10,
-            posZ: -4.3,
+            posX: 6.5,
+            posY: 8,
+            posZ: 4.3,
             targetX: 0,
             targetY: 3.5,
             targetZ: 0,
@@ -71,6 +73,17 @@ export default class GLRenderer {
         this.projectionHelper = new ProjectionHelper()
 
         this.glShadowMap = new GLShadowMap(this.gl)
+
+        this.setup()
+    }
+
+    setup() {
+        this.programId = -1
+
+        this.gl.enable(this.gl.DEPTH_TEST) // teste de profundidade
+        this.gl.enable(this.gl.CULL_FACE)
+        this.gl.disable(this.gl.SCISSOR_TEST)
+        this.isInitialized = true
     }
 
     onResizeHandler() {
@@ -79,11 +92,14 @@ export default class GLRenderer {
 
     createProgram(vertexShaderSource, fragmentShaderSource) {
         this.programs.push(new GLProgram(this.gl, vertexShaderSource, fragmentShaderSource))
-        this.setProgram(this.programs.length - 1)
+        //this.setProgram(this.programs.length - 1)
         return this.programs.length - 1
     }
 
     setProgram(id) {
+        if (this.programId == id) return
+
+        this.programId = id
         this.program = this.programs[id]
         this.gl.useProgram(this.program.id)
     }
@@ -100,9 +116,9 @@ export default class GLRenderer {
     }
 
     renderShadow(scene, fps, debugMode) {
-        // 1. Render to depth map
+        // Render to depth map
         // depth buffer
-        this.gl.cullFace(this.gl.FRONT) // peter panning correction
+        //this.gl.cullFace(this.gl.FRONT) // peter panning correction
 
         this.gl.viewport(0, 0, this.glShadowMap.size, this.glShadowMap.size)
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.glShadowMap.depthMapFBO)
@@ -123,6 +139,7 @@ export default class GLRenderer {
                 this.settings.zNear,           // near
                 this.settings.zFar)            // far
 
+        this.lightWorldMatrix.identity()
         this.lightWorldMatrix.lookAt(
             [this.settings.posX, this.settings.posY, this.settings.posZ],          // position
             [this.settings.targetX, this.settings.targetY, this.settings.targetZ], // target
@@ -142,55 +159,34 @@ export default class GLRenderer {
         this.lightSpaceMatrix.multiply(this.lightProjectionMatrix)
         this.lightSpaceMatrix.multiply(this.lightWorldMatrix)
 
-        this.gl.cullFace(this.gl.BACK)
+        //this.gl.cullFace(this.gl.BACK)
     }
 
     render(scene, camera, fps, pickingMode = false, debugMode = false) {
         this.pickingMode = pickingMode
-        if (!this.isInitialized) {
-            this.gl.enable(this.gl.DEPTH_TEST) // teste de profundidade
-            this.gl.enable(this.gl.CULL_FACE)
-            this.gl.disable(this.gl.SCISSOR_TEST)
-            this.isInitialized = true
-        }
 
         if (!this.pickingMode) {
             this.renderShadow(scene, fps, debugMode)
         }
 
-        // 2. Render scene
+        // Render scene
         this.gl.viewport(0, 0, this.width, this.height)
 
         this.gl.clearColor(0, 0, 0, 0)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 
-        this.lightWorldMatrix.invert(this.lightWorldMatrix)   // return to default
-
-        this.lightProjectionMatrix.invert(this.lightProjectionMatrix)
-        this.mat.identity()
-        this.mat.multiply(this.lightWorldMatrix)
-        this.mat.multiply(this.lightProjectionMatrix)
-
         camera.aspect = this.width / this.height
 
         this.renderScene(scene, camera, this.object3ProgramId, fps, debugMode)
-
-        if (this.projectionHelper.id == 0) {
-            scene.add(this.projectionHelper)
-        }
-        this.projectionHelper.updateWorld(this.mat)
     }
 
     renderScissor(scene, cameras, fps, pickingMode = false) {
         this.pickingMode = pickingMode
-        if (!this.isInitialized) {
-            this.gl.enable(this.gl.DEPTH_TEST)
-            this.gl.enable(this.gl.CULL_FACE)
-            this.gl.enable(this.gl.SCISSOR_TEST)
-            this.isInitialized = true
-        }
+        this.gl.enable(this.gl.SCISSOR_TEST)
 
-        this.renderShadow(scene, fps, false)
+        if (!this.pickingMode) {
+            this.renderShadow(scene, fps, false)
+        }
 
         // config display
         // left
@@ -201,12 +197,12 @@ export default class GLRenderer {
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT) 
 
-        this.lightWorldMatrix.invert(this.lightWorldMatrix)   // return to default
+        /*this.lightWorldMatrix.invert(this.lightWorldMatrix)   // return to default
 
         this.lightProjectionMatrix.invert(this.lightProjectionMatrix)
         this.mat.identity()
         this.mat.multiply(this.lightWorldMatrix)
-        this.mat.multiply(this.lightProjectionMatrix)
+        this.mat.multiply(this.lightProjectionMatrix)*/
 
         cameras[0].aspect = (this.width / 2) / this.height
         this.renderScene(scene, cameras[0], this.object3ProgramId, fps)
@@ -222,10 +218,10 @@ export default class GLRenderer {
         cameras[1].aspect = (this.width / 2) / this.height
         this.renderScene(scene, cameras[1], this.object3ProgramId, fps, true)
 
-        if (this.projectionHelper.id == 0) {
+        /*if (this.projectionHelper.id == 0) {
             scene.add(this.projectionHelper)
         }
-        this.projectionHelper.updateWorld(this.mat)
+        this.projectionHelper.updateWorld(this.mat)*/
     }
 
     renderScene(scene, camera, programId, fps, debugMode = false) {
@@ -246,6 +242,7 @@ export default class GLRenderer {
     renderObject(object, scene, camera, programId, fps, debugMode) {
         if (object.type == 'collection') {
             this.renderObjects(object.children, scene, camera, programId, fps, debugMode)
+            return
         }
 
         if (!debugMode && object.debug) return
@@ -286,8 +283,8 @@ export default class GLRenderer {
                     object.material.samplers[key].setEmptyTexture(this.gl)
                     
                     // unbind
-                    //this.gl.activeTexture(this.gl.TEXTURE0)
-                    //this.gl.bindTexture(this.gl.TEXTURE_2D, null)
+                    this.gl.activeTexture(this.gl.TEXTURE0)
+                    this.gl.bindTexture(this.gl.TEXTURE_2D, null)
                 }
             })
 
@@ -296,10 +293,10 @@ export default class GLRenderer {
 
             object.isInitialized = true
 
-            object.geometry.attributes.forEach(attribute => {
-                //attribute.data = null
-                //delete attribute.data
-            })
+            /*object.geometry.attributes.forEach(attribute => {
+                attribute.data = null
+                delete attribute.data
+            })*/
         }
 
         object.onBeforeRender(scene, camera, fps)
@@ -310,24 +307,29 @@ export default class GLRenderer {
         this.useVao(this.program.getVao(object.id))
 
         // load samplers
-        let unit = 0
-        Object.keys(object.material.samplers).forEach(key => {
-            this.gl.activeTexture(this.gl.TEXTURE0 + unit)
-            this.gl.bindTexture(this.gl.TEXTURE_2D, object.material.samplers[key].data)
-            this.program.setUniform(key, unit, this.program.types.sampler)
-            unit++
-        })
+        if (!this.sameMaterial(object.material)) {
+            let unit = 0
+            Object.keys(object.material.samplers).forEach(key => {
+                this.gl.activeTexture(this.gl.TEXTURE0 + unit)
+                this.gl.bindTexture(this.gl.TEXTURE_2D, object.material.samplers[key].data)
+                this.program.setUniform(key, unit, this.program.types.sampler)
+                unit++
+            })
 
-        this.gl.activeTexture(this.gl.TEXTURE0 + unit)
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.glShadowMap.depthMap)
-        this.program.setUniform('projectedTexture', unit, this.program.types.sampler)
+            this.gl.activeTexture(this.gl.TEXTURE0 + unit)
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.glShadowMap.depthMap)
+            this.program.setUniform('projectedTexture', unit, this.program.types.sampler)
+        }
         
-        this.program.setUniform('u_id', [
-            ((object.id >>  0) & 0xFF) / 0xFF,
-            ((object.id >>  8) & 0xFF) / 0xFF,
-            ((object.id >> 16) & 0xFF) / 0xFF,
-            ((object.id >> 24) & 0xFF) / 0xFF,
-        ], this.program.types.vec4)
+        // load id for picking mode
+        if (this.pickingMode) {
+            this.program.setUniform('u_id', [
+                ((object.id >>  0) & 0xFF) / 0xFF,
+                ((object.id >>  8) & 0xFF) / 0xFF,
+                ((object.id >> 16) & 0xFF) / 0xFF,
+                ((object.id >> 24) & 0xFF) / 0xFF,
+            ], this.program.types.vec4)
+        }
 
         this.program.setUniform('u_bias', [this.settings.bias], this.program.types.float)
         this.program.setUniform('u_shadow', [object.shadow], this.program.types.int)
@@ -384,6 +386,13 @@ export default class GLRenderer {
         }
 
         object.onAfterRender(scene, camera, fps)
+    }
+
+    sameMaterial(material) {
+        if (material.name == this.materialName) return true
+
+        this.materialName = material.name
+        return false
     }
 
     useVao(vao) {

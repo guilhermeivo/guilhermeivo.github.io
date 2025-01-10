@@ -4,7 +4,7 @@ export default class GLShadowMap {
     constructor(gl) {
         this.gl = gl
 
-        this.size = 512
+        this.size = 1024
 
         this.loadDepthBuffer(this.gl, this.size)
         this.loadCubeMap(this.gl, this.size)

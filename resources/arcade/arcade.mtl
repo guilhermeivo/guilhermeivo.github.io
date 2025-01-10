@@ -1,4 +1,4 @@
-# Blender 4.1.0 MTL File: 'arcade.blend'
+# Blender 4.3.2 MTL File: 'arcade.blend'
 # www.blender.org
 
 newmtl Button
@@ -11,16 +11,16 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl CabinetOuter
+newmtl CabinetOuterExport
 Ka 1.000000 1.000000 1.000000
-Ks 0.600000 0.600000 0.600000
+Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd background@2.png
-map_Ns roughness_map@2.png
-map_Bump normal_map@2.png
+map_Kd background@4.png
+map_Ns roughness_map@4.png
+map_Bump normal_map@4.png
 
 newmtl Metal
 Ns 490.000000
@@ -33,7 +33,7 @@ d 1.000000
 illum 3
 
 newmtl Plastic
-Ns 250.000000
+Ns 490.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.000000 0.000000 0.000000
 Ks 0.600000 0.600000 0.600000
@@ -41,7 +41,6 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Bump normal_map@2.png
 
 newmtl Screen
 Ns 640.000000
@@ -57,18 +56,8 @@ newmtl ScreenAsteroids
 Ns 640.000000
 Ka 1.000000 1.000000 1.000000
 Ks 0.800000 0.800000 0.800000
-Ke 0.000000 0.000000 0.000000
+Ke 0.050000 0.043981 0.017096
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd background@2.png
-
-newmtl Silver
-Ns 490.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.611908 0.611908 0.611908
-Ks 0.500000 0.500000 0.500000
-Ke 0.000000 0.000000 0.000000
-Ni 1.500000
-d 1.000000
-illum 3
+map_Kd background@4.png

@@ -3,6 +3,7 @@ export default `#version 300 es
 
 #define USE_BLINN
 #define USE_PCF
+#define USE_SHADOW
 //#define RENDER_DEPTH_BUFFER
 
 // definindo a precisão média como alta
@@ -78,7 +79,7 @@ float CalcShadow(vec3 normal, vec3 lightDirection) {
         for (int x = -1; x <= 1; ++x) {
             for (int y = -1; y <= 1; ++y){
                 float pcfDepth = texture(projectedTexture, projectedCoords.xy + vec2(x, y) * texelSize).r; 
-                shadow += currentDepth - bias > pcfDepth  ? 0.75 : 0.0;        
+                shadow += currentDepth - bias > pcfDepth  ? 0.25 : 0.0;        
             }    
         }
         shadow /= 9.0;
@@ -123,7 +124,11 @@ vec3 CalcLight(Light light, vec3 normal, vec3 viewDirection) {
     vec3 effectiveAmbient = light.ambient * u_material.ambient * u_ambientLight;
 
     // SHADOW
-    float shadowLight = 1.0 - CalcShadow(normal, lightDirection); 
+    #if defined(USE_SHADOW)
+        float shadowLight = 1.0 - CalcShadow(normal, lightDirection); 
+    #else
+        float shadowLight = 1.0;
+    #endif
 
     #if defined(RENDER_DEPTH_BUFFER)
         return vec3(shadowLight);
@@ -154,7 +159,7 @@ void main() {
 
     vec4 texColor = vec4(pow(outputColor.rgb, vec3(1.0 / gamma)), effectiveOpacity);
 
-    if (v_color == vec4(0,0,0,1)) {
+    if (v_color.rgb == vec3(0,0,0)) {
         outColor = vec4(texColor.rgb, texColor.a);
     } else {
         outColor = vec4(texColor.rgb * v_color.rgb, texColor.a);

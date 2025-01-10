@@ -4,8 +4,6 @@ import Scene from './Core/Scene.js'
 
 import './components/overlayDebug/index.js'
 import Light from './Lights/Light.js'
-import Axis from './Objects/Axis.js'
-import Camera from './Cameras/Camera.js'
 
 import Vector3 from './Math/Vector3.js'
 import GLRenderer from './GLRenderer.js'

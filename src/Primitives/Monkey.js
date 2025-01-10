@@ -3,8 +3,6 @@ import { UnsignedByte } from "../Core/constants.js"
 import Geometry from "../Core/Geometry.js"
 import Material from "../Core/Material.js"
 import Mesh from "../Core/Mesh.js"
-import Vector3 from "../Math/Vector3.js"
-import Object3 from "../Objects/Object3.js"
 
 export default class Monkey extends Mesh {
     constructor(transformation) {
