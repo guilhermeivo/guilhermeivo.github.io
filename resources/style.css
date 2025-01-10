@@ -78,45 +78,42 @@ button {
     left: 0;
     padding: 12px;
     font-size: 12px;
-}
 
-.shortcuts > div {
-    display: flex;
-    align-items: center;
-    margin: 4px 0;
-    outline: none;
-    user-select: none;
-}
+    & > div {
+        display: flex;
+        align-items: center;
+        outline: none;
+        user-select: none;
+        margin: 8px 0;
 
-.shortcuts > div span {
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-    background: #ffffff;
-    border: 1px solid #D9DBDD;
-    border-bottom: 1px solid #0476ce;
-    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.06);
-    border-radius: 8px;
-    color: #1C1C1C;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 12px;
-    transition: .2s cubic-bezier(1, 0, 1, 1);
-}
+        span {
+            width: 24px;
+            height: 24px;
+            padding: 4px;
+            background: #ffffff;
+            border: 1px solid #D9DBDD;
+            border-bottom: 1px solid #0476ce;
+            box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            color: #1C1C1C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            transition: .2s cubic-bezier(1, 0, 1, 1);
+        }
 
-.shortcuts > div p {
-    margin: 0;
-    text-shadow: -1px 0 #ffffff, 0 1px #ffffff, 1px 0 #ffffff, 0 -1px #ffffff;
-}
+        p {
+            margin: 0;
+            text-shadow: -1px 0 #ffffff, 0 1px #ffffff, 1px 0 #ffffff, 0 -1px #ffffff;
+        }
+    }
 
-.shortcuts > div span:hover {
-    transition: .2s ease-in;
-    border: 1px solid #0476ce;
-}
-
-.shortcuts > div {
-    margin: 12px 0;
+    & > div:hover span {
+        transition: .2s ease-in;
+        border: 1px solid #0476ce;
+        background: #fafafa;
+    }
 }
 
 #screen {
@@ -133,9 +130,9 @@ button {
     width: 100%;
     display: flex;
     justify-content: center;
-}
 
-#screen.simplified > div {
-    max-width: 570px;
-    padding: 12px !important;
+    & > div {
+        max-width: 570px;
+        /*padding: 12px !important;*/
+    }
 }
