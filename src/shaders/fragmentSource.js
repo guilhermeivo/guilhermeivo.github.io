@@ -154,7 +154,7 @@ void main() {
 
     // color = ambientColor * lightAmbient + diffuseColor * sumOfLightCalculations
     vec3 outputColor = vec3(0.0);
-    for(int i = 0; i < NUMBER_LIGHTS; i++)
+    for (int i = 0; i < NUMBER_LIGHTS; i++)
         outputColor += CalcLight(u_lights[i], normal, surfaceToViewDirection);  
 
     vec4 texColor = vec4(pow(outputColor.rgb, vec3(1.0 / gamma)), effectiveOpacity);

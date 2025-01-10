@@ -353,7 +353,8 @@ export default class GLRenderer {
 
                 this.program.setUniform('u_ambientLight', [ .1, .1, .1 ], this.program.types.vec3)
 
-                for (let i = 0; i < scene.lights.length; i++) {
+                const amountLights = scene.lights.length
+                for (let i = 0; i < amountLights; i++) {
                     this.program.setUniform(`u_lights[${ i }].surfaceToLight`, scene.lights[i].position.elements, this.program.types.vec3)
 
                     scene.lights[i].uniforms.list.forEach(light => {

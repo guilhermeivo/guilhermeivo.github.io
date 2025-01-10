@@ -1,11 +1,11 @@
-* {
-    font-family: monospace;
+h1, h2, h3, h4, h5, h6, span, p, label, b, input {
+    font-family: monospace
 }
 
 body {
     margin: 0;
     padding: 0;
-    min-height: 100vh;
+    min-height: 100vh
 }
 
 canvas {
@@ -13,62 +13,7 @@ canvas {
     padding: 0;
     width: 100%;
     height: 100%;
-    display: block;
-}
-
-button {
-    padding: 6px 12px;
-    background: none;
-    outline: none;
-    border: 1px solid #1C1C1C;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 12px;
-    color: #1C1C1C;
-    cursor: pointer;
-}
-
-#overlay--debug, overlay-debug {
-    position: absolute;
-    /*left: 10px;
-    top: 10px;*/
-    background: #ecf0f1;
-    padding: 8px 24px;
-    display: flex;
-    flex-direction: column;
-    border-radius: 8px;
-
-    display: none;
-
-    #menu {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid black;
-        margin-bottom: 12px;
-
-        .icon {
-            padding: 6px;
-            cursor: pointer;
-        }
-
-        span {
-            margin: 12px 0;
-            user-select: none;
-            font-weight: bold;
-        }
-    }
-}
-
-#overlay--debug > div, overlay-debug form > div {
-    display: flex;
-    align-items: center;
-    margin: 6px 0;
-}
-
-#overlay--debug > div > *, overlay-debug form > div > * {
-    margin: 0;
-    margin-right: 4px;
+    display: block
 }
 
 .shortcuts {
@@ -90,7 +35,7 @@ button {
             width: 24px;
             height: 24px;
             padding: 4px;
-            background: #ffffff;
+            background: #FFF;
             border: 1px solid #D9DBDD;
             border-bottom: 1px solid #0476ce;
             box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.06);
@@ -100,19 +45,19 @@ button {
             align-items: center;
             justify-content: center;
             margin-right: 12px;
-            transition: .2s cubic-bezier(1, 0, 1, 1);
+            transition: .2s cubic-bezier(1, 0, 1, 1)
         }
 
         p {
             margin: 0;
-            text-shadow: -1px 0 #ffffff, 0 1px #ffffff, 1px 0 #ffffff, 0 -1px #ffffff;
+            text-shadow: -1px 0 #FFF, 0 1px #FFF, 1px 0 #FFF, 0 -1px #FFF
         }
     }
 
     & > div:hover span {
         transition: .2s ease-in;
         border: 1px solid #0476ce;
-        background: #fafafa;
+        background: #fafafa
     }
 }
 
@@ -120,7 +65,7 @@ button {
     height: 0;
     overflow: hidden;
     width: 650px;
-    background: rgb(0,0,0);
+    background: #000
 }
 
 #screen.simplified {

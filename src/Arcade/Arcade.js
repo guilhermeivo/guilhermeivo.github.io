@@ -115,7 +115,8 @@ export default class Arcade {
         const data = readPixel(this.gl, pixelX, pixelY, widthData, heightData)
 
         let values = []
-        for (let i = 0; i < widthData * heightData * 4; i+=4) {
+        const dataSize = widthData * heightData * 4
+        for (let i = 0; i < dataSize; i+=4) {
             if (data[i + 0] == data[i + 1] && data[i + 0] == data[i + 2]) {
                 if (!values.filter(value => value.number == data[i + 0]).length) {
                     values.push({ number: data[i + 0], amount: 1 })
