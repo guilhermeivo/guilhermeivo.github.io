@@ -23,6 +23,7 @@ export default class Monkey extends Mesh {
         geometry.setAttribute('normal', monkey.normal())
         geometry.setAttribute('texcoord', monkey.texture(), { size: 2, normalize: false })
         const material = new Material()
+        material.name = 'monkey'
 
         super(geometry, material, transformation)
     }

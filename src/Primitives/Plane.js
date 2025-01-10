@@ -43,6 +43,7 @@ export default class Plane extends Mesh {
         gl.generateMipmap(gl.TEXTURE_2D)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
         material.defineSampler('diffuseMap', texture)
+        material.name = 'plane'
 
         super(geometry, material, transformation)
 

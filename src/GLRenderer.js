@@ -38,8 +38,6 @@ export default class GLRenderer {
         this.width = this.gl.canvas.width
         this.height = this.gl.canvas.height
 
-        this.materialName = null
-
         this.lastUsedVertexArray = null
 
         this.onResizeHandler = this.onResizeHandler.bind(this)
@@ -163,6 +161,7 @@ export default class GLRenderer {
     }
 
     render(scene, camera, fps, pickingMode = false, debugMode = false) {
+        this.materialName = null
         this.pickingMode = pickingMode
 
         if (!this.pickingMode) {
@@ -283,7 +282,6 @@ export default class GLRenderer {
                     object.material.samplers[key].setEmptyTexture(this.gl)
                     
                     // unbind
-                    this.gl.activeTexture(this.gl.TEXTURE0)
                     this.gl.bindTexture(this.gl.TEXTURE_2D, null)
                 }
             })
@@ -313,13 +311,14 @@ export default class GLRenderer {
                 this.gl.activeTexture(this.gl.TEXTURE0 + unit)
                 this.gl.bindTexture(this.gl.TEXTURE_2D, object.material.samplers[key].data)
                 this.program.setUniform(key, unit, this.program.types.sampler)
+                
                 unit++
             })
-
             this.gl.activeTexture(this.gl.TEXTURE0 + unit)
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.glShadowMap.depthMap)
             this.program.setUniform('projectedTexture', unit, this.program.types.sampler)
         }
+        
         
         // load id for picking mode
         if (this.pickingMode) {

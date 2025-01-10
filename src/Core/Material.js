@@ -2,6 +2,7 @@ import Uniforms from "./Uniforms.js"
 
 export default class Material {
     constructor(config = {}) {
+        this.name = null
         this.uniforms = new Uniforms()
 
         this.uniforms.add('shininess', config.shininess || [ 32 ], 'float')

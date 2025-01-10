@@ -63,7 +63,7 @@ export default class GLShadowMap {
         const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER)
         
         if (status != gl.FRAMEBUFFER_COMPLETE) {
-            console.log("FB error, status: 0x%x\n", status)
+            console.log(`FB error, status: ${status}`)
             return false
         }
 
