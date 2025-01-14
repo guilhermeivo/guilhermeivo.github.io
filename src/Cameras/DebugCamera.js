@@ -6,33 +6,46 @@ export default class DebugCamera extends Camera {
 
         this.type = 'camera'
         this.prefix = 'DEBUG_CAMERA'
+
+        this.aspect = 1
+
+        window[`${ this.prefix }_VIEW`] = this.fieldOfViewRadians
     }
 
     _onBeforeRender() {
+        this.zNear = Number(window[`${ this.prefix }_ZNEAR`])
+        this.zFar = Number(window[`${ this.prefix }_ZFAR`])
+
         this.position.elements[0] = Number(window[`${ this.prefix }_X`])
         this.position.elements[1] = Number(window[`${ this.prefix }_Y`])
         this.position.elements[2] = Number(window[`${ this.prefix }_Z`])
+
         this.orthographic = window[`${ this.prefix }_ORTHOGRAPHIC`]
         this.orthographicUnits = Number(window[`${ this.prefix }_UNITS`])
 
+        this.fieldOfViewRadians = window[`${ this.prefix }_VIEW`]
+
         this.projectionViewMatrix.identity()
+
         // perspective or projection matrix
-        /*this.projectionMatrix = this.orthographic 
-        ? m4.orthographic(
+        this.orthographic 
+        ? this.projectionMatrix.orthographic(
             -this.orthographicUnits * this.aspect,  // left
             this.orthographicUnits * this.aspect,   // right
             -this.orthographicUnits,           // bottom
             this.orthographicUnits,            // top
             this.zNear,
             this.zFar)
-        : m4.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)*/
-        this.projectionMatrix.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
+        : this.projectionMatrix.perspective(this.fieldOfViewRadians, this.aspect, this.zNear, this.zFar)
 
         // camera matrix
-        let position = !this.parent ? this.position.elements : this.parent.position.elements
-        let target = !this.parent ? this.target.position.elements : this.parent.position.elements
+        let target = !this.parent ? this.target.elements : this.parent.position.elements
         
-        this.cameraMatrix.lookAt(position, target, this.up.elements)
+        this.cameraMatrix.lookAt(
+            !this.parent ? this.position.elements : this.parent.position.elements, 
+            target, 
+            this.up.elements)
+
 
         // Make a view matrix from the camera matrix
         this.viewMatrix.invert(this.cameraMatrix)

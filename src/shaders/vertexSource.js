@@ -14,22 +14,28 @@ uniform mat4 u_world; // or model matrix
 
 uniform vec3 u_viewWorldPosition;
 
+uniform mat4 u_lightSpaceMatrix;
+
 out vec3 v_normal;
 out vec4 v_color;
 out vec3 v_surfaceToView;
 out vec2 v_texcoord;
-out vec3 v_fragmentPosition;  
+out vec4 v_fragmentPositionLightSpace;
+out vec3 v_fragmentPosition; // or worldPosition
 
 void main() {
-	vec4 worldPosition = u_world * a_position;
-	gl_Position = u_projection * u_view * worldPosition;
+	v_fragmentPosition = vec3(u_world * vec4(a_position.xyz, 1.0));
+
+	v_normal = mat3(u_world) * a_normal;
+	v_texcoord = a_texcoord;
 
     v_color = a_color;
-    v_texcoord = a_texcoord;
-
-	vec3 surfaceWorldPosition = worldPosition.xyz;
+    
+	vec3 surfaceWorldPosition = v_fragmentPosition;
 	v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
-	v_fragmentPosition = vec3(u_world * vec4(a_position.xyz, 1.0));
-	v_normal = mat3(u_world) * a_normal;
+
+	v_fragmentPositionLightSpace = u_lightSpaceMatrix * vec4(v_fragmentPosition, 1.0); // for planar projection
+
+	gl_Position = u_projection * u_view * vec4(v_fragmentPosition, 1.0);
 }
 `

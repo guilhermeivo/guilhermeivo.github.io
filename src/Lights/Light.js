@@ -10,7 +10,7 @@ export default class Light extends Object3 {
         this.uniforms = new Uniforms()
 
         this.uniforms.add('color', configs.color || [ 1, 1, 1 ], 'vec3')
-        this.uniforms.add('itensity', configs.itensity || [ .5 ], 'float')
+        this.uniforms.add('itensity', configs.itensity || [ 0.5 ], 'float')
         this.uniforms.add('ambient', configs.ambient || [ 0.05, 0.05, 0.05 ], 'vec3')
         this.uniforms.add('diffuse', configs.diffuse || [ 0.8, 0.8, 0.8 ], 'vec3')
         this.uniforms.add('specular', configs.specular || [ 1.0, 1.0, 1.0 ], 'vec3')

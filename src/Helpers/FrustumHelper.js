@@ -7,8 +7,8 @@ export default class FrustumHelper extends Lines {
     constructor(cameraElement) {
         const geometry = new Geometry()
         geometry.setAttribute('position', frustum.vertice())
-        geometry.setAttribute('color', frustum.color(), { type: UnsignedByte })
-        geometry.setAttribute('texcoord', frustum.texture(), { size: 2 })
+        //geometry.setAttribute('color', frustum.color(), { type: UnsignedByte })
+        //geometry.setAttribute('texcoord', frustum.texture(), { size: 2 })
         geometry.setIndice(frustum.indices())
         const material = new Material()
 
@@ -30,15 +30,6 @@ const frustum = {
         if (frustum.isConfigured) return
 
         frustum.isConfigured = true
-
-        for (let i = 0; i < frustum._vertice.length / 4; i++) {
-            for (let j = 0; j < 3; j++) {
-                frustum._color.push(1)
-            }
-            for (let j = 0; j < 2; j++) {
-                frustum._texture.push(1)
-            }
-        }
     },
 
     _vertice: [
@@ -66,19 +57,5 @@ const frustum = {
     indices: () => {
         frustum.configuration()
         return new Uint32Array(frustum._indices)
-    },
-
-    _color: [],
-
-    color: () => {
-        frustum.configuration()
-        return new Uint8Array(frustum._color)
-    },
-
-    _texture: [],
-
-    texture: () => {
-        frustum.configuration()
-        return new Float32Array(frustum._texture)
     }
 }

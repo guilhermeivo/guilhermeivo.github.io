@@ -181,7 +181,7 @@ const loadObj = async (gl, url, object, transform = { }) => {
 							const name = currentMaterial[samplerKey] || 'empty'
 							if (!Object.keys(textures).includes(name) || textures[name].id != index) {
 								const texture = new GLTexture(gl)
-								texture.id = index
+								texture.setId(index);
 
 								if (!json.images || !json.images[name]) texture.setEmptyTexture(gl)
 								else if (json.images[name].succeed) texture.setImageTexture(gl, json.images[name].data)
@@ -242,7 +242,7 @@ const loadObj = async (gl, url, object, transform = { }) => {
 					const mesh = new Mesh(geometry, materials[currentObject.material])
 					mesh.position = transform.position || new Vector3(0, 0, 0)
 					mesh.rotation = transform.rotation || new Vector3(0, 0, 0)
-					mesh.scale = transform.scale || new Vector3(25, 25, 25)
+					mesh.scale = transform.scale || new Vector3(5, 5, 5)
 					mesh.name = key
 
 					collection.add(mesh)

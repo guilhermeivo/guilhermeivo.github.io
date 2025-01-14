@@ -1,5 +1,3 @@
-import Vector3 from "../Math/Vector3.js"
-
 export default class Button {
     constructor(callback) {
         this.object = null

@@ -3,12 +3,13 @@ import Lines from "./Lines.js";
 import Material from "../Core/Material.js";
 import { UnsignedByte } from "../Core/constants.js";
 
+// TODO: fix axis indices
 export default class AxisObject extends Lines {
     constructor(transformation = { }) {
         const geometry = new Geometry()
         geometry.setAttribute('position', axis.vertice())
-        geometry.setAttribute('color', axis.color(), { type: UnsignedByte })
-        geometry.setAttribute('texcoord', axis.texture(), { size: 2 })
+        //geometry.setAttribute('color', axis.color(), { type: UnsignedByte })
+        //geometry.setAttribute('texcoord', axis.texture(), { size: 2 })
         geometry.setIndice(axis.indices())
         const material = new Material()
         
@@ -46,16 +47,6 @@ const axis = {
         axis._vertice.forEach((v, ndx) => {
             axis._vertice[ndx] *= 2.5
         })
-
-        for (let i = 0; i < axis._vertice.length / 3; i++) {
-            for (let j = 0; j < 4; j++) {
-                axis._color.push(1)
-            }
-            for (let j = 0; j < 2; j++) {
-                axis._texture.push(1)
-            }
-        }
-    
     },
 
     _vertice: [
@@ -63,7 +54,7 @@ const axis = {
     ], 
 
     vertice: () => {
-        axis.configuration()
+        //axis.configuration()
         return new Float32Array(axis._vertice)
     },
 
@@ -72,21 +63,7 @@ const axis = {
     ],
 
     indices: () => {
-        axis.configuration()
+        //axis.configuration()
         return new Uint32Array(axis._indices)
-    },
-
-    _color: [],
-
-    color: () => {
-        axis.configuration()
-        return new Uint8Array(axis._color)
-    },
-
-    _texture: [],
-
-    texture: () => {
-        axis.configuration()
-        return new Float32Array(axis._texture)
     }
 }

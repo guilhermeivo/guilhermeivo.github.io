@@ -43,7 +43,7 @@ export default class Matrix4 {
 		]
 	}
 
-	unit = () => {
+	zero = () => {
 		this.elements = [
 			0, 0, 0, 0,
 			0, 0, 0, 0,
@@ -81,11 +81,11 @@ export default class Matrix4 {
 		 *    b             a                   result
 		 * ⎡ a b ⋯ ⎤     ⎡ e f ⋯ ⎤     ⎡ a*e+b*g+⋯ a*f+b*h+⋯ ⋯ ⎤
          * ⎢ c d ⋯ ⎥  *  ⎢ g h ⋯ ⎥  =  ⎢ c*e+d*g+⋯ c*f+d*g+⋯ ⋯ ⎥
-         * ⎣ ⋮  ⋮ ⋱ ⎦     ⎣ ⋮  ⋮ ⋱ ⎦     ⎣     ⋮          ⋮       ⋱ ⎦
+         * ⎣ ⋮⋮ ⋱ ⎦     ⎣ ⋮⋮ ⋱ ⎦     ⎣    ⋮         ⋮       ⋱ ⎦
 	     *    4x4            4x4                  4x4
 		 */
 
-		if (matrixA.length != matrixB.length) return
+		//if (matrixA.length != matrixB.length) return
 		for (let ib = 0; ib < matrixA.length; ib+=amountOfLines) { // line
 			for (let jb = 0; jb < amountOfColumns; jb++) { // column
 				const valueB = matrixB[ib + jb]
