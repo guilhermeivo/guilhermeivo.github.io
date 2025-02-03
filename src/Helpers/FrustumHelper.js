@@ -1,10 +1,9 @@
 import Geometry from "../Core/Geometry.js";
 import Material from "../Core/Material.js";
-import Lines from "../Objects/Lines.js";
-import { UnsignedByte } from "../Core/constants.js";
+import Line from "../Objects/Line.js";
 
-export default class FrustumHelper extends Lines {
-    constructor(cameraElement) {
+export default class FrustumHelper extends Line {
+    constructor(wasm, cameraElement) {
         const geometry = new Geometry()
         geometry.setAttribute('position', frustum.vertice())
         //geometry.setAttribute('color', frustum.color(), { type: UnsignedByte })
@@ -12,14 +11,15 @@ export default class FrustumHelper extends Lines {
         geometry.setIndice(frustum.indices())
         const material = new Material()
 
-        super(geometry, material)
+        super(wasm, geometry, material)
         
         this.camera = cameraElement
         this.debug = true
     }
 
     onBeforeRender() {
-        this.worldMatrix.invert(this.camera.projectionViewMatrix)
+        // TODO:
+        //this.worldMatrix.invert(this.camera.projectionViewMatrix)
     }
 }
 

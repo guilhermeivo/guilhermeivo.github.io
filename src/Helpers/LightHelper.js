@@ -1,10 +1,9 @@
 import Geometry from "../Core/Geometry.js";
 import Material from "../Core/Material.js";
-import Lines from "../Objects/Lines.js";
-import { UnsignedByte } from "../Core/constants.js";
+import Line from "../Objects/Line.js";
 
-export default class LightHelper extends Lines {
-    constructor(lightElement, transformation) {
+export default class LightHelper extends Line {
+    constructor(wasm, lightElement, transformation) {
         const geometry = new Geometry()
         geometry.setAttribute('position', light.vertice(lightElement))
         //geometry.setAttribute('color', light.color(), { type: UnsignedByte })
@@ -12,7 +11,7 @@ export default class LightHelper extends Lines {
         geometry.setIndice(light.indices(lightElement))
         const material = new Material()
 
-        super(geometry, material, transformation)
+        super(wasm, geometry, material, transformation)
 
         this.parent = lightElement
         this.debug = true

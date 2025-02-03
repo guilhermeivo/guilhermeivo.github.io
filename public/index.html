@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕹️</text></svg>">
+
+    <title>guilhermeivo | portfolio</title>
+    <meta name="description" content="Some programming-related projects, developed">
+    <meta name="theme-color" content="#0476ce">
+
+    <meta name="twitter:site" content="@portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Portfolio">
+    <meta name="twitter:description" content="🕹️">
+    <meta property="og:image" content="./cover.png">
+    <meta property="og:image:alt" content="cover">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="600">
+    <meta property="og:site_name" content="Portfolio">
+    <meta property="og:type" content="object">
+    <meta property="og:title" content="Portfolio">
+    <meta property="og:url" content="https://guilhermeivo.github.io/">
+    <meta property="og:description" content="Some programming-related projects, developed">
+    
+    <link rel="stylesheet" href="./resources/style.css">
+    <link rel="stylesheet" href="./resources/debug.css">
+</head>
+<body>
+    <div id="screen">
+        <div style="padding: 48px;">
+            <h3 style="display: block; font-size: 28px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">
+                Oi 👋, meu nome é <span>Guilherme</span>
+            </h3>
+            <p style="display: block; font-size: 24px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                Técnico em Desenvolvimento de Sistemas (ETESP)
+            </p>
+            <p style="display: block; font-size: 24px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                Cursando Sistemas de Informação (USP)
+            </p>
+    
+            <h2 style="display: block; font-size: 36px; margin-top: 20px;  margin-bottom: 20px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
+                Projetos
+            </h2>
+            
+            <div id="cards" style="display: grid; grid-template-columns: 1fr;"></div>
+    
+            <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
+                criado por <a href="https://github.com/guilhermeivo" style="color: rgb(255, 255, 255)">guilhermeivo</a> <span title="🥄">❤️</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="shortcuts">
+        <div>
+            <span>c</span>
+            <p>Alterar para o modo simplificado</p>
+        </div>
+        <div>
+            <span>&#x2191;</span>
+            <p>Subir scroll</p>
+        </div>
+        <div>
+            <span>&#x2193;</span>
+            <p>Descer scroll</p>
+        </div>
+        <div>
+            <span>Tab</span>
+            <p>Navegar entre projetos</p>
+        </div>
+        <div>
+            <span>&#x21B5;</span>
+            <p>Abrir projeto</p>
+        </div>
+    </div>
+
+    <script>
+        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            document.querySelector('#screen>div').insertAdjacentHTML('afterbegin', `
+                <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                para uma melhor experiência acessar pelo computador 😊 <br/><br/><hr/><br/>
+                </p>
+                `)
+            document.querySelector('#screen').classList.add('simplified')
+            document.querySelector('.shortcuts').style.display = 'none'
+        }
+
+        const cardsList = [
+            { title: 'BaseTech-Inc/Tupa-Server', description: 'Servidor para a empresa Tupã desenvolvido por @BaseTech-Inc.', links: ['https://github.com/BaseTech-Inc/Tupa-Server'] },
+            { title: 'experiment-using-mouse', description: 'Desafios para ajudar um rato a encontrar um pedaço de queijo em um labirinto.', links: ['https://github.com/guilhermeivo/experiment-using-mouse'] },
+            { title: 'snake-game', description: 'O clássico jogo da cobrinha no console gameboy.', links: ['https://github.com/guilhermeivo/snake-game'] },
+            { title: 'tcm-codezone', description: 'Projeto desenvolvido para trabalho de conclusão de módulo (TCM).', links: ['https://github.com/guilhermeivo/tcm-codezone'] }
+        ]
+
+        cardsList.forEach((card, index) => {
+            document.querySelector('#cards').insertAdjacentHTML('beforeend', `
+                <a href="${ card.links[0] }" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); background: rgba(${ 16 * index + 16 }, ${ 16 * index + 16 }, ${ 16 * index + 16 }); padding: 4px; text-decoration: none" data-card tabindex="${ index + 1 }" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                    <h3 style="display: block; font-size: 28px; margin-top: 0; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">${ card.title }</h3>
+                    <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">${ card.description }</p>
+                </a>
+                `)
+        })
+
+        const onFocusOutCard = event => {
+            for (let card of document.querySelector('#cards').children) {
+                card.style.border = '1px solid rgb(255, 255, 255)'
+            }
+        }
+        const onFocusCard = event => {
+            for (let card of document.querySelector('#cards').children) {
+                card.style.border = '1px solid rgb(255, 255, 255)'
+            }
+            event.target.style.border = '1px solid rgb(0, 0, 0)'
+        }
+    </script>
+
+    <script src="common.bundle.js"></script>
+    <script src="components.bundle.js"></script>
+    <script defer src="index.bundle.js"></script>
+
+    <noscript>script type is not supported by the page or scripting is disabled in browser.</noscript>
+
+    <!-- Gabizinha ❤️🥄 -->
+</body>
+</html>

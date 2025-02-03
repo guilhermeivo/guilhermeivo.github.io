@@ -1,9 +1,11 @@
-import { readPixel } from "../GLUtil.js";
+import { readPixel } from "../WebGL/GLUtil.js";
 import Button from "./Button.js";
 import Screen from "./Screen.js";
+import { ObjectType } from "../Objects/Object3.js";
 
 export default class Arcade {
-    constructor(gl) {
+    constructor(wasm, gl) {
+        this.wasm = wasm
         this.gl = gl
         this.isSimpleMode = false
         this.actualFocus = 0
@@ -15,24 +17,24 @@ export default class Arcade {
         this.mouseEventY = -1
 
         this.screenArcade = new Screen(
-            '../resources/arcade/screen_blank.png',
+            './resources/arcade/screen_blank.png',
             1000, 750,
             180, 150
         )
 
-        this.buttonRotateRight = new Button(() => { 
+        this.buttonRotateRight = new Button(wasm, () => { 
             if (!this.screenArcade.opened || this.isSimpleMode) return
     
             this.screenArcade.scrollDown(document.querySelector('#screen>div').scrollHeight) 
         })
 
-        this.buttonRotateLeft = new Button(() => { 
+        this.buttonRotateLeft = new Button(wasm, () => { 
             if (!this.screenArcade.opened || this.isSimpleMode) return
     
             this.screenArcade.scrollUp() 
         })
 
-        this.buttonFire = new Button(event => {
+        this.buttonFire = new Button(wasm, event => {
             if (!this.screenArcade.opened || this.isSimpleMode) return
             const cards = document.querySelector("#cards")
     
@@ -42,7 +44,7 @@ export default class Arcade {
             cards.children[focusElement].click()
         })
 
-        this.buttonThrust = new Button(event => {
+        this.buttonThrust = new Button(wasm, event => {
             if (!this.screenArcade.opened || this.isSimpleMode) return
             const cards = document.querySelector("#cards")
     
@@ -52,7 +54,7 @@ export default class Arcade {
             if (this.actualFocus >= cards.children.length) this.actualFocus = 0
         })
 
-        this.buttonHyperSpace = new Button(() => { 
+        this.buttonHyperSpace = new Button(wasm, () => { 
             if (this.isSimpleMode) return
     
             if (this.screenArcade.opened) this.screenArcade.close() 
@@ -82,7 +84,7 @@ export default class Arcade {
 
     updateScreen(scene) {
         this.screenArcade.update(document.querySelector('#screen'), document.querySelector('#screen>div').scrollHeight).then(() => {
-            const screen = scene.children.filter(object => object.type == 'collection')[0]
+            const screen = scene.children.filter(object => object.type == ObjectType.COLLECTION)[0]
                 .children.filter(object => object.name == 'Screen')[0]
 
             this.screenArcade.draw()
@@ -93,7 +95,7 @@ export default class Arcade {
     }
 
     getMouseOver(scene) {
-        if (!scene.children.filter(object => object.type == 'collection').length) return
+        if (!scene.children.filter(object => object.type == ObjectType.COLLECTION).length) return
 
         const pixelX = this.mouseEventX * this.gl.canvas.width / this.gl.canvas.clientWidth
         const pixelY = this.gl.canvas.height - this.mouseEventY * this.gl.canvas.height / this.gl.canvas.clientHeight - 1
@@ -101,7 +103,7 @@ export default class Arcade {
         const data = readPixel(this.gl, pixelX, pixelY, 1, 1)
         const id = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)
 
-        scene.getById(scene.children.filter(object => object.type == 'collection')[0].children, id)
+        scene.getById(scene.children.filter(object => object.type == ObjectType.COLLECTION)[0].children, id)
             .then(value => this.currentObjectOver = value)
     }
 

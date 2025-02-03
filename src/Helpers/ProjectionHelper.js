@@ -1,28 +1,21 @@
 import Geometry from "../Core/Geometry.js"
 import Material from "../Core/Material.js"
-import Matrix4 from "../Math/Matrix4.js"
-import Vector3 from "../Math/Vector3.js"
-import Lines from "../Objects/Lines.js"
+import Line from "../Objects/Line.js"
 
-export default class ProjectionHelper extends Lines {
-    constructor() {
+export default class ProjectionHelper extends Line {
+    constructor(wasm) {
         const geometry = new Geometry()
         geometry.setAttribute('position', projection.vertice(), { size: 3 })
         geometry.setIndice(projection.indices())
         const material = new Material()
 
-        super(geometry, material)
+        super(wasm, geometry, material)
         
         this.debug = true
-        this.mat = new Matrix4()
-    }
-
-    updateWorld(matrix) {
-        this.mat = matrix
     }
 
     onBeforeRender() {
-        this.worldMatrix = this.mat
+        //this.worldMatrix = this.mat
     }
 }
 

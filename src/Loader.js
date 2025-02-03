@@ -1,9 +1,8 @@
-import Collection from "./Core/Collection.js"
+import Collection from "./Objects/Collection.js"
 import Geometry from "./Core/Geometry.js"
 import Material from "./Core/Material.js"
-import Vector3 from "./Math/Vector3.js"
-import Mesh from "./Core/Mesh.js"
-import GLTexture from "./Textures/GLTexture.js"
+import Mesh from "./Objects/Mesh.js"
+import GLTexture from "./WebGL/GLTexture.js"
 
 const objToJson = async (url, file, current = 'objects') => {
 	const data = await fetch(url + file)
@@ -39,7 +38,6 @@ const objToJson = async (url, file, current = 'objects') => {
 
 		const currentObjectName = Object.keys(json[current])[Object.keys(json[current]).length - 1]
 		const currentObject = json[current][currentObjectName]
-		let tempImage = null
 
 		switch (parts.name) {
 			case 'mtllib':
@@ -134,8 +132,8 @@ const objToJson = async (url, file, current = 'objects') => {
 	return json
 }
 
-const loadObj = async (gl, url, object, transform = { }) => {
-	const collection = new Collection()
+const loadObj = async (wasm, gl, url, object, transform = { }) => {
+	const collection = new Collection(wasm)
 	let materials = { }
 	let maxIndex = [ 1, 1, 1 ]
 	let vertexData = [ [], [], [] ]
@@ -239,10 +237,11 @@ const loadObj = async (gl, url, object, transform = { }) => {
 					geometry.setAttribute('normal', new Float32Array(vertexData[2]))
 					geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
 
-					const mesh = new Mesh(geometry, materials[currentObject.material])
-					mesh.position = transform.position || new Vector3(0, 0, 0)
-					mesh.rotation = transform.rotation || new Vector3(0, 0, 0)
-					mesh.scale = transform.scale || new Vector3(5, 5, 5)
+					const mesh = new Mesh(wasm, geometry, materials[currentObject.material], {
+						position: transform.position || [ 0, 0, 0 ],
+						rotation: transform.rotation || [ 0, 0, 0 ],
+						scale: transform.scale || [ 5, 5, 5 ]
+					})
 					mesh.name = key
 
 					collection.add(mesh)

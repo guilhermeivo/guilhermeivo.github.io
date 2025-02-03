@@ -1,0 +1,1 @@
+Mantido com objetivo de comparação com os novos métodos de cálculo (*Vector3* e *Matrix4*).

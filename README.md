@@ -6,9 +6,10 @@
     <img alt="Cover" src=".github/banner.png" />
 </h1>
 
-Para visualizar o modo de desenvolvimento no navegador, digitar no console:
+Rodar aplicação:
 ```
-window["DEBUG_MODE"] = true
+$ npm install
+$ ./build.sh && ./run.sh
 ```
 
 <img src="https://github.githubassets.com/images/mona-whisper.gif" align="right" />

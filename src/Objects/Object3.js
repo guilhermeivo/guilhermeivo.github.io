@@ -1,48 +1,96 @@
-import Matrix4 from '../Math/Matrix4.js'
-import Vector3 from '../Math/Vector3.js'
+import { float } from "../types.js"
 
-export default class Object3 {
-    constructor(transformation = {}) {
-        this.type = 'object3'
+/**
+ * Adaptado do `enum class ObjectType` no arquivo Object3.h
+ */
+export class ObjectType {
+    static #_OBJECT3 = 0
+    static #_COLLECTION = 1
+    static #_LINE = 2
+    static #_MESH = 3
+    static #_LIGHT = 4
+    static #_CAMERA = 5
+
+    static get OBJECT3() { return this.#_OBJECT3; }
+    static get COLLECTION() { return this.#_COLLECTION; }
+    static get LINE() { return this.#_LINE; }
+    static get MESH() { return this.#_MESH; }
+    static get LIGHT() { return this.#_LIGHT; }
+    static get CAMERA() { return this.#_CAMERA; }
+
+    static to_string(objectType) {
+        switch (objectType) {
+            case ObjectType.OBJECT3: return "Object3"
+            case ObjectType.COLLECTION: return "Collection"
+            case ObjectType.LINE: return "Line"
+            case ObjectType.MESH: return "Mesh"
+            case ObjectType.LIGHT: return "Light"
+            case ObjectType.CAMERA: return "Camera"
+        }
+        return ""
+    }
+}
+
+/**
+ * @header Cycle Life
+ * 
+ *                          Opcional
+ *  +---------------+   +---------------+
+ *  | BeforeRender  |-->| _BeforeRender |
+ *  +---------------+   +---------------+
+ *         |                    |
+ *         v                    |
+ *  +---------------+           |
+ *  |  AfterRender  |<----------+
+ *  +---------------+
+ * 
+ */
+export class Object3 {
+    constructor(wasm, transformation = {}) {
+        this.wasm = wasm
+
+        this.type = ObjectType.OBJECT3
 
         this.parent = null
         this.children = []
 
-        this.position = transformation.position || new Vector3()
-        this.rotation = transformation.rotation || new Vector3()
-        this.scale = transformation.scale || new Vector3(1, 1, 1)
+        this.position =  wasm.create(float, transformation.position || [ 0.0, 0.0, 0.0 ])
+        this.rotation = wasm.create(float, transformation.rotation || [ 0.0, 0.0, 0.0 ])
+        this.scale = wasm.create(float, transformation.scale || [ 1.0, 1.0, 1.0 ])
 
-        this.worldMatrix = new Matrix4()
+        this.worldMatrix = wasm.create(float, Math.matrixIdentity())
 
         this.id = 0
 
         this.shadow = 0
     }
 
+    /// virtual
     add(object) {
         if (object === this) return
 
         this.children.push(object)
     }
 
-    onBeforeRender(scene, camera, fps, callback = null) {
-        this.worldMatrix.identity()
+    /// virtual
+    onBeforeRender(fps, callback = null) {
+        const usedValues = !this.parent
+            ? [ this.position, this.rotation, this.scale]
+            : [ this.parent.position, this.parent.rotation, this.parent.scale ]
 
-        const usedValues = [
-            !this.parent ? this.position : this.parent.position,
-            !this.parent ? this.rotation : this.parent.rotation,
-            !this.parent ? this.scale : this.parent.scale,
-        ]
+        this.wasm.exports.worldMatrix(
+            this.worldMatrix.byteOffset, 
+            usedValues[0].byteOffset, 
+            usedValues[1].byteOffset, 
+            usedValues[2].byteOffset)
 
-        // model or world matrix = translation * rotation * scale
-        this.worldMatrix.identity()
-        this.worldMatrix.translate(usedValues[0])
-        this.worldMatrix.rotate(usedValues[1])
-        this.worldMatrix.scale(usedValues[2])
-
-        if (callback) callback(scene, camera, fps)
-        else if (this._onBeforeRender) this._onBeforeRender(scene, camera, fps)
+        if (callback) callback(fps)
+        else if (this._onBeforeRender) this._onBeforeRender(fps)
     }
 
-    onAfterRender(scene, camera, fps) { }
+    /// virtual
+    _onBeforeRender(fps) { }
+
+    /// virtual
+    onAfterRender(fps) { }
 }

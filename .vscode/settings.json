@@ -1,0 +1,21 @@
+{
+    "C_Cpp.autoAddFileAssociations": false,
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "*.h": "$(capture).c, $(capture).cpp"
+    },
+    "files.associations": {
+        "*.h": "cpp",
+        "*.cpp": "cpp",
+        "*.c": "c",
+    },
+    "files.exclude": {
+        "**/*.out": true,
+
+        /* folders not needed in viewing */
+        "node_modules": true,
+        "dependencies": true
+    },
+    "liveServer.settings.port": 5501
+}

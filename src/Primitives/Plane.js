@@ -1,19 +1,19 @@
-import plane from "../../resources/plane/plane.js"
+import plane from "./plane_data.js"
 import { UnsignedByte } from "../Core/constants.js"
 import Geometry from "../Core/Geometry.js"
 import Material from "../Core/Material.js"
-import Mesh from "../Core/Mesh.js"
-import GLTexture from "../Textures/GLTexture.js"
+import Mesh from "../Objects/Mesh.js"
+import GLTexture from "../WebGL/GLTexture.js"
 
 export default class Plane extends Mesh {
-    constructor(gl, transformation) {
+    constructor(wasm, gl, transformation) {
         const width = 15
         const height = 15
 
         const geometry = new Geometry()
 
         geometry.setAttribute('position', plane.vertice(width, height), { size: 3 })
-        geometry.setAttribute('color', plane.color(), { type: UnsignedByte })
+        geometry.setAttribute('color', plane.color())
         geometry.setAttribute('normal', plane.normal())
         geometry.setAttribute('texcoord', plane.texture(), { size: 2, normalize: false })
         const material = new Material({
@@ -45,12 +45,12 @@ export default class Plane extends Mesh {
         material.defineSampler('diffuseMap', texture)
         material.name = 'plane'
 
-        super(geometry, material, transformation)
+        super(wasm, geometry, material, transformation)
 
-        this.vertice = [...plane.vertice(width, height)]
-        this.color = [...plane.color()]
-        this.normal = [...plane.normal()]
-        this.texture = [...plane.texture()]
+        //this.vertice = [...plane.vertice(width, height)]
+        //this.color = [...plane.color()]
+        //this.normal = [...plane.normal()]
+        //this.texture = [...plane.texture()]
 
         //this.subdivision()
     }
