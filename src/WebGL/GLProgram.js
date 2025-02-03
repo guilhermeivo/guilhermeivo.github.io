@@ -85,7 +85,6 @@ export default class GLProgram {
     setUniform(uniformName, data, dataType) {
 
         // procurar posição uniform
-        // TODO: não é necessario todo frame procurar o location
         //const uniformLocation = this.gl.getUniformLocation(this.id, uniformName)
         const uniformLocation = this.uniforms[uniformName]
 

@@ -7,7 +7,7 @@
 #include "../../src/Math/real_t.h"
 
 EXPORT("some_func")
-matrix4<> some_func() {
+matrix4<real_t> some_func() {
     matrix4 projectionMatrix;
     projectionMatrix.orthographic(-50.0_r, 50.0_r, -50.0_r, 50.0_r, 90.0_r, 1.0_r);
 
@@ -22,5 +22,10 @@ matrix4<> some_func() {
 }
 
 int main() {
+    #ifdef USE_WASM
+        // The linker synthesizes this to call constructors
+        __wasm_call_ctors();
+    #endif
+
     return 0;
 }

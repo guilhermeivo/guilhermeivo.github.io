@@ -16,6 +16,5 @@
         /* folders not needed in viewing */
         "node_modules": true,
         "dependencies": true
-    },
-    "liveServer.settings.port": 5501
+    }
 }

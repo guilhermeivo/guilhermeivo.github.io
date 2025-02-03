@@ -11,17 +11,17 @@ const wasm = new Wasm()
 
 async function wasmFunction() {
     return new Promise((resolve, reject) => {
-        wasm.exports.init()
+        wasm.exports._start()
         const ptr = wasm.exports.some_func()
         const array = new float(wasm.memory, ptr, 16)
         console.log(array)
-        wasm.exports.exit()
+        wasm.exports._exit()
 
         resolve()
     })
 }
 
-WebAssembly.instantiate(wasmBuffer, wasm.importObject).then(
+WebAssembly.instantiate(wasmBuffer, wasm.importObject()).then(
     async object => {
         wasm.exports = object.instance.exports
         wasm.memory = object.instance.exports.memory.buffer
