@@ -62,7 +62,7 @@ Os testes são, principalmente, de comparações entre o tempo de execução e t
 
 \section*{Inicialização Vetor}
 
-Observando a inicialização de um vetor com valores padrões, por exemplo, 0, em um vetor com 16 posições, não é possível observar uma expressiva diferença quanto a velocidade de preenchimento desses valores, mesmo quando quando observado os métodos de otimização dos arquivos binários, como observado na \autoref{fig:eff-init}. Portanto, não terá um caráter rigoroso quanto a inicialização utilizada, seguindo a forma de otimização -O3 nos arquivos binários para gerar códigos mais rápidos (não me preocupando, nesse caso e nesse momento, com o tamanho do arquivo, pois foram criadas poucas instruções nos arquivos finais utilizados resultando em um arquivo de, aproximadamente, 60 kB).
+Observando a inicialização de um vetor com valores padrões, por exemplo, 0, em um vetor com 16 posições, não é possível observar uma expressiva diferença quanto a velocidade de preenchimento desses valores, mesmo quando observado os métodos de otimização dos arquivos binários, como observado na \autoref{fig:eff-init}. Portanto, não terá um caráter rigoroso quanto a inicialização utilizada, seguindo a forma de otimização -O3 nos arquivos binários para gerar códigos mais rápidos (não me preocupando, nesse caso e nesse momento, com o tamanho do arquivo, pois foram criadas poucas instruções nos arquivos finais utilizados resultando em um arquivo de, aproximadamente, 60 kB).
 % NOTE: tamanho do arquivo inserido de forma manual
 
 \begin{figure}[H]
@@ -146,6 +146,7 @@ glm::mat4 projectionViewMatrix = projectionMatrix * viewMatrix;
     \label{fig:glm}
 \end{figure}
 
+\newpage\pagestyle{empty}\pagenumbering{gobble}
 \bibliographystyle{plain}
 \bibliography{references}
 
