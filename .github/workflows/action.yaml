@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Confira o código do repositório
         uses: actions/checkout@v4
+      - name: Instalando os arquivos
+        run: ./install.sh
       - name: Compilando os arquivos
         run: ./build.sh
       - name: Listar arquivos dentro do repositório
