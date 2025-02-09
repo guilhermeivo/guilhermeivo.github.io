@@ -1,11 +1,10 @@
-import Geometry from "../Core/Geometry.js";
-import Lines from "./Lines.js";
-import Material from "../Core/Material.js";
-import { UnsignedByte } from "../Core/constants.js";
+import Geometry from "../Core/Geometry.js"
+import Line from "./Line.js"
+import Material from "../Core/Material.js"
 
 // TODO: fix axis indices
-export default class AxisObject extends Lines {
-    constructor(transformation = { }) {
+export default class Axis extends Line {
+    constructor(wasm, transformations = { }) {
         const geometry = new Geometry()
         geometry.setAttribute('position', axis.vertice())
         //geometry.setAttribute('color', axis.color(), { type: UnsignedByte })
@@ -13,7 +12,7 @@ export default class AxisObject extends Lines {
         geometry.setIndice(axis.indices())
         const material = new Material()
         
-        super(geometry, material, transformation)
+        super(wasm, geometry, material, transformations)
 
         this.debug = true
     }

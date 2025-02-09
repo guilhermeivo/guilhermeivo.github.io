@@ -1,0 +1,41 @@
+name: Deploy Page
+
+run-name: ${{ github.actor }} está compilando uma página
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confira o código do repositório
+        uses: actions/checkout@v4
+      - name: Compilando os arquivos
+        run: ./build.sh
+      - name: Listar arquivos dentro do repositório
+        run: |
+          ls -a ${{ github.workspace }}/public
+      - name: Carregar arquivos estáticos como artefato
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public/
+  deploy:
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 

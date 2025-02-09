@@ -1,4 +1,4 @@
-import Uniform from "./Uniform.js"
+import { Uniform } from "./Uniform.js"
 
 export default class Uniforms {
     constructor() {

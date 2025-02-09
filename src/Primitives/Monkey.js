@@ -1,11 +1,10 @@
-import monkey from "../../resources/monkey/monkey.js"
-import { UnsignedByte } from "../Core/constants.js"
+import monkey from "./monkey_data.js"
 import Geometry from "../Core/Geometry.js"
 import Material from "../Core/Material.js"
-import Mesh from "../Core/Mesh.js"
+import Mesh from "../Objects/Mesh.js"
 
 export default class Monkey extends Mesh {
-    constructor(transformation) {
+    constructor(wasm, transformation) {
         const geometry = new Geometry()
         geometry.setAttribute('position', monkey.vertice(), { size: 3 })
         
@@ -19,12 +18,12 @@ export default class Monkey extends Mesh {
             ]
             i++
         }
-        geometry.setAttribute('color', monkey.color(), { size: 2, type: UnsignedByte })
+        geometry.setAttribute('color', monkey.color(), { size: 2 })
         geometry.setAttribute('normal', monkey.normal())
         geometry.setAttribute('texcoord', monkey.texture(), { size: 2, normalize: false })
         const material = new Material()
         material.name = 'monkey'
 
-        super(geometry, material, transformation)
+        super(wasm, geometry, material, transformation)
     }
 }

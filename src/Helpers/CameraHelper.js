@@ -1,10 +1,9 @@
 import Geometry from "../Core/Geometry.js";
 import Material from "../Core/Material.js";
-import Lines from "../Objects/Lines.js";
-import { UnsignedByte } from "../Core/constants.js";
+import Line from "../Objects/Line.js";
 
-export default class CameraHelper extends Lines {
-    constructor(cameraElement) {
+export default class CameraHelper extends Line {
+    constructor(wasm, cameraElement) {
         const geometry = new Geometry()
         geometry.setAttribute('position', camera.vertice())
         //geometry.setAttribute('color', camera.color(), { type: UnsignedByte })
@@ -12,7 +11,7 @@ export default class CameraHelper extends Lines {
         geometry.setIndice(camera.indices())
         const material = new Material()
 
-        super(geometry, material)
+        super(wasm, geometry, material)
         
         this.camera = cameraElement
         this.debug = true

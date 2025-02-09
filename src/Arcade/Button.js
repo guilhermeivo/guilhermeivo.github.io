@@ -1,5 +1,6 @@
 export default class Button {
-    constructor(callback) {
+    constructor(wasm, callback) {
+        this.wasm = wasm
         this.object = null
         this.inClick = false
         this.inAnimation = false
@@ -25,7 +26,7 @@ export default class Button {
 
             const t = i / steps
             const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
-            this.object.position.set(0, ((this.object.position.elements[1] - 0) * curve) + 0, 0)
+            this.wasm.update(this.object.position, [ 0, ((this.object.position[1] - 0) * curve) + 0, 0 ])
             await new Promise(resolve => setTimeout(resolve, 1))
         }
     }
@@ -49,7 +50,7 @@ export default class Button {
 
             const t = i / steps
             const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
-            this.object.position.set(0, ((this.object.position.elements[1] - -0.4) * curve) + -0.4, 0)
+            this.wasm.update(this.object.position, [ 0, ((this.object.position[1] - -0.4) * curve) + -0.4, 0 ])
             await new Promise(resolve => setTimeout(resolve, 1))
         }
     }
