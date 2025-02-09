@@ -46,4 +46,10 @@ then
     cd ..
 fi
 
+cd test
+pdflatex main.tex
+bibtex main
+pdflatex main.tex
+pdflatex main.tex
+
 exit 0

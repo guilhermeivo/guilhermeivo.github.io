@@ -16,5 +16,11 @@
         /* folders not needed in viewing */
         "node_modules": true,
         "dependencies": true
-    }
+    },
+    "[latex]": {
+        "editor.wordWrap": "on"
+    },
+    "[tex]": {
+        "editor.wordWrap": "on"
+    },
 }

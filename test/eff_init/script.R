@@ -33,6 +33,58 @@ for (i in seq(from=2,to=(total+spaces),by=4)) {
 }
 # BEGIN BOXPLOT
 
+caption <- paste0("Inicialização de Array com 16 posições do tipo float (float e[16]) usando compilador GCC e ", version)
+
+list_item <- list()
+for (test in tests) {
+    for (level in levels) {
+        test_data <- read.delim(paste("data/", test, "__", level, ".dat", sep = ""))
+        list_item <- append(list_item, list(remove_outliers(test_data$time)))
+    }
+    if (test != tests[4]) {
+        list_item <- append(list_item, list(c()))
+    }
+}
+
+legend_level <- c()
+for (level in levels) {
+    legend_level <- c(legend_level, paste("-O", level, sep = ""))
+}
+
+breaks_plot <- c()
+for (i in 1:(total + spaces)) {
+    if (i %% parts) {
+        breaks_plot <- c(breaks_plot, i)
+    }
+}
+size_data <- read.delim(paste("data/", "size", ".dat", sep = ""))
+
+## without title and description
+pdf(file = paste("generated/o__boxplot", ".pdf", sep = ""),
+    width = 6.5,
+    height = 4,
+    family = "serif")
+nf <- layout(matrix(c(
+    1, 1, 1,
+    1, 1, 1,
+    2, 2, 2,
+    2, 2, 2,
+    2, 2, 2,
+    2, 2, 2), nrow=6, byrow=TRUE))
+
+par(mar=c(3, 5, 1, 3))
+plot(
+    breaks_plot, 
+    size_data$size,
+    main = NULL, bty="n", 
+    xlab = "", ylab = "Tamanho Arquivo (byte)", xaxt="n", xlim=c(0.5,15.5))
+
+legend("topright", legend = legend_level, fill = colors)
+
+create_boxplot("nanosegundos", list_item)
+
+dev.off()
+
 pdf(file = paste("generated/boxplot", ".pdf", sep = ""),
     width = 10,
     height = 6,
@@ -51,41 +103,18 @@ nf <- layout(matrix(c(
 par(mar=c(0, 3, 1, 3))
 plot.new()
 
-mtext(substitute(bold(atop(
-"Inicialização de Array com 16 posições do",
-"tipo float (float e[16]) usando compilador GCC e " ~ version)), 
-list(version=version)), side = 3, line = -3, cex = 0.75)
-legend_level <- c()
-for (level in levels) {
-    legend_level <- c(legend_level, paste("-O", level, sep = ""))
-}
+mtext(substitute(bold(caption), list(caption=caption)), side = 3, line = -3, cex = 0.75)
+
 legend("topright", legend = legend_level, fill = colors)
 
 par(mar=c(3, 5, 0, 3))
 
-breaks_plot <- c()
-for (i in 1:(total + spaces)) {
-    if (i %% parts) {
-        breaks_plot <- c(breaks_plot, i)
-    }
-}
-size_data <- read.delim(paste("data/", "size", ".dat", sep = ""))
 plot(
     breaks_plot, 
     size_data$size,
     main = NULL, bty="n", 
     xlab = "", ylab = "Tamanho Arquivo (byte)", xaxt="n", xlim=c(0.5,15.5))
 
-list_item <- list()
-for (test in tests) {
-    for (level in levels) {
-        test_data <- read.delim(paste("data/", test, "__", level, ".dat", sep = ""))
-        list_item <- append(list_item, list(remove_outliers(test_data$time)))
-    }
-    if (test != tests[4]) {
-        list_item <- append(list_item, list(c()))
-    }
-}
 create_boxplot("nanosegundos", list_item)
 
 plot.new()
@@ -101,3 +130,12 @@ mtext(description, side = 1, line = 1, cex = 0.75, adj = 0)
 mtext(readLines("data/max.txt"), side = 1, line = 1, cex = 0.75, adj = 1)
 dev.off()
 # END BOXPLOT
+
+fileConn <- file("generated/caption.tex")
+writeLines(paste0("\\caption{", caption, "}"), fileConn)
+close(fileConn)
+
+description <- gsub("[\n]", "\\\\par", description)
+fileConn <- file("generated/description.tex")
+writeLines(paste0("\n{\\par\\small Nota: ", description, "}"), fileConn)
+close(fileConn)

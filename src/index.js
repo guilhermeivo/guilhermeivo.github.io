@@ -53,7 +53,7 @@ import { loadObj } from './Loader.js'
             scene.add(camera)
 
             const light001 = new Light(wasm, { 
-                position: [ 6.0, 10.0, -4.3 ]
+                position: [ 6.0, 15.0, -4.3 ]
             })
             scene.addLight(light001)
 

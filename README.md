@@ -13,7 +13,7 @@
 `public/`\
 `src/`\
  ├ `WebGL/`: Recursos usados para conectar com a WebGL API.\
- └ `wasm.h`: Baseado no recursos utilizados no [wasi-libc](https://github.com/WebAssembly/wasi-libc).\
+ └ `wasm.h`: Baseado nos recursos utilizados no [wasi-libc](https://github.com/WebAssembly/wasi-libc).\
 `test/`
 
 # Rodando

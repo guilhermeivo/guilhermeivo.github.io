@@ -1,5 +1,152 @@
 \documentclass{article}
 
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+\usepackage{float}
+
+\usepackage[section, maketitle]{m_style}
+
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Código}
+\lstdefinestyle{m_lststyle}{
+    % Colors
+    backgroundcolor = \color{white},
+    rulesepcolor    = \color{darkgray}, 
+    identifierstyle = \color{black},
+    commentstyle    = \color{gray},
+    % Caracteres
+    basicstyle      = \ttfamily\footnotesize,
+    extendedchars   = true,
+    % Frame Style
+    numbers         = left,
+    tabsize         = 2,
+    numberstyle     = \scriptsize,
+    frame           = shadowbox,
+    breaklines      = true,
+    breakautoindent = true,
+    xleftmargin     = 25pt,
+    xrightmargin    = 25pt,
+    aboveskip       = 10pt,
+    belowskip       = 10pt,
+    belowcaptionskip = 5pt,
+    captionpos      = t,
+    morekeywords    = {matrix4, vector3, real_t, opmat4, glm, mat4, lookAt, affineInverse, ortho, invert}}
+\usepackage[bottom]{footmisc} % force footnote in bottom
+
+\title{Comparação Javascript \(\boldsymbol{\times}\) WebAssembly}
+
+\hypersetup{
+    colorlinks = true,
+    allcolors = black
+}
+
 \begin{document}
+
+\maketitle\pagenumbering{arabic}
+
+\section*{Introdução}
+
+Este documento é usado como forma de demonstrar as motivações para o uso do \textit{WebAssembly}\cite{wasi} em substituição do código nativo em \textit{Javascript} nos métodos para cálculos de matrizes (\verb|Matrix4.js| ou \verb|matrix4.h|) e vetores (\verb|Vector3.js| ou \verb|vector3.h|) no projeto atual. A nova implementação - em \textit{WebAssembly} - é encontrada a partir da \textit{commit} \href{https://github.com/guilhermeivo/guilhermeivo.github.io/commit/2b537169b3fdd6d0d027cc9d810aac9471eb477e}{2b53716} e, como consequência, a antiga implementação - em \textit{Javascript} - é encontrada anteriormente à essa \textit{commit}. Serão compilados para \textit{WebAssembly} códigos escritos em \textit{C}/\textit{C++} baseados nos recursos utilizados no código fonte da implementação \href{https://github.com/WebAssembly/wasi-libc}{wasi-libc}, como, de importar e exportar as funções usando \verb|__attribute__|.
+
+Os testes são, principalmente, de comparações entre o tempo de execução e tamanho do arquivo binário do \textit{Javascript} e \textit{WebAssembly}, com diferentes implementações, e podem ser enumerados, em um hierarquia temporal de realização, da seguinte maneira:
+
+{\renewcommand{\labelenumi}{(\alph{enumi})}
+\begin{enumerate}
+    \item Formas de inicializar um vetor usando \textit{C++};
+    \item Cálculo da matriz nomeada \textit{projectionView}\footnote{multiplicação entre a matriz de projeção (\textit{projection}) e matriz de visualização (\textit{view}) é usada para definir a posição do vértice do objeto};
+    \item Cálculo da mesma matriz, porém, dessa vez, usando o pacote OpenGL Mathematics (GLM)\cite{glm}.
+\end{enumerate}}
+
+\section*{Inicialização Vetor}
+
+Observando a inicialização de um vetor com valores padrões, por exemplo, 0, em um vetor com 16 posições, não é possível observar uma expressiva diferença quanto a velocidade de preenchimento desses valores, mesmo quando quando observado os métodos de otimização dos arquivos binários, como observado na \autoref{fig:eff-init}. Portanto, não terá um caráter rigoroso quanto a inicialização utilizada, seguindo a forma de otimização -O3 nos arquivos binários para gerar códigos mais rápidos (não me preocupando, nesse caso e nesse momento, com o tamanho do arquivo, pois foram criadas poucas instruções nos arquivos finais utilizados resultando em um arquivo de, aproximadamente, 60 kB).
+% NOTE: tamanho do arquivo inserido de forma manual
+
+\begin{figure}[H]
+    \centering
+    \input{eff_init/generated/caption.tex}
+    \vspace{5pt}
+    \includegraphics[width = 0.9\linewidth]{eff_init/generated/o__boxplot.pdf}
+    \vspace{5pt}
+    {\par\small Fonte: Elaborado pelo próprio autor}
+    \input{eff_init/generated/description.tex}
+    \label{fig:eff-init}
+\end{figure}
+
+\section*{Cálculo da Matriz projectionView no NodeJS}
+
+A multiplicação entre uma matriz de projeção e uma matriz de visualização (\autoref{lst:projectionView}) é usado no \textit{Shaders OpenGL} para definir a posição do vértice do objeto, sendo, então, um código necessário de ser executado a cada \textit{frame}, portanto não pode apresentar grandes dificuldades na sua chamada. E então, a grande motivação para substituir o uso dos códigos \textit{Javascript} em cálculos matriciais e vetoriais por códigos em \textit{WebAssembly}.
+
+\begin{lstlisting}[language=c,style=m_lststyle,label=lst:projectionView,caption=Cálculo da Matriz projectionView]
+// perspective or projection matrix
+matrix4<real_t> projectionMatrix.orthographic(
+    -orthographicUnits * aspect, // left
+    orthographicUnits * aspect,  // right
+    -orthographicUnits,          // bottom
+    orthographicUnits,           // top
+    zNear,
+    zFar)
+
+matrix4<real_t> cameraMatrix = opmat4::lookAt<real_t>(position, target, yAxis);
+
+// faz uma matriz de visualizacao a partir da matriz da camera
+matrix4<real_t> viewMatrix = opmat4::invert<real_t>(cameraMatrix);
+
+// mova o espaco de projecao para visualizar o espaco (o espaco na frente da camera)
+// perspective ou projection matrix * view matrix
+matrix4<real_t> projectionViewMatrix = projectionMatrix * viewMatrix;
+\end{lstlisting}
+% NOTE: codigo inserido de forma manual
+
+Segundo a \autoref{fig:time-run} o uso do \textit{Javascript} é \input{time_run/generated/comparison.tex} vezes mais lento que o uso do \textit{WebAssembly}\footnote{Esses dados foram gerados no \textit{NodeJS}, possívelmente, não apresentará os mesmos valores no navegador}.
+
+\begin{figure}[H]
+    \centering
+    \input{time_run/generated/caption.tex}
+    \vspace{5pt}
+    \includegraphics[width = 0.9\linewidth]{time_run/generated/o__boxplot.pdf}
+    \vspace{5pt}
+    {\par\small Fonte: Elaborado pelo próprio autor}
+    \input{time_run/generated/description.tex}
+    \label{fig:time-run}
+\end{figure}
+
+\section*{Cálculo da Matriz projectionView no C++}
+
+Apenas para finalidades de verificação da velocidade de execução dos códigos desenvolvidos (\verb|Matrix4.h| e \verb|Vector3.h|) será comparado com a biblioteca de cálculos matemáticos \textit{GLM}, utilizada em diversos programas de produção. Observado em alguns testes uma melhor velocidade usando \textit{GLM} e em outros usando o código desenvolvido, como visto na \autoref{fig:glm}, portanto uma inexpressiva diferença podendo manter assim o códigos desenvolvidos.
+
+\begin{lstlisting}[language=c,style=m_lststyle,label=lst:projectionViewGLM,caption=Cálculo da Matriz projectionView usando GLM]
+glm::mat4 projectionMatrix = glm::ortho(
+-orthographicUnits * aspect, // left
+orthographicUnits * aspect,  // right
+-orthographicUnits,          // bottom
+orthographicUnits,           // top
+zNear,
+zFar);
+
+glm::mat4 cameraMatrix = glm::lookAt(position, target, yAxis);
+
+glm::mat4 viewMatrix = glm::affineInverse(cameraMatrix);
+
+glm::mat4 projectionViewMatrix = projectionMatrix * viewMatrix;
+\end{lstlisting}
+% NOTE: codigo inserido de forma manual
+
+\begin{figure}[H]
+    \centering
+    \input{glm/generated/caption.tex}
+    \vspace{5pt}
+    \includegraphics[width = 0.9\linewidth]{glm/generated/o__boxplot.pdf}
+    \vspace{5pt}
+    {\par\small Fonte: Elaborado pelo próprio autor}
+    \input{glm/generated/description.tex}
+    \label{fig:glm}
+\end{figure}
+
+\bibliographystyle{plain}
+\bibliography{references}
 
 \end{document}
