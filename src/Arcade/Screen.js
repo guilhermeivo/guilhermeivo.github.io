@@ -38,7 +38,7 @@ export default class Screen {
 
         this.scrollHeight += 50
 
-        const spaceScreen = (this.imageBg.width / this.width) * (this.height - (3 * this.marginY))
+        const spaceScreen = (this.imageBg.width / this.width) * (this.height - (4 * this.marginY))
         if (this.scrollHeight >= maxScroll - spaceScreen) this.scrollHeight = maxScroll - spaceScreen
     }
 

@@ -64,7 +64,9 @@ canvas {
 #screen {
     height: 0;
     overflow: hidden;
-    width: 650px;
+    /* TODO: */
+    /* this dimension is defined with data from the Arcade class */
+    width: 680px;
     background: #000
 }
 

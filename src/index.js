@@ -8,7 +8,7 @@ import Arcade from "./Arcade/Arcade.js"
 import { loadObj } from './Loader.js'
 
 (() => {
-    if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    if(window.executeInSimplifiedMode) {
         return
     }
 
