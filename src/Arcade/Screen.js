@@ -8,7 +8,7 @@ export default class Screen {
         this.marginX = marginX
         this.marginY = marginY
 
-        canvas.width = width
+        canvas.width = width + (2 * this.marginX)
         canvas.height = height
 
         this.ctx = canvas.getContext("2d")
@@ -38,7 +38,7 @@ export default class Screen {
 
         this.scrollHeight += 50
 
-        const spaceScreen = this.height
+        const spaceScreen = (this.imageBg.width / this.width) * (this.height - (4 * this.marginY))
         if (this.scrollHeight >= maxScroll - spaceScreen) this.scrollHeight = maxScroll - spaceScreen
     }
 
@@ -57,7 +57,7 @@ export default class Screen {
 
         const aSvgImage = `
         data:image/svg+xml,
-        <svg xmlns="http://www.w3.org/2000/svg" width="${ (this.width - this.marginX * 2) }" height="${ maxScroll }">
+        <svg xmlns="http://www.w3.org/2000/svg" width="${ content.clientWidth }" height="${ maxScroll }">
             <foreignObject width="100%" height="100%">
                 <div xmlns="http://www.w3.org/1999/xhtml">
                     ${ value }
@@ -75,13 +75,29 @@ export default class Screen {
     }
 
     draw() {
-        this.ctx.fillRect(0, 0, this.width, this.height)
+        this.ctx.fillStyle = "black"
+        this.ctx.fillRect(0, 0, this.width + (2 * this.marginX), this.height)
         this.ctx.scale(1, -1)
+
         this.ctx.drawImage(this.imageBg, 
-            this.marginX, this.marginY - this.scrollHeight, 
-            this.width - this.marginX * 2, (this.height - this.marginY * 2) * -1 - this.marginY * 2 - this.scrollHeight)
+            0, // sx
+            this.scrollHeight, // sy
+            this.imageBg.width, // sWidth,
+            (this.imageBg.width / this.width) * (this.height - (2 * this.marginY)), // sHeight
+            this.marginX, this.marginY, 
+            this.width, -this.height + this.marginY)
+
         this.ctx.scale(1, -1)
-        this.ctx.drawImage(this.image, 0, 0)
+        this.ctx.drawImage(this.image, 0, 0, this.width + (2 * this.marginX), this.height)
+
+        // this.ctx.fillStyle = "green"
+        // this.ctx.fillRect(0, 0, this.marginX, this.height)
+        // this.ctx.fillRect(this.width + this.marginX, 0, this.marginX, this.height)
+
+        // this.ctx.fillRect(this.width + this.marginX, 0, this.marginX, this.height)
+
+        // this.ctx.fillStyle = "green"
+        // this.ctx.fillRect(this.marginX + 100, this.marginY + 100, 50, 50)
 
         return new Promise((resolve, reject) => {
             try {

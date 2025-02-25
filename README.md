@@ -20,7 +20,7 @@
 
 Rodar aplicação:
 ```
-$ npm install
+$ npm install && ./install.sh
 $ ./build.sh && ./run.sh
 ```
 

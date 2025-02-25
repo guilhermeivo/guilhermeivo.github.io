@@ -28,8 +28,11 @@
     <link rel="stylesheet" href="./resources/debug.css">
 </head>
 <body>
-    <div id="screen">
-        <div style="padding: 48px;">
+    <main id="screen">
+        <div style="padding: 48px">
+            <div id="warning_message" style="display: none; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+            </div>
+
             <h3 style="display: block; font-size: 28px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">
                 Oi 👋, meu nome é <span>Guilherme</span>
             </h3>
@@ -37,7 +40,7 @@
                 Técnico em Desenvolvimento de Sistemas (ETESP)
             </p>
             <p style="display: block; font-size: 24px; margin-top: 24px; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
-                Cursando Sistemas de Informação (USP)
+                Cursando Bacharelado em Ciência da Computação (USP)
             </p>
     
             <h2 style="display: block; font-size: 36px; margin-top: 20px;  margin-bottom: 20px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
@@ -46,11 +49,11 @@
             
             <div id="cards" style="display: grid; grid-template-columns: 1fr;"></div>
     
-            <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
+            <p style="display: block; font-size: 24px; margin-top: 0; margin-left: 0; margin-right: 0; margin-bottom: 0; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
                 criado por <a href="https://github.com/guilhermeivo" style="color: rgb(255, 255, 255)">guilhermeivo</a> <span title="🥄">❤️</span>
             </p>
         </div>
-    </div>
+    </main>
 
     <div class="shortcuts">
         <div>
@@ -75,31 +78,57 @@
         </div>
     </div>
 
+    <template id="card">
+        <!-- inline css to be used in svg -->
+        <a id="card_anchor" href="#" tabindex="-1" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); padding: 4px; text-decoration: none" data-card onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+            <h3 style="display: block; font-size: 28px; margin-top: 0; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);"></h3>
+            <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);"></p>
+        </a>
+    </template>
+
     <script>
-        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            document.querySelector('#screen>div').insertAdjacentHTML('afterbegin', `
-                <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
-                para uma melhor experiência acessar pelo computador 😊 <br/><br/><hr/><br/>
-                </p>
-                `)
+        const canvasSupported = !!window.HTMLCanvasElement
+        const templateSupported = "content" in document.createElement("template")
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+        window.executeInSimplifiedMode = isMobile || !canvasSupported || !templateSupported
+        if(window.executeInSimplifiedMode) {
+            document.querySelector('#warning_message').style.display = 'block'
+            document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `<hr>`)
             document.querySelector('#screen').classList.add('simplified')
             document.querySelector('.shortcuts').style.display = 'none'
+        }
+        if (isMobile) {
+            document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `para uma melhor experiência acessar pelo computador 😊 <br>`)
+        }
+        if (!canvasSupported) {
+            document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `HTML canvas element is not supported. <br>`)
+        }
+        if (!templateSupported) {
+            document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `HTML template element is not supported. <br>`)
         }
 
         const cardsList = [
             { title: 'BaseTech-Inc/Tupa-Server', description: 'Servidor para a empresa Tupã desenvolvido por @BaseTech-Inc.', links: ['https://github.com/BaseTech-Inc/Tupa-Server'] },
             { title: 'experiment-using-mouse', description: 'Desafios para ajudar um rato a encontrar um pedaço de queijo em um labirinto.', links: ['https://github.com/guilhermeivo/experiment-using-mouse'] },
             { title: 'snake-game', description: 'O clássico jogo da cobrinha no console gameboy.', links: ['https://github.com/guilhermeivo/snake-game'] },
-            { title: 'tcm-codezone', description: 'Projeto desenvolvido para trabalho de conclusão de módulo (TCM).', links: ['https://github.com/guilhermeivo/tcm-codezone'] }
+            { title: 'tcm-codezone', description: 'Projeto desenvolvido para trabalho de conclusão de módulo (TCM).', links: ['https://github.com/guilhermeivo/tcm-codezone'] },
+            { title: 'computing-projects', description: 'Experimentos relacionados com computação.', links: ['https://github.com/guilhermeivo/computing-projects'] }
         ]
 
+        const cards = document.getElementById("cards")
+        const templateCard = document.getElementById("card")
         cardsList.forEach((card, index) => {
-            document.querySelector('#cards').insertAdjacentHTML('beforeend', `
-                <a href="${ card.links[0] }" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); background: rgba(${ 16 * index + 16 }, ${ 16 * index + 16 }, ${ 16 * index + 16 }); padding: 4px; text-decoration: none" data-card tabindex="${ index + 1 }" onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
-                    <h3 style="display: block; font-size: 28px; margin-top: 0; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">${ card.title }</h3>
-                    <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">${ card.description }</p>
-                </a>
-                `)
+            const clone = templateCard.content.cloneNode(true)
+            const cardAnchor = clone.getElementById('card_anchor')
+            cardAnchor.href = card.links[0]
+            cardAnchor.tabIndex = index + 1
+            cardAnchor.style.background = `rgba(${ 16 * index + 16 }, ${ 16 * index + 16 }, ${ 16 * index + 16 })`
+
+            cards.appendChild(clone);
+
+            cardAnchor.querySelector("h3").textContent = card.title
+            cardAnchor.querySelector("p").textContent = card.description
         })
 
         const onFocusOutCard = event => {

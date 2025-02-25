@@ -5,7 +5,7 @@ h1, h2, h3, h4, h5, h6, span, p, label, b, input {
 body {
     margin: 0;
     padding: 0;
-    min-height: 100vh
+    min-height: 100dvh
 }
 
 canvas {
@@ -64,7 +64,9 @@ canvas {
 #screen {
     height: 0;
     overflow: hidden;
-    width: 650px;
+    /* TODO: */
+    /* this dimension is defined with data from the Arcade class */
+    width: 680px;
     background: #000
 }
 
