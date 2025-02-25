@@ -16,10 +16,11 @@ export default class Arcade {
         this.mouseEventX = -1
         this.mouseEventY = -1
 
+        // 1.08 and 1.21 - actual dimension of the object in blender
         this.screenArcade = new Screen(
             './resources/arcade/screen_blank.png',
-            1000, 750,
-            180, 150
+            (1.08 * 1000) - (2 * 200), 1.21 * 1000,
+            200, 125
         )
 
         this.buttonRotateRight = new Button(wasm, () => { 
@@ -83,7 +84,7 @@ export default class Arcade {
     }
 
     updateScreen(scene) {
-        this.screenArcade.update(document.querySelector('#screen'), document.querySelector('#screen>div').scrollHeight).then(() => {
+        this.screenArcade.update(document.querySelector('#screen'), document.querySelector('#screen').scrollHeight).then(() => {
             const screen = scene.children.filter(object => object.type == ObjectType.COLLECTION)[0]
                 .children.filter(object => object.name == 'Screen')[0]
 
