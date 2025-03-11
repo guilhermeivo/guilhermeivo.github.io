@@ -74,15 +74,26 @@ export class Object3 {
 
     /// virtual
     onBeforeRender(fps, callback = null) {
+        const lastPosition = [this.position[0], this.position[1], this.position[2]]
+        if (this.parent) {
+            this.wasm.update(this.position, [this.parent.position[0]+this.position[0], this.parent.position[1]+this.position[1], this.parent.position[2]+this.position[2]])
+        }
+
         const usedValues = !this.parent
             ? [ this.position, this.rotation, this.scale]
-            : [ this.parent.position, this.parent.rotation, this.parent.scale ]
+            : [ 
+                this.position, 
+                this.parent.rotation, 
+                this.parent.scale 
+            ]
 
         this.wasm.exports.worldMatrix(
             this.worldMatrix.byteOffset, 
             usedValues[0].byteOffset, 
             usedValues[1].byteOffset, 
             usedValues[2].byteOffset)
+
+        this.wasm.update(this.position, [lastPosition[0],lastPosition[1],lastPosition[2]])
 
         if (callback) callback(fps)
         else if (this._onBeforeRender) this._onBeforeRender(fps)

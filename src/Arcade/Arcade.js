@@ -70,13 +70,14 @@ export default class Arcade {
     switchMode(callback) {
         if (!this.isSimpleMode) {
             this.isSimpleMode = true
-            document.querySelector('#screen').classList.add('simplified')
-            document.querySelector('.shortcuts').style.display = 'none'
+            document.body.setAttribute('data-mode', 'simplified')
+
             document.querySelector('#canvas').style.display = 'none'
         } else {
             this.isSimpleMode = false
-            document.querySelector('#screen').classList.remove('simplified')
-            document.querySelector('.shortcuts').style.display = 'block'
+
+            document.body.removeAttribute('data-mode')
+
             document.querySelector('#canvas').style.display = 'block'
 
             callback(0)
@@ -106,6 +107,7 @@ export default class Arcade {
 
         scene.getById(scene.children.filter(object => object.type == ObjectType.COLLECTION)[0].children, id)
             .then(value => this.currentObjectOver = value)
+            .catch(() => this.currentObjectOver = 'window')
     }
 
     getScreenMouseClick() {

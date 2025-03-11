@@ -16,6 +16,7 @@ export default class Plane extends Mesh {
         geometry.setAttribute('color', plane.color())
         geometry.setAttribute('normal', plane.normal())
         geometry.setAttribute('texcoord', plane.texture(), { size: 2, normalize: false })
+        
         const material = new Material({
             specular: [0, 0, 0]
         })

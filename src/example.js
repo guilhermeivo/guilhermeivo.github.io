@@ -4,7 +4,7 @@ import GLInfo from "./WebGL/GLInfo.js"
 import Scene from "./Objects/Scene.js"
 import Plane from "./Primitives/Plane.js"
 import Monkey from "./Primitives/Monkey.js"
-import Camera from "./Objects/Cameras/Camera.js"
+import DebugCamera from "./Objects/Cameras/DebugCamera.js"
 import Light from "./Objects/Lights/Light.js"
 import LightHelper from "./Helpers/LightHelper.js"
 
@@ -63,7 +63,7 @@ WebAssembly.instantiateStreaming(fetch("main.wasm"), wasm.importObject()).then(
                 label: 'Camera_X',
                 type: 'range',
                 configs: { 
-                    value: 2.75,
+                    value: 3,
                     max: 50,
                     min: -50
                 }
@@ -110,7 +110,7 @@ WebAssembly.instantiateStreaming(fetch("main.wasm"), wasm.importObject()).then(
         const scene = new Scene(wasm)
 
         /// CAMERA
-        const camera = new Camera(wasm, {
+        const camera = new DebugCamera(wasm, {
             position: [ 3, 8, 25 ],
             target: [ 0, 15/2-2, 0 ]
         }, {
@@ -121,12 +121,14 @@ WebAssembly.instantiateStreaming(fetch("main.wasm"), wasm.importObject()).then(
         })
         scene.add(camera)
 
+        /// LIGHT
         const light001 = new Light(wasm, { 
             position: [ 6, 10, -4.3 ]
         })
         scene.addLight(light001)
         scene.add(new LightHelper(wasm, light001))
 
+        /// OBJECT
         scene.add(new Plane(wasm, glRenderer.gl))
         scene.add(new Plane(wasm, glRenderer.gl, {
             position: [ -15/2, 15/2, 0 ],
@@ -153,6 +155,7 @@ WebAssembly.instantiateStreaming(fetch("main.wasm"), wasm.importObject()).then(
                 fpsElement.value = fps.toFixed(2)
             }
             
+            glRenderer.render(scene, camera, fps, true)
             glRenderer.render(scene, camera, fps, false, true)
             window.requestAnimationFrame(animate)
         }

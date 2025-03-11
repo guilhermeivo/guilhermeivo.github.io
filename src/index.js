@@ -6,9 +6,12 @@ import Light from "./Objects/Lights/Light.js"
 import Axis from "./Objects/Axis.js"
 import Arcade from "./Arcade/Arcade.js"
 import { loadObj } from './Loader.js'
+import Plane from "./Primitives/Plane.js"
+import Material from "./Core/Material.js"
+import { ObjectType } from "./Objects/Object3.js"
 
 (() => {
-    if(window.executeInSimplifiedMode) {
+    if (window.executeInSimplifiedMode) {
         return
     }
 
@@ -27,7 +30,48 @@ import { loadObj } from './Loader.js'
             const glRenderer = new GLRenderer(wasm)
                     
             glRenderer.setSize(window.innerWidth, window.innerHeight) // change resolution image (1x, 2x)
-            document.body.appendChild(glRenderer.gl.canvas)
+            document.querySelector('#experience').appendChild(glRenderer.gl.canvas)
+            glRenderer.setSize(glRenderer.gl.canvas.clientWidth, glRenderer.gl.canvas.clientHeight)
+
+            let statusArcade = false
+
+            const updateScroll = () => {
+                if (arcade.isSimpleMode || !scene.children) return t
+
+                const t = Math.abs(document.body.getBoundingClientRect().top / (document.body.clientHeight - window.innerHeight))
+
+                document.body.style.setProperty('--scroll', t)
+
+                wasm.update(camera.position, [
+                    Math.easeInOutQuad(t, 8.5, startCamera[0]), 
+                    Math.easeInOutQuad(t, 12.0, startCamera[1]), 
+                    Math.easeInOutQuad(t, 0.0, startCamera[2])
+                ])
+                wasm.update(scene.children.find(object => object.type == ObjectType.COLLECTION).position, [
+                    startArcade[0], 
+                    Math.easeInOutQuad(t, 0.0, startArcade[1]), 
+                    startArcade[2]
+                ])
+
+                document.querySelector('canvas').style.transform = `
+                    translateX(-${ Math.easeInOutQuad(t, getComputedStyle(glRenderer.gl.canvas).getPropertyValue('left').split('px')[0], 0) }px)
+                `
+
+                if (t >= 0.85) {
+                    if (statusArcade == false) {
+                        statusArcade = true
+                        activeArcade()
+                    }
+                } else {
+                    if (statusArcade == true) {
+                        statusArcade = false
+                        disableArcade()
+                    }
+                }
+                return t
+            }
+
+            window.addEventListener('scroll', updateScroll)
 
             /// SCENE
             const scene = new Scene(wasm)
@@ -40,7 +84,7 @@ import { loadObj } from './Loader.js'
             scene.add(axis)
 
             /// CAMERA
-            const startCamera = [ 25.0, 25.0, 75.0 ]
+            const startCamera = [ 30.0, 20.0, -20.0 ]
 
             const camera = new Camera(wasm, {
                 position: startCamera,
@@ -57,15 +101,45 @@ import { loadObj } from './Loader.js'
             })
             scene.addLight(light001)
 
+            // MASK
+            const material = new Material({
+                shininess: [ 0.0 ],
+                ambient: [ 0.0, 0.0, 0.0 ],
+                diffuse: [ 0.0, 0.0, 0.0 ],
+                specular: [ 0.0, 0.0, 0.0 ],
+                emissive: [ 0.0, 0.0, 0.0 ],
+                opticalDensity: [ 1.45 ],
+                opacity: [ 0.0 ],
+                illum: [ 0.0 ]
+            })
+
+            const plane001 = new Plane(wasm, glRenderer.gl, {
+                position: [ 6, -2, 0 ],
+                rotation: [ 0, 0, Math.degreeToRadians(-90) ]
+            })
+            plane001.shadow = 1
+            plane001.material = material
+            scene.add(plane001)
+            const plane002 = new Plane(wasm, glRenderer.gl, {
+                position: [ -3/2, -2, -6-3/2 ],
+                rotation: [ Math.degreeToRadians(-90), 0, 0 ]
+            })
+            plane002.shadow = 1
+            plane002.material = material
+            scene.add(plane002)
+
             /// ARCADE
             const arcade = new Arcade(wasm, glRenderer.gl)
 
-            loadObj(wasm, glRenderer.gl, './resources/arcade/', 'arcade.obj')
+            const startArcade = [ 0.0, 5.0, 0.0 ]
+
+            loadObj(wasm, glRenderer.gl, './resources/arcade/', 'arcade.obj', {
+                position: [ 0.0, -50.0, 0.0 ]
+            })
                 .then(async collection => {
                     scene.add(collection)
                     arcade.screenArcade.open()
                     arcade.updateScreen(scene)
-
 
                     arcade.buttonRotateRight.init(collection.children.filter(object => object.name == 'Button.RotateRight')[0])
                     arcade.buttonRotateLeft.init(collection.children.filter(object => object.name == 'Button.RotateLeft')[0])
@@ -77,21 +151,47 @@ import { loadObj } from './Loader.js'
 
                     glRenderer.setup(scene)
 
-                    // animation
+                    const tScroll = updateScroll()
+
                     let steps = 100 // TODO: influenced by FPS
                     for (let i = steps; i >= 0; i--) {
                         const t = i / steps
-                        wasm.update(camera.position, [
-                            Math.easeInOutQuad(t, startCamera[0], 8.5), 
-                            Math.easeInOutQuad(t, startCamera[1], 12), 
-                            Math.easeInOutQuad(t, startCamera[2], 0)
+                        wasm.update(collection.position, [
+                            Math.easeInOutQuad(t, 0.0, startArcade[0]), 
+                            Math.easeInOutQuad(t, -50.0, startArcade[1] * (1 - tScroll)), 
+                            Math.easeInOutQuad(t, 0.0, startArcade[2])
                         ])
                         await new Promise(resolve => setTimeout(resolve, 5))
                     }
                 })
 
-            /// EVENTS
-            document.addEventListener('keydown', event => {
+            // mousemoveend event
+            const debounce = (callback, wait) => {
+                let timeoutId = null
+                return (...args) => {
+                    window.clearTimeout(timeoutId)
+                    timeoutId = window.setTimeout(() => {
+                        callback(...args)
+                    }, wait)
+                }
+            }
+
+            const throttle = (callback, wait) => {
+                let timeoutId = null
+                
+                return (...args) => {
+                    if (timeoutId === null) {
+                        callback(...args)
+                        timeoutId = setTimeout(() => { 
+                            timeoutId = null
+                        }, wait)
+                    }
+                }
+            }
+
+            let wheelEventEndTimeoutId = null
+
+            const keydownEvent = (event) => {
                 switch (event.key) {
                     case 'Escape':
                         arcade.buttonHyperSpace.click()
@@ -113,6 +213,8 @@ import { loadObj } from './Loader.js'
                     case 'c':
                     case 'C':
                         arcade.switchMode(animate)
+                        window.scroll({ top: 0, behavior: 'instant' })
+                        updateScroll()
                         break
                     default:
                         return
@@ -121,13 +223,15 @@ import { loadObj } from './Loader.js'
                     arcade.updateScreen(scene)
                 }, 10)
                 document.addEventListener('keyup', arcade.onKeyupHandler)
-            })
+            }
 
-            glRenderer.gl.canvas.addEventListener('mousemove', arcade.onMouseMoveHandler)
+            const mousemoveEvent = debounce(function (event) {
+                arcade.onMouseMoveHandler(event)
+            }, 50)
 
-            glRenderer.gl.canvas.addEventListener('mousedown', event => {
+            const mouseDownEvent = (event) => {
                 event.preventDefault()
-                
+                    
                 if (!arcade.currentObjectOver) return
                 if (event.buttons != 1) return
 
@@ -173,33 +277,48 @@ import { loadObj } from './Loader.js'
                 }, 10)
 
                 glRenderer.gl.canvas.addEventListener('mouseup', arcade.onMouseupHandler)
-            })
+            }
 
-            let wheelEventEndTimeout = null
-            glRenderer.gl.canvas.addEventListener('wheel', event => {
+            const wheelEvent = (event) => {
                 if (!arcade.currentObjectOver) return
 
                 switch (arcade.currentObjectOver.name) {
                     case 'Screen':
                         event.preventDefault()
+
                         if (event.deltaY > 0) arcade.buttonRotateRight.click()
-                        else arcade.buttonRotateLeft.click() 
-                        clearTimeout(wheelEventEndTimeout)
-                        wheelEventEndTimeout = setTimeout(() => {
+                        else arcade.buttonRotateLeft.click()
+
+                        setTimeout(() => {
+                            arcade.updateScreen(scene)
+                        }, 10)
+
+                        window.clearTimeout(wheelEventEndTimeoutId)
+                        wheelEventEndTimeoutId = window.setTimeout(() => {
                             arcade.buttonRotateRight.up()
                             arcade.buttonRotateLeft.up() 
-                        }, 100)
+                        }, 500)
                         
                         break
                     default:
                         break
                 }
+            }
 
-                setTimeout(() => {
-                    arcade.updateScreen(scene)
-                }, 10)
-            })
+            const activeArcade = async () => {
+                /// EVENTS
+                document.addEventListener('keydown', keydownEvent)
+                document.addEventListener('mousemove', mousemoveEvent)
+                glRenderer.gl.canvas.addEventListener('mousedown', mouseDownEvent)
+                glRenderer.gl.canvas.addEventListener('wheel', wheelEvent)
+            }
 
+            const disableArcade = () => {
+                document.removeEventListener('keydown', keydownEvent)
+                document.removeEventListener('mousemove', mousemoveEvent)
+                glRenderer.gl.canvas.removeEventListener('mousedown', mouseDownEvent)
+                glRenderer.gl.canvas.removeEventListener('wheel', wheelEvent)
+            }
 
             /// ANIMATE
             let lastTimeFps = 0
@@ -209,6 +328,7 @@ import { loadObj } from './Loader.js'
                 return fps
             }
 
+            glRenderer.setup(scene)
             function animate(timeStamp) {
                 if (arcade.isSimpleMode) return
 
