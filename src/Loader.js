@@ -133,7 +133,11 @@ const objToJson = async (url, file, current = 'objects') => {
 }
 
 const loadObj = async (wasm, gl, url, object, transform = { }) => {
-	const collection = new Collection(wasm)
+	const collection = new Collection(wasm, {
+		position: transform.position || [ 0, 0, 0 ],
+		rotation: transform.rotation || [ 0, 0, 0 ],
+		scale: transform.scale || [ 5, 5, 5 ]
+	})
 	let materials = { }
 	let maxIndex = [ 1, 1, 1 ]
 	let vertexData = [ [], [], [] ]
@@ -237,11 +241,8 @@ const loadObj = async (wasm, gl, url, object, transform = { }) => {
 					geometry.setAttribute('normal', new Float32Array(vertexData[2]))
 					geometry.setAttribute('texcoord', new Float32Array(vertexData[1]), { size: 2, normalize: false })
 
-					const mesh = new Mesh(wasm, geometry, materials[currentObject.material], {
-						position: transform.position || [ 0, 0, 0 ],
-						rotation: transform.rotation || [ 0, 0, 0 ],
-						scale: transform.scale || [ 5, 5, 5 ]
-					})
+					const mesh = new Mesh(wasm, geometry, materials[currentObject.material])
+					mesh.parent = collection
 					mesh.name = key
 
 					collection.add(mesh)

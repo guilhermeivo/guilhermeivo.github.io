@@ -29,10 +29,11 @@ export default class Scene extends Object3 {
     }
 
     getById(objects, id) {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             objects.forEach(object => {
                 if (object.id == id) resolve(object)
             })
+            reject()
         })
     }
 

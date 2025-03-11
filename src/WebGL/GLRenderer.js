@@ -188,7 +188,7 @@ export default class GLRenderer {
     }
 
     onResizeHandler() {
-        this.setSize(window.innerWidth, window.innerHeight)
+        this.setSize(this.gl.canvas.clientWidth, this.gl.canvas.clientHeight)
     }
 
     createProgram(vertexShaderSource, fragmentShaderSource) {

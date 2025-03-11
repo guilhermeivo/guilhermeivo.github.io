@@ -5,23 +5,23 @@ export default class DebugCamera extends Camera {
         super(wasm, transformation, config)
 
         this.debug = true
-
-        window[`${ this.prefix }_VIEW`] = this.fieldOfViewRadians
+        this.prefix = 'DEBUG'
     }
 
     _onBeforeRender() {
-        this.zNear = Number(window[`${ this.prefix }_ZNEAR`])
-        this.zFar = Number(window[`${ this.prefix }_ZFAR`])
+        this.zNear = Number(window[`${ this.prefix }_CAMERA_ZNEAR`])
+        this.zFar = Number(window[`${ this.prefix }_CAMERA_ZFAR`])
 
-        // TODO:
-        //this.position.elements[0] = Number(window[`${ this.prefix }_X`])
-        //this.position.elements[1] = Number(window[`${ this.prefix }_Y`])
-        //this.position.elements[2] = Number(window[`${ this.prefix }_Z`])
+        this.wasm.update(this.position, [ 
+            Number(window[`${ this.prefix }_CAMERA_X`]), 
+            Number(window[`${ this.prefix }_CAMERA_Y`]), 
+            Number(window[`${ this.prefix }_CAMERA_Z`]) 
+        ])
 
-        this.orthographic = window[`${ this.prefix }_ORTHOGRAPHIC`]
-        this.orthographicUnits = Number(window[`${ this.prefix }_UNITS`])
+        this.orthographic = window[`${ this.prefix }_CAMERA_ORTHOGRAPHIC`]
+        this.orthographicUnits = Number(window[`${ this.prefix }_CAMERA_UNITS`])
 
-        this.fieldOfViewRadians = window[`${ this.prefix }_VIEW`]
+        this.fieldOfViewRadians = window[`${ this.prefix }_CAMERA_VIEW`]
 
         const position = !this.parent ? this.position : this.parent.position
         const target = !this.parent ? this.target : this.parent.position

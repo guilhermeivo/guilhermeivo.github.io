@@ -50,6 +50,7 @@ export default class Button {
 
             const t = i / steps
             const curve = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
+
             this.wasm.update(this.object.position, [ 0, ((this.object.position[1] - -0.4) * curve) + -0.4, 0 ])
             await new Promise(resolve => setTimeout(resolve, 1))
         }
