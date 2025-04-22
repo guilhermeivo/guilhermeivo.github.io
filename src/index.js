@@ -38,7 +38,17 @@ import { ObjectType } from "./Objects/Object3.js"
             const updateScroll = () => {
                 if (arcade.isSimpleMode || !scene.children) return t
 
-                const t = Math.abs(document.body.getBoundingClientRect().top / (document.body.clientHeight - window.innerHeight))
+                let t = Math.abs(document.body.getBoundingClientRect().top / (document.querySelector('#hero').clientHeight + document.querySelector('#projects').clientHeight - window.innerHeight))
+
+                if (t > 1.0 ) {
+                    glRenderer.gl.canvas.style.top = document.querySelector('#projects').getBoundingClientRect().top - 24 + 'px'
+                    t = 1.0
+                    //return t
+                } else {
+                    glRenderer.gl.canvas.style.top = '0'
+                }
+
+                if (arcade.inmove) return t
 
                 document.body.style.setProperty('--scroll', t)
 
@@ -153,6 +163,8 @@ import { ObjectType } from "./Objects/Object3.js"
 
                     const tScroll = updateScroll()
 
+                    arcade.inmove = true
+
                     let steps = 100 // TODO: influenced by FPS
                     for (let i = steps; i >= 0; i--) {
                         const t = i / steps
@@ -163,6 +175,9 @@ import { ObjectType } from "./Objects/Object3.js"
                         ])
                         await new Promise(resolve => setTimeout(resolve, 5))
                     }
+
+                    arcade.inmove = false
+                    updateScroll()
                 })
 
             // mousemoveend event

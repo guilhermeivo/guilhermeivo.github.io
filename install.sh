@@ -24,3 +24,5 @@ mkdir build
 cd build
 cmake ..
 cmake --build .
+
+npm install
