@@ -2,7 +2,7 @@
 set -e
 
 SOURCE_PATH=src
-EXPORT_PATH=public
+EXPORT_PATH=assets
 
 WASI_SDK_PATH=`pwd`/dependencies/wasi-sdk
 WABT_PATH=dependencies/wabt/build
@@ -17,6 +17,7 @@ $CXX -D USE_WASM \
 
 $WABT_PATH/wasm2wat $EXPORT_PATH/main.wasm -o $EXPORT_PATH/main.wat
 
-npm run build
+# npm run build
+jekyll build
 
 exit 0

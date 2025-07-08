@@ -1,1 +1,1 @@
-npm run-script run
+jekyll serve

@@ -10,7 +10,7 @@ import LightHelper from "./Helpers/LightHelper.js"
 
 const wasm = new Wasm()
 
-WebAssembly.instantiateStreaming(fetch("main.wasm"), wasm.importObject()).then(
+WebAssembly.instantiateStreaming(fetch("assets/main.wasm"), wasm.importObject()).then(
     object => {
         wasm.exports = object.instance.exports
         wasm.memory = object.instance.exports.memory.buffer

@@ -18,7 +18,7 @@ export default class Arcade {
 
         // 1.08 and 1.21 - actual dimension of the object in blender
         this.screenArcade = new Screen(
-            './resources/arcade/screen_blank.png',
+            './assets/arcade/screen_blank.png',
             (1.08 * 1000) - (2 * 200), 1.21 * 1000,
             200, 125
         )

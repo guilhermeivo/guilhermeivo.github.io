@@ -1,3 +1,5 @@
+bundle install
+
 mkdir -p dependencies
 cd dependencies
 
