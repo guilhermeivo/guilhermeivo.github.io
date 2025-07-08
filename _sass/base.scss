@@ -1,5 +1,10 @@
----
----
+@use "variables" as *;
+
+@forward "text";
+
+:root {
+    color-scheme: light dark;
+}
 
 * {
     margin: 0;
@@ -7,59 +12,21 @@
     box-sizing: border-box;
 }
 
-:root {
-    --width-section: min(calc(100vw / 2), 720px);
-    --shadow-color: rgba(0, 0, 0, 0.06);
-
-    --high-emphasis-color: #1C1C1C;
-    --medium-emphasis-color: #37352f;
-    --disabled-color: #9E9E9E;
-
-    --high-emphasis-color__dark: #e0e0e0;
-    --medium-emphasis-color__dark: #a0a0a0;
-
-    --title-font: 'Passion One', -apple-system, sans-serif;
-    --body-font: -apple-system, sans-serif;
-
-    --primary-color: #0476ce;
-    --primary-color--variant: #d4e1ec;
-}
-
-@font-face {
-    font-family: 'Passion One';
-    src: local('Passion One'),
-        local('PassionOne'),
-        url('/assets/PassionOne-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-display: swap;
-}
-
 ::selection {
-    color: var(--high-emphasis-color__dark);
-    background-color: var(--high-emphasis-color);
+    color: $high-emphasis-color__dark;
+    background-color: $high-emphasis-color;
 }
 
 [data-mode="simplified"] ::selection {
-    background-color: var(--high-emphasis-color__dark);
-    color: var(--high-emphasis-color);
+    background-color: $high-emphasis-color__dark;
+    color: $high-emphasis-color;
 }
 
 @media (max-width: 576px) {
     ::selection {
-        background-color: var(--high-emphasis-color__dark);
-        color: var(--high-emphasis-color);
+        background-color: $high-emphasis-color__dark;
+        color: $high-emphasis-color;
     }
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--title-font);
-    font-weight: 700;
-    color: var(--high-emphasis-color);
-}
-
-span, p, a, li, textarea, button, select, label, b, input, text {
-    color: var(--medium-emphasis-color);
-    font-family: var(--body-font);
 }
 
 html {
@@ -68,8 +35,21 @@ html {
 
 body {
     min-height: 100dvh;
-    background: #000;
-    --scroll: 0
+    background: $surface-color;
+}
+
+body[data-hero] {
+    --scroll: 0;
+    background: #1e1e1e;
+
+    > footer {
+        display: none;
+    }
+}
+
+footer {
+    text-align: center;
+    font-size: 80%;
 }
 
 .wrapper {
@@ -85,7 +65,7 @@ body {
 section { 
     margin: 12px;
     margin-top: 0; 
-    box-shadow: 0px 4px 16px var(--shadow-color);
+    box-shadow: 0px 4px 16px $shadow-color;
 }
 
 section.section__first {
@@ -97,7 +77,7 @@ section .content {
 }
 
 .hero {
-    --size-margin: 172px;
+    $size-margin: 172px;
 
     padding: 24px;
     display: flex;
@@ -109,9 +89,9 @@ section .content {
     overflow: hidden;
 
     .content {
-        min-width: var(--width-section);
-        width: var(--width-section);
-        height: calc(100% - var(--size-margin)); /* remove bottom part */
+        min-width: $width-section;
+        width: $width-section;
+        height: calc(100% - $size-margin); /* remove bottom part */
         padding: 0 120px;
         z-index: 1000;
         display: flex;
@@ -158,30 +138,30 @@ section .content {
         }
 
         svg:hover {
-            filter: drop-shadow(0px 4px 16px var(--shadow-color));
+            filter: drop-shadow(0px 4px 16px $shadow-color);
         }
 
         svg:hover path {
-            fill: var(--primary-color);
+            fill: $primary-color;
             transition: .2s;
         }
     }
 
     .experience {
-        background-image: linear-gradient(-30deg, var(--primary-color--variant), #bcd7ee);
+        background-image: linear-gradient(-30deg, $primary-color--variant, #bcd7ee);
 
-        box-shadow: 0px 4px 16px var(--shadow-color);
+        box-shadow: 0px 4px 16px $shadow-color;
 
         border-radius: 12px;
         position: relative;
-        width: calc(100vw - var(--width-section) - 24px);
-        height: calc(100% - var(--size-margin) / 2);
+        width: calc(100vw - $width-section - 24px);
+        height: calc(100% - $size-margin / 2);
         position: relative;
 
         canvas {
             position: fixed;
             top: 0;
-            left: calc(var(--width-section) / 2); /* efeito de posicionamento scroll-linked */
+            left: calc($width-section / 2); /* efeito de posicionamento scroll-linked */
             width: 100%;
             height: 100%;
             transition-property: transform;
@@ -189,13 +169,13 @@ section .content {
         }
 
         .scroll {
-            --extra: 16px;
+            $extra: 16px;
             position: absolute;
-            bottom: calc(var(--extra) * -1 - var(--size-margin) / 2);
-            left: calc(var(--extra) * -1 - var(--size-margin) / 2);
+            bottom: calc($extra * -1 - $size-margin / 2);
+            left: calc($extra * -1 - $size-margin / 2);
             background: white;
-            height: var(--size-margin);
-            width: var(--size-margin);
+            height: $size-margin;
+            width: $size-margin;
             border-radius: 0 16px 0 0;
             cursor: pointer;
 
@@ -204,7 +184,7 @@ section .content {
                 height: 16px;
                 width: 16px;
                 position: absolute;
-                bottom: calc(var(--extra) + var(--size-margin) / 2);
+                bottom: calc($extra + $size-margin / 2);
                 right: -16px;
                 border-radius: 0 0 0 16px;
                 box-shadow: -12px 12px 0 12px white;
@@ -216,7 +196,7 @@ section .content {
                 width: 16px;
                 position: absolute;
                 top: -16px;
-                left: calc(var(--extra) + var(--size-margin) / 2);
+                left: calc($extra + $size-margin / 2);
                 border-radius: 0 0 0 16px;
                 box-shadow: -12px 12px 0 12px white;
             }
@@ -245,7 +225,7 @@ section .content {
 }
 
 .effects__mark {
-    color: var(--primary-color) !important
+    color: $primary-color !important
 }
 
 @keyframes blink-caret {
@@ -296,7 +276,7 @@ svg {
 }
 
 .projects {
-    /*background-image: linear-gradient(var(--primary-color--variant, transparent 35%);*/
+    /*background-image: linear-gradient($primary-color--variant, transparent 35%);*/
     border-radius: 12px;
     background: white;
     height: calc(100dvh - 24px);
@@ -331,7 +311,7 @@ canvas {
     }
 
     .background__primary {
-        background: radial-gradient(circle at center, var(--primary-color), var(--primary-color--variant));
+        background: radial-gradient(circle at center, $primary-color, $primary-color--variant);
     }
 
     .background__orb {
@@ -388,8 +368,8 @@ canvas {
             padding: 4px;
             background: #fff;
             border: 1px solid #D9DBDD;
-            border-bottom: 1px solid var(--primary-color);
-            box-shadow: 0px 4px 16px var(--shadow-color);
+            border-bottom: 1px solid $primary-color;
+            box-shadow: 0px 4px 16px $shadow-color;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -406,7 +386,7 @@ canvas {
 
     & > div:hover span {
         transition: .2s ease-in;
-        border: 1px solid var(--primary-color);
+        border: 1px solid $primary-color;
         background: #fafafa
     }
 }
@@ -423,13 +403,15 @@ canvas {
 /* simplified */
 [data-mode="simplified"], #screen {
     h1, h2, h3, h4, h5, h6, span, p, a, li, textarea, button, select label, b, input, text {
-        font-family: var(--body-font)
+        font-family: $body-font
     }
 }
 
 @media (max-width: 576px) {
-    h1, h2, h3, h4, h5, h6, span, p, a, li, textarea, button, select label, b, input, text {
-        font-family: var(--body-font)
+    [data-hero] {
+        h1, h2, h3, h4, h5, h6, span, p, a, li, textarea, button, select label, b, input, text {
+            font-family: $body-font
+        }
     }
 }
 
@@ -666,11 +648,4 @@ canvas {
             }
         }
     }
-}
-
-.container-wrapper {
-    position: relative;
-    padding: 0 32px;
-    max-width: 1280px;
-    margin: 0 auto;
 }

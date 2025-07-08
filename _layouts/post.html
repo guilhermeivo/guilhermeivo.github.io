@@ -26,14 +26,15 @@
 
     <link rel="preload" href="{{ "/assets/PassionOne-Bold.ttf" | relative_url }}" as="font" type="font/ttf" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="{{ "/assets/css/style.css" | relative_url }}">
-    <link rel="stylesheet" href="{{ "/assets/css/debug.css" | relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/css/main.css" | relative_url }}">
 </head>
 <body>
     <main class="container-wrapper">
-        {{ content }}
-    </main>
+        <h1 class="title">{{ page.title }}</h1>
 
-    {% include footer.html %}
+        {{ content }}
+
+        {% include footer.html %}
+    </main>
 </body>
 </html>

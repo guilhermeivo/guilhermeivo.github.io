@@ -1,0 +1,17 @@
+$width-section: min(calc(100vw / 2), 720px);
+$shadow-color: light-dark(rgba(0, 0, 0, 0.06), rgba(158, 158, 158, 0.06));
+
+$surface-color: light-dark(#FBFAFD, #1e1e1e);
+
+$high-emphasis-color: light-dark(#1C1C1C, #e0e0e0);
+$medium-emphasis-color: light-dark(#37352f, #a0a0a0);
+$disabled-color: light-dark(#9E9E9E, #6c6c6c);
+
+$high-emphasis-color__dark: #e0e0e0;
+$medium-emphasis-color__dark: #a0a0a0;
+
+$title-font: 'Passion One', -apple-system, sans-serif;
+$body-font: -apple-system, sans-serif;
+
+$primary-color: #0476ce;
+$primary-color--variant: #d4e1ec;

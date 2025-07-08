@@ -2,6 +2,10 @@ url: "https://guilhermeivo.github.io"
 baseurl: ""
 title: "guilhermeivo"
 
+sass:
+  sass_dir: _sass
+  style: compressed
+
 plugins:
   - jekyll-feed
   - jekyll/webpack
