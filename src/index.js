@@ -19,7 +19,7 @@ import { ObjectType } from "./Objects/Object3.js"
 
     const wasm = new Wasm()
 
-    WebAssembly.instantiateStreaming(fetch("main.wasm"), wasm.importObject()).then(
+    WebAssembly.instantiateStreaming(fetch("assets/main.wasm"), wasm.importObject()).then(
         object => {
             wasm.exports = object.instance.exports
             wasm.memory = object.instance.exports.memory.buffer
@@ -133,7 +133,7 @@ import { ObjectType } from "./Objects/Object3.js"
 
             const startArcade = [ 0.0, 5.0, 0.0 ]
 
-            loadObj(wasm, glRenderer.gl, './resources/arcade/', 'arcade.obj', {
+            loadObj(wasm, glRenderer.gl, './assets/arcade/', 'arcade.obj', {
                 position: [ 0.0, -50.0, 0.0 ]
             })
                 .then(async collection => {

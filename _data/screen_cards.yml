@@ -1,0 +1,24 @@
+- title: "BaseTech-Inc/Tupa-Server"
+  description: "Servidor para a empresa Tupã desenvolvido por @BaseTech-Inc."
+  links: 
+    - "https://github.com/BaseTech-Inc/Tupa-Server"
+
+- title: "experiment-using-mouse"
+  description: "Desafios para ajudar um rato a encontrar um pedaço de queijo em um labirinto."
+  links:
+    - "https://github.com/guilhermeivo/experiment-using-mouse"
+
+- title: "snake-game"
+  description: "O clássico jogo da cobrinha no console gameboy."
+  links: 
+   - "https://github.com/guilhermeivo/snake-game"
+  
+- title: "tcm-codezone"
+  description: "Projeto desenvolvido para trabalho de conclusão de módulo (TCM)."
+  links: 
+    - "https://github.com/guilhermeivo/tcm-codezone"
+
+- title: "computing-projects"
+  description: "Experimentos relacionados com computação."
+  links:
+    - "https://github.com/guilhermeivo/computing-projects"

@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "run": "npx http-server `pwd`/public/ -c-1 -p 8080",
-    "build": "webpack --config webpack.config.js --mode production"
+    "build:webpack": "webpack --config webpack.config.js --mode production"
   },
   "author": "guilhermeivo",
   "devDependencies": {

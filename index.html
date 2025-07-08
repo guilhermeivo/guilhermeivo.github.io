@@ -1,0 +1,176 @@
+---
+title: portfolio
+layout: default
+---
+
+<section>
+    <div class="content section__first">
+        <div id="warning_message" style="display: none; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+        </div>
+    </div>
+</section>
+
+<section id="hero" class="section__first hero">
+    <div class="content">
+        <h1>
+            Olá <span class="emoji emoji__waving_hands">👋</span>, meu nome é <span class="effects effects__mark">guilhermeivo</span>
+        </h1>
+
+        <p>
+            Técnico em Desenvolvimento de Sistemas (ETESP) e atualmente cursando <strong>Bacharelado em Ciência da Computação</strong> (IME-USP).
+        </p>
+    </div>
+
+    <div id="experience" class="experience">
+        <!-- CANVAS -->
+        <a  href="#projects" class="scroll">
+            <div class="hover-area"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+                <defs>
+                <path id="textcircle" d="M250,400
+                            a150,150 0 0,1 0,-300a150,150 0 0,1 0,300Z" transform="rotate(12,250,250)" />
+                </defs>
+                <g class="textcircle">
+                    <text textLength="940">
+                        <textPath xlink:href="#textcircle" textLength="940">
+                            Scroll Down&nbsp;&nbsp;•&nbsp;&nbsp;Scroll Down&nbsp;&nbsp;•&nbsp;&nbsp;Scroll Down&nbsp;&nbsp;•&nbsp;&nbsp;Scroll Down&nbsp;&nbsp;•&nbsp;&nbsp;
+                        </textPath>
+                    </text>
+                </g>
+            </svg>
+            <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px;">↓</span>
+        </a>
+
+        <!--<div class="background background--1">
+            <div class="background__orb background__primary"></div>
+        </div>-->
+    </div>
+
+    <div class="social">
+        <a target="_blank" href="https://github.com/guilhermeivo">
+            <span>
+                <svg width="26" height="25" viewBox="0 0 26 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.8572 0C5.75361 0 0 5.73902 0 12.8175C0 18.4817 3.6836 23.2851 8.79113 24.978C9.43399 25.0987 9.66971 24.7024 9.66971 24.3617C9.66971 24.0573 9.65899 23.2509 9.65364 22.1828C6.07718 22.9561 5.32289 20.4631 5.32289 20.4631C4.73789 18.9837 3.89253 18.5885 3.89253 18.5885C2.72788 17.7938 3.98253 17.8099 3.98253 17.8099C5.27361 17.8996 5.95183 19.1301 5.95183 19.1301C7.09826 21.0901 8.96149 20.524 9.6965 20.196C9.81221 19.3672 10.1433 18.8021 10.5108 18.4817C7.65541 18.1613 4.65432 17.059 4.65432 12.1477C4.65432 10.7485 5.15254 9.60562 5.97754 8.7084C5.8329 8.38476 5.39897 7.08165 6.09004 5.31604C6.09004 5.31604 7.16683 4.97211 9.62578 6.62983C10.6544 6.34464 11.7472 6.20365 12.8401 6.19724C13.933 6.20365 15.0258 6.34464 16.0544 6.62983C18.4973 4.97211 19.5741 5.31604 19.5741 5.31604C20.2651 7.08165 19.8312 8.38476 19.7026 8.7084C20.5223 9.60562 21.0205 10.7485 21.0205 12.1477C21.0205 17.0718 18.0151 18.1559 15.1544 18.471C15.6044 18.8556 16.0223 19.6417 16.0223 20.8423C16.0223 22.5577 16.0062 23.9355 16.0062 24.3521C16.0062 24.6886 16.2312 25.0891 16.8901 24.9609C22.0341 23.2797 25.7145 18.4732 25.7145 12.8175C25.7145 5.73902 19.9576 0 12.8572 0Z" fill="white"></path>
+                </svg>
+            </span>
+        </a>
+    </div>
+</section>
+
+<div class="wrapper">
+    <div class="background background--2">
+        <div class="background__orb background__primary"></div>
+    </div>
+</div>
+
+<main id="screen">
+    <div style="padding: 48px">
+        <h2 style="display: block; font-size: 36px; margin-top: 20px;  margin-bottom: 20px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
+            Projetos e Posts
+        </h2>
+        
+        <div id="cards" style="display: grid; grid-template-columns: 1fr;">
+            <!-- inline css to be used in svg -->
+            {% for card in site.data.screen_cards %}
+                {% assign tmp = 16 | times: forloop.index0 %}
+                {% assign color = tmp | plus: 16 %}
+                <a id="card_anchor" href="{{ card.links[0] }}" tabindex="{{ forloop.index }}" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); padding: 4px; text-decoration: none; background: rgba({{ color }}, {{ color }}, {{ color }})" data-card onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                    <h3 style="display: block; font-size: 28px; margin-top: 0; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">
+                        {{ card.title }}
+                    </h3>
+                    <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                        {{ card.description }}
+                    </p>
+                </a>
+                {% assign lastindex = forloop.index %}
+            {% endfor %}
+            {% for post in site.posts %}
+                {% assign loop = lastindex | plus: forloop.index0 %}
+                {% assign tmp = 16 | times: loop %}
+                {% assign color = tmp | plus: 16 %}
+                {% assign loop = loop | plus: 1 %}
+                <a id="card_anchor" href="{{ post.url }}" tabindex="{{ loop }}" target="_blank" style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 12px; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255); border: 1px solid rgb(255, 255, 255); padding: 4px; text-decoration: none; background: rgba({{ color }}, {{ color }}, {{ color }})" data-card onfocus="onFocusCard(event)" onfocusout="onFocusOutCard(event)">
+                    <h3 style="display: block; font-size: 28px; margin-top: 0; margin-bottom: 24px; margin-left: 0; margin-right: 0; font-weight: bold; font-family: monospace; color: rgb(255, 255, 255);">
+                        {{ post.title }}
+                    </h3>
+                    <p style="display: block; font-size: 24px; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; font-family: monospace; color: rgb(255, 255, 255);">
+                        {{ post.categories }}
+                    </p>
+                </a>
+            {% endfor %}
+        </div>
+
+        <p style="display: block; font-size: 24px; margin-top: 0; margin-left: 0; margin-right: 0; margin-bottom: 0; font-family: monospace; color: rgb(255, 255, 255); text-align: center;">
+            criado por <a href="https://github.com/guilhermeivo" style="color: rgb(255, 255, 255)">guilhermeivo</a> <span title="🥄">❤️</span>
+        </p>
+    </div>
+</main>
+
+<section id="projects" class="projects">
+    <div class="shortcuts">
+        <div>
+            <span>c</span>
+            <p>Alterar para o modo simplificado</p>
+        </div>
+        <div>
+            <span>&#x2191;</span>
+            <p>Subir scroll</p>
+        </div>
+        <div>
+            <span>&#x2193;</span>
+            <p>Descer scroll</p>
+        </div>
+        <div>
+            <span>Tab</span>
+            <p>Navegar entre projetos</p>
+        </div>
+        <div>
+            <span>&#x21B5;</span>
+            <p>Abrir projeto</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    // load in simplified mode
+    const canvasSupported = !!window.HTMLCanvasElement
+    const templateSupported = "content" in document.createElement("template")
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+    window.executeInSimplifiedMode = isMobile || !canvasSupported || !templateSupported
+    if (window.executeInSimplifiedMode) {
+        document.body.setAttribute('data-mode', 'simplified')
+    }
+</script>
+
+<script>
+    if (window.executeInSimplifiedMode) {
+        document.querySelector('#warning_message').style.display = 'block'
+        document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `<hr>`)
+    }
+    if (isMobile) {
+        document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `para uma melhor experiência acessar pelo computador 😊 <br>`)
+    }
+    if (!canvasSupported) {
+        document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `HTML canvas element is not supported. <br>`)
+    }
+    if (!templateSupported) {
+        document.querySelector('#warning_message').insertAdjacentHTML('afterbegin', `HTML template element is not supported. <br>`)
+    }
+
+    const onFocusOutCard = event => {
+        for (let card of document.querySelector('#cards').children) {
+            card.style.border = '1px solid rgb(255, 255, 255)'
+        }
+    }
+    const onFocusCard = event => {
+        for (let card of document.querySelector('#cards').children) {
+            card.style.border = '1px solid rgb(255, 255, 255)'
+        }
+        event.target.style.border = '1px solid rgb(0, 0, 0)'
+    }
+</script>
+
+<script defer src="{{ "/dist/common.bundle.js" | relative_url }}"></script>
+<script defer src="{{ "/dist/components.bundle.js" | relative_url }}"></script>
+<script defer src="{{ "/dist/index.bundle.js" | relative_url }}"></script>

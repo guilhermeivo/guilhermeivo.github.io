@@ -9,6 +9,6 @@ export default {
     },
     output: {
     filename: '[name].bundle.js',
-        path: path.resolve('', 'public'),
+        path: path.resolve('', 'dist'),
     },
 };

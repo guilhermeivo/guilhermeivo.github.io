@@ -1,3 +1,6 @@
+---
+---
+
 * {
     margin: 0;
     padding: 0;
@@ -26,7 +29,7 @@
     font-family: 'Passion One';
     src: local('Passion One'),
         local('PassionOne'),
-        url('/PassionOne-Bold.ttf') format('truetype');
+        url('/assets/PassionOne-Bold.ttf') format('truetype');
     font-weight: 700;
     font-display: swap;
 }
@@ -663,4 +666,11 @@ canvas {
             }
         }
     }
+}
+
+.container-wrapper {
+    position: relative;
+    padding: 0 32px;
+    max-width: 1280px;
+    margin: 0 auto;
 }
