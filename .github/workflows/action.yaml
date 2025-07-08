@@ -12,18 +12,28 @@ jobs:
     steps:
       - name: Confira o código do repositório
         uses: actions/checkout@v4
+      - name: Setup Ruby
+        # https://github.com/ruby/setup-ruby/releases/tag/v1.245.0
+        uses: ruby/setup-ruby@a4effe49ee8ee5b8b5091268c473a4628afb5651
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 0
+      - name: Setup Páginas
+        id: pages
+        uses: actions/configure-pages@v5
       - name: Instalando os arquivos
         run: ./install.sh
       - name: Compilando os arquivos
         run: ./build.sh
+        env:
+          JEKYLL_ENV: production
       - name: Listar arquivos dentro do repositório
         run: |
-          ls -a ${{ github.workspace }}/public
+          ls -a ${{ github.workspace }}/_site
       - name: Carregar arquivos estáticos como artefato
         id: deployment
         uses: actions/upload-pages-artifact@v3
-        with:
-          path: public/
   deploy:
     needs: build
 
