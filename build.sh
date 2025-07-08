@@ -18,6 +18,6 @@ $CXX -D USE_WASM \
 $WABT_PATH/wasm2wat $EXPORT_PATH/main.wasm -o $EXPORT_PATH/main.wat
 
 # npm run build
-jekyll build
+bundle exec jekyll build
 
 exit 0
