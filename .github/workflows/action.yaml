@@ -23,9 +23,9 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
       - name: Instalando os arquivos
-        run: ./install.sh
+        run: ./bin/install.sh
       - name: Compilando os arquivos
-        run: ./build.sh
+        run: ./bin/build.sh
         env:
           JEKYLL_ENV: production
       - name: Listar arquivos dentro do repositório

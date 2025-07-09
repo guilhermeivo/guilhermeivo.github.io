@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 bundle install
 
 mkdir -p dependencies
@@ -28,3 +31,5 @@ cmake ..
 cmake --build .
 
 npm install
+
+exit 0

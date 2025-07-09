@@ -23,6 +23,6 @@ webpack:
 exclude: 
   - test/
   - dependencies/
-  - "*.sh"
+  - bin/
   - LICENSE
   - README.md

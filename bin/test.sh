@@ -15,7 +15,7 @@ do
     esac
 done
 
-./build.sh
+./bin/build.sh
 
 TEST_PATH=test
 SOURCE_PATH=src

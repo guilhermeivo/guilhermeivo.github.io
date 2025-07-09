@@ -4,8 +4,11 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
+\usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{xcolor}
+\usepackage{amsmath}
 
 \usepackage[section, maketitle]{m_style}
 
@@ -36,33 +39,44 @@
     morekeywords    = {matrix4, vector3, real_t, opmat4, glm, mat4, lookAt, affineInverse, ortho, invert}}
 \usepackage[bottom]{footmisc} % force footnote in bottom
 
-\title{Comparação Javascript \(\boldsymbol{\times}\) WebAssembly}
+\title{Comparação Javascript $\boldsymbol{\times}$  WebAssembly}
+\author{\href{https://github.com/guilhermeivo}{guilhermeivo}}
+\keywords{benchmark}
+\date{\today}
 
+\makeatletter
 \hypersetup{
     colorlinks = true,
-    allcolors = black
+    allcolors = black,
+    pdfauthor = {\@author},
+    pdfcreator = {\LaTeX},
+    pdfkeywords = {\@keywords}
 }
+\makeatother
+
+\renewcommand{\labelenumi}{(\alph{enumi})}
 
 \begin{document}
 
-\maketitle\pagenumbering{arabic}
+\maketitle
+
+\pagenumbering{arabic}
 
 \section*{Introdução}
 
-Este documento é usado como forma de demonstrar as motivações para o uso do \textit{WebAssembly}\cite{wasi} em substituição do código nativo em \textit{Javascript} nos métodos para cálculos de matrizes (\verb|Matrix4.js| ou \verb|matrix4.h|) e vetores (\verb|Vector3.js| ou \verb|vector3.h|) no projeto atual. A nova implementação - em \textit{WebAssembly} - é encontrada a partir da \textit{commit} \href{https://github.com/guilhermeivo/guilhermeivo.github.io/commit/2b537169b3fdd6d0d027cc9d810aac9471eb477e}{2b53716} e, como consequência, a antiga implementação - em \textit{Javascript} - é encontrada anteriormente à essa \textit{commit}. Serão compilados para \textit{WebAssembly} códigos escritos em \textit{C}/\textit{C++} baseados nos recursos utilizados no código fonte da implementação \href{https://github.com/WebAssembly/wasi-libc}{wasi-libc}, como, de importar e exportar as funções usando \verb|__attribute__|.
+Este documento é usado como forma de demonstrar as motivações para o uso do \textit{WebAssembly}\cite{wasi} em substituição do código nativo em \textit{Javascript} nos métodos para cálculos de matrizes (\verb|Matrix4.js| ou \verb|matrix4.h|) e vetores (\verb|Vector3.js| ou \verb|vector3.h|) no projeto atual. A nova implementação -- em \textit{WebAssembly} -- é encontrada a partir da \textit{commit} \href{https://github.com/guilhermeivo/guilhermeivo.github.io/commit/2b537169b3fdd6d0d027cc9d810aac9471eb477e}{2b53716} e, como consequência, a antiga implementação -- em \textit{Javascript} -- é encontrada anteriormente à essa \textit{commit}. Serão compilados para \textit{WebAssembly} códigos escritos em \textit{C}/\textit{C++} baseados nos recursos utilizados no código fonte da implementação \href{https://github.com/WebAssembly/wasi-libc}{wasi-libc}, como, de importar e exportar as funções usando \verb|__attribute__|.
 
 Os testes são, principalmente, de comparações entre o tempo de execução e tamanho do arquivo binário do \textit{Javascript} e \textit{WebAssembly}, com diferentes implementações, e podem ser enumerados, em um hierarquia temporal de realização, da seguinte maneira:
 
-{\renewcommand{\labelenumi}{(\alph{enumi})}
 \begin{enumerate}
     \item Formas de inicializar um vetor usando \textit{C++};
     \item Cálculo da matriz nomeada \textit{projectionView}\footnote{multiplicação entre a matriz de projeção (\textit{projection}) e matriz de visualização (\textit{view}) é usada para definir a posição do vértice do objeto};
     \item Cálculo da mesma matriz, porém, dessa vez, usando o pacote OpenGL Mathematics (GLM)\cite{glm}.
-\end{enumerate}}
+\end{enumerate}
 
-\section*{Inicialização Vetor}
+\section*{Inicialização de Vetores}
 
-Observando a inicialização de um vetor com valores padrões, por exemplo, 0, em um vetor com 16 posições, não é possível observar uma expressiva diferença quanto a velocidade de preenchimento desses valores, mesmo quando observado os métodos de otimização dos arquivos binários, como observado na \autoref{fig:eff-init}. Portanto, não terá um caráter rigoroso quanto a inicialização utilizada, seguindo a forma de otimização -O3 nos arquivos binários para gerar códigos mais rápidos (não me preocupando, nesse caso e nesse momento, com o tamanho do arquivo, pois foram criadas poucas instruções nos arquivos finais utilizados resultando em um arquivo de, aproximadamente, 60 kB).
+Observando a inicialização de um vetor com valores padrões, por exemplo, 0, em um vetor com 16 posições, não é possível visualizar uma expressiva diferença quanto à velocidade de preenchimento desses valores, mesmo quando observado os métodos de otimização dos arquivos binários, como observado na \autoref{fig:eff-init}. Portanto, não terá um caráter rigoroso quanto a inicialização utilizada, seguindo a forma de otimização -O3 nos arquivos binários para gerar códigos mais rápidos (não me preocupando, nesse caso e nesse momento, com o tamanho do arquivo, pois foram criadas poucas instruções nos arquivos finais utilizados resultando em um arquivo de, aproximadamente, 60 kB).
 % NOTE: tamanho do arquivo inserido de forma manual
 
 \begin{figure}[H]
