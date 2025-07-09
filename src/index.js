@@ -41,7 +41,7 @@ import { ObjectType } from "./Objects/Object3.js"
                 let t = Math.abs(document.body.getBoundingClientRect().top / (document.querySelector('#hero').clientHeight + document.querySelector('#projects').clientHeight - window.innerHeight))
 
                 if (t > 1.0 ) {
-                    glRenderer.gl.canvas.style.top = document.querySelector('#projects').getBoundingClientRect().top - 24 + 'px'
+                    glRenderer.gl.canvas.style.top = document.querySelector('#projects').getBoundingClientRect().top - 12 + 'px'
                     t = 1.0
                     //return t
                 } else {

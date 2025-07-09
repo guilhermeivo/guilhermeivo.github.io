@@ -1,0 +1,241 @@
+@use "variables" as *;
+
+body[data-hero] {
+    --scroll: 0;
+
+    > footer {
+        display: none;
+    }
+}
+
+.shortcuts {
+    position: sticky;
+    top: 100svh;
+    left: 0;
+    padding: 12px;
+    z-index: 1;
+    font-size: 12px;
+
+    & > div {
+        display: flex;
+        align-items: center;
+        outline: none;
+        user-select: none;
+        margin: 8px 0;
+
+        span {
+            width: 24px;
+            height: 24px;
+            padding: 4px;
+            background: #fff;
+            border: 1px solid #D9DBDD;
+            border-bottom: 1px solid $primary-color;
+            box-shadow: 0px 4px 16px $shadow-color;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            transition: .2s cubic-bezier(1, 0, 1, 1)
+        }
+
+        p {
+            margin: 0;
+            text-shadow: -1px 0 #FFF, 0 1px #FFF, 1px 0 #FFF, 0 -1px #FFF
+        }
+    }
+
+    & > div:hover span {
+        transition: .2s ease-in;
+        border: 1px solid $primary-color;
+        background: #fafafa
+    }
+}
+
+.hero {
+    color-scheme: light;
+
+    $size-margin: 172px;
+
+    padding: 24px;
+    display: flex;
+    flex-direction: row;
+    border-radius: 16px;
+    height: calc(100dvh - 24px); /* remove margins */
+
+    background: $background-color;
+    overflow: hidden;
+
+    .content {
+        min-width: $width-section;
+        width: $width-section;
+        height: calc(100% - $size-margin); /* remove bottom part */
+        padding: 0 120px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        h1 {
+            font-size: 4.5rem;
+        }
+    }
+
+    .social {
+        z-index: 1000;
+        position: absolute;
+        bottom: 12px;
+        padding: 24px;
+        right: 12px;
+
+        span {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        path {
+            fill: #000;
+            transition: .5s ease-in;
+        }
+
+        svg:hover {
+            filter: drop-shadow(0px 4px 16px $shadow-color);
+        }
+
+        svg:hover path {
+            fill: $primary-color;
+            transition: .2s;
+        }
+    }
+
+    .experience {
+        background-image: linear-gradient(-30deg, $primary-color--variant, #bcd7ee);
+
+        box-shadow: 0px 4px 16px $shadow-color;
+
+        border-radius: 12px;
+        position: relative;
+        width: calc(100vw - $width-section - 24px);
+        height: calc(100% - $size-margin / 2);
+        position: relative;
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: calc($width-section / 2); /* efeito de posicionamento scroll-linked */
+            width: 100%;
+            height: 100%;
+            transition-property: transform;
+            will-change: transform;
+        }
+
+        .scroll {
+            $extra: 16px;
+            position: absolute;
+            bottom: calc($extra * -1 - $size-margin / 2);
+            left: calc($extra * -1 - $size-margin / 2);
+            background: white;
+            height: $size-margin;
+            width: $size-margin;
+            border-radius: 0 16px 0 0;
+            cursor: pointer;
+
+            &::after {
+                content: '';
+                height: 16px;
+                width: 16px;
+                position: absolute;
+                bottom: calc($extra + $size-margin / 2 - 16px);
+                right: -16px;
+                border-radius: 0 0 0 16px;
+                box-shadow: -12px 12px 0 12px white;
+            }
+        
+            &::before {
+                content: '';
+                height: 16px;
+                width: 16px;
+                position: absolute;
+                top: -16px;
+                left: calc($extra + $size-margin / 2);
+                border-radius: 0 0 0 16px;
+                box-shadow: -12px 12px 0 12px white;
+            }
+
+            .hover-area {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 1000;
+
+                &:hover + svg text {
+                    transform: rotate(180deg);
+                    transition: transform 5s; 
+                }
+            }
+        }
+    }
+}
+
+section.projects {
+    color-scheme: light;
+    /*background-image: linear-gradient($primary-color--variant, transparent 35%);*/
+    border-radius: 12px;
+    background: $background-color;
+    height: calc(100dvh - 24px);
+}
+
+#screen {
+    height: 0;
+    overflow: hidden;
+    /* TODO: */
+    /* this dimension is defined with data from the Arcade class */
+    width: 680px;
+    background: #000;
+}
+
+/* xl */
+@media (max-width: 1280px) { 
+    .hero {
+        .content {
+            h1 {
+                font-size: 3rem;
+            }
+    
+            p {
+                font-size: 0.9rem;
+            }
+        }
+    }
+}
+
+/* lg */
+@media (max-width: 992px) {
+    .hero {
+        $size-margin: 96px;
+
+        .content {
+            padding: 0 60px;
+        }
+
+        .experience {
+            .scroll {
+                &::after {
+                    box-shadow: -4px 4px 0 4px white;
+                }
+            
+                &::before {
+                    box-shadow: -4px 4px 0 4px white;
+                }
+            }
+        }
+    }
+}

@@ -1,6 +1,7 @@
 @use "variables" as *;
 
-@forward "text";
+@use "text" as *;
+@forward "hero";
 
 :root {
     color-scheme: light dark;
@@ -13,18 +14,18 @@
 }
 
 ::selection {
-    color: $high-emphasis-color__dark;
+    color: $background-color;
     background-color: $high-emphasis-color;
 }
 
 [data-mode="simplified"] ::selection {
-    background-color: $high-emphasis-color__dark;
+    background-color: $background-color;
     color: $high-emphasis-color;
 }
 
 @media (max-width: 576px) {
     ::selection {
-        background-color: $high-emphasis-color__dark;
+        background-color: $background-color;
         color: $high-emphasis-color;
     }
 }
@@ -38,28 +39,17 @@ body {
     background: $surface-color;
 }
 
-body[data-hero] {
-    --scroll: 0;
-    background: #1e1e1e;
-
-    > footer {
-        display: none;
-    }
-}
-
 footer {
     text-align: center;
     font-size: 80%;
 }
 
-.wrapper {
+canvas {
+    margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-
-    position: absolute;
-    top: 0;
-    left: 0;
+    display: block;
 }
 
 section { 
@@ -68,154 +58,8 @@ section {
     box-shadow: 0px 4px 16px $shadow-color;
 }
 
-section.section__first {
-    margin-top: 12px;
-}
-
 section .content {
     position: relative;
-}
-
-.hero {
-    $size-margin: 172px;
-
-    padding: 24px;
-    display: flex;
-    flex-direction: row;
-    border-radius: 16px;
-    height: calc(100dvh - 24px); /* remove margins */
-
-    background: white;
-    overflow: hidden;
-
-    .content {
-        min-width: $width-section;
-        width: $width-section;
-        height: calc(100% - $size-margin); /* remove bottom part */
-        padding: 0 120px;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-
-        h1 {
-            font-size: 4.5rem;
-            margin-bottom: 1em;
-        }
-
-        p {
-            font-size: 1rem;
-            margin-bottom: 1em;
-            line-height: 1.65em;
-        }
-
-        p:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    .social {
-        z-index: 1000;
-        position: absolute;
-        bottom: 12px;
-        padding: 24px;
-        right: 12px;
-
-        span {
-            display: inline-block;
-            width: 32px;
-            height: 32px;
-        }
-
-        svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        path {
-            fill: #000;
-            transition: .5s ease-in;
-        }
-
-        svg:hover {
-            filter: drop-shadow(0px 4px 16px $shadow-color);
-        }
-
-        svg:hover path {
-            fill: $primary-color;
-            transition: .2s;
-        }
-    }
-
-    .experience {
-        background-image: linear-gradient(-30deg, $primary-color--variant, #bcd7ee);
-
-        box-shadow: 0px 4px 16px $shadow-color;
-
-        border-radius: 12px;
-        position: relative;
-        width: calc(100vw - $width-section - 24px);
-        height: calc(100% - $size-margin / 2);
-        position: relative;
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: calc($width-section / 2); /* efeito de posicionamento scroll-linked */
-            width: 100%;
-            height: 100%;
-            transition-property: transform;
-            will-change: transform;
-        }
-
-        .scroll {
-            $extra: 16px;
-            position: absolute;
-            bottom: calc($extra * -1 - $size-margin / 2);
-            left: calc($extra * -1 - $size-margin / 2);
-            background: white;
-            height: $size-margin;
-            width: $size-margin;
-            border-radius: 0 16px 0 0;
-            cursor: pointer;
-
-            &::after {
-                content: '';
-                height: 16px;
-                width: 16px;
-                position: absolute;
-                bottom: calc($extra + $size-margin / 2);
-                right: -16px;
-                border-radius: 0 0 0 16px;
-                box-shadow: -12px 12px 0 12px white;
-            }
-        
-            &::before {
-                content: '';
-                height: 16px;
-                width: 16px;
-                position: absolute;
-                top: -16px;
-                left: calc($extra + $size-margin / 2);
-                border-radius: 0 0 0 16px;
-                box-shadow: -12px 12px 0 12px white;
-            }
-
-            .hover-area {
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
-                z-index: 1000;
-
-                &:hover + svg text {
-                    transform: rotate(180deg);
-                    transition: transform 5s; 
-                }
-            }
-        }
-    }
 }
 
 .effects {
@@ -231,7 +75,7 @@ section .content {
 @keyframes blink-caret {
     from, to { color: transparent }
     50% { color: inherit; }
-  }
+}
 
 .emoji {
     position: relative;
@@ -263,7 +107,7 @@ section .content {
 }
 
 text {
-    font-size: 36px;
+    font-size: 36px !important;
     user-select: none;
     transform-origin: 250px 250px;
     transition: transform 1s; 
@@ -275,19 +119,14 @@ svg {
     max-width: 80vmin;
 }
 
-.projects {
-    /*background-image: linear-gradient($primary-color--variant, transparent 35%);*/
-    border-radius: 12px;
-    background: white;
-    height: calc(100dvh - 24px);
-}
-
-canvas {
-    margin: 0;
-    padding: 0;
+.wrapper {
     width: 100%;
     height: 100%;
-    display: block;
+    overflow: hidden;
+
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .background {
@@ -347,117 +186,22 @@ canvas {
     }
 }
 
-.shortcuts {
-    position: sticky;
-    top: 100dvh;
-    left: 0;
-    padding: 12px;
-    z-index: 1;
-    font-size: 12px;
-
-    & > div {
+@mixin simplified {
+    .hero {
+        color-scheme: light dark;
         display: flex;
-        align-items: center;
-        outline: none;
-        user-select: none;
-        margin: 8px 0;
+        justify-content: center;
+        border-radius: 0;
 
-        span {
-            width: 24px;
-            height: 24px;
-            padding: 4px;
-            background: #fff;
-            border: 1px solid #D9DBDD;
-            border-bottom: 1px solid $primary-color;
-            box-shadow: 0px 4px 16px $shadow-color;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            transition: .2s cubic-bezier(1, 0, 1, 1)
-        }
-
-        p {
-            margin: 0;
-            text-shadow: -1px 0 #FFF, 0 1px #FFF, 1px 0 #FFF, 0 -1px #FFF
-        }
-    }
-
-    & > div:hover span {
-        transition: .2s ease-in;
-        border: 1px solid $primary-color;
-        background: #fafafa
-    }
-}
-
-#screen {
-    height: 0;
-    overflow: hidden;
-    /* TODO: */
-    /* this dimension is defined with data from the Arcade class */
-    width: 680px;
-    background: #000;
-}
-
-/* simplified */
-[data-mode="simplified"], #screen {
-    h1, h2, h3, h4, h5, h6, span, p, a, li, textarea, button, select label, b, input, text {
-        font-family: $body-font
-    }
-}
-
-@media (max-width: 576px) {
-    [data-hero] {
-        h1, h2, h3, h4, h5, h6, span, p, a, li, textarea, button, select label, b, input, text {
-            font-family: $body-font
-        }
-    }
-}
-
-[data-mode="simplified"] {
-    .background {
-        &.background--1 {
+        .experience, .social {
             display: none;
         }
-    
-        &.background--2 {
-            position: absolute;
-            z-index: 1;
-        }
     }
 
-    section {
-        padding: 0;
-        margin: 0;
-        height: auto;
-        width: auto;
+    #projects {
+        display: none;
     }
 
-    section.section__first {
-        margin-top: 12px;
-    }
-    
-    section .content {
-        padding: 0 24px;
-        padding-top: 48px;
-        z-index: 1000;
-
-        min-width: auto;
-        max-width: 570px;
-        width: auto;
-    }
-    
-    #screen {
-        & > div {
-            z-index: 1000;
-            padding: 48px 24px !important
-        }
-    }
-}
-
-/* sm */
-@media (max-width: 576px) {
     .background {
         &.background--1 {
             display: none;
@@ -474,178 +218,64 @@ canvas {
         margin: 0 !important;
         height: auto !important; 
         width: auto !important;
+        box-shadow: none !important;
+        background: $surface-color !important;
     }
     
     section .content {
-        padding: 0 24px !important;
-        padding-top: 48px !important;
-        z-index: 1000;
+        max-width: 42em;
+        padding: 1.5em !important;
 
         min-width: auto !important;
-        max-width: 570px !important;
         width: auto !important;
     }
     
     #screen {
-        & > div {
-            z-index: 1000;
-            padding: 48px 24px !important
-        }
-    }
-}
-
-[data-mode="simplified"] .hero {
-    background: #000;
-    display: flex;
-    justify-content: center;
-    border-radius: 0;
-
-    .experience {
-        display: none;
-    }
-
-    .social {
-        display: none;
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-        font-size: 36px;
-        color: rgb(255, 255, 255);
-    }
-
-    span {
-        color: rgb(255, 255, 255);
-        font-size: inherit;
-    }
-
-    p, label, b, input {
-        font-size: 24px;
-        color: rgb(255, 255, 255);
-    }
-}
-
-/* sm */
-@media (max-width: 576px) {
-    .hero {
-        background: #000;
-        display: flex;
-        justify-content: center;
-        border-radius: 0;
-    
-        .experience {
-            display: none;
-        }
-    
-        .social {
-            display: none;
-        }
-    
-        h1, h2, h3, h4, h5, h6 {
-            font-size: 36px;
-            color: rgb(255, 255, 255);
-        }
-    
-        span {
-            color: rgb(255, 255, 255);
-            font-size: inherit;
-        }
-    
-        p, label, b, input {
-            font-size: 24px;
-            color: rgb(255, 255, 255);
-        }
-    }
-}
-
-[data-mode="simplified"] #projects {
-    display: none;
-}
-
-/* sm */
-@media (max-width: 576px) {
-    #projects {
-        display: none;
-    }
-}
-
-[data-mode="simplified"] #screen {
-    height: auto;
-    min-height: 100dvh;
-    overflow: visible;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-
-    & > div {
-        max-width: 570px;
-        /*padding: 12px !important;*/
-    }
-}
-
-/* sm */
-@media (max-width: 576px) {
-    #screen {
-        height: auto;
-        min-height: 100dvh;
         overflow: visible;
+        height: auto;
         width: 100%;
         display: flex;
         justify-content: center;
-    
+        background: $surface-color !important;
+
         & > div {
-            max-width: 570px;
-            /*padding: 12px !important;*/
+            max-width: 42em;
+            padding: 1.5em !important;
+            z-index: 1000;
+        }
+
+        a#card_anchor {
+            border: 1px solid $border-color !important;
+            background: $background-color !important;
+            padding: 1.5em !important;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: $title-font !important;
+            font-weight: $bold-font !important;
+            color: $high-emphasis-color !important;
+            line-height: 1.25 !important;
+        }
+
+        span, p, a, li, textarea, button, select, label, b, input, text, ol {
+            color: $medium-emphasis-color !important;
+            font-family: $body-font !important;
+            line-height: 1.5 !important;
+            font-size: $body-font-size !important;
+        }
+
+        a {
+            color: $primary-color !important;
         }
     }
 }
 
-/* xl */
-@media (max-width: 1280px) { 
-    .hero {
-        .content {
-            h1 {
-                font-size: 3rem;
-            }
-    
-            p {
-                font-size: 0.9rem;
-            }
-        }
-    }
+[data-mode="simplified"] {
+    @include simplified
 }
 
-/* lg */
-@media (max-width: 992px) {
-    .hero {
-        --size-margin: 96px;
-
-        .content {
-            padding: 0 60px;
-        }
-
-        .experience {
-            .scroll {
-                &::after {
-                    box-shadow: -4px 4px 0 4px white;
-                }
-            
-                &::before {
-                    box-shadow: -4px 4px 0 4px white;
-                }
-            }
-        }
-    }
-}
-
-/* md */
 @media (max-width: 768px) {
-    .hero {
-        .content {
-            padding: 0 48px;
-
-            h1 {
-                font-size: 2rem;
-            }
-        }
-    }
+    @include simplified
 }
+
+@include text

@@ -1,65 +1,69 @@
 @use "variables" as *;
 
-@font-face {
-    font-family: 'Passion One';
-    src: local('Passion One'),
-        local('PassionOne'),
-        url('/assets/PassionOne-Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-display: swap;
-}
+@mixin text($important: false) {
+    @font-face {
+        font-family: 'Passion One';
+        src: local('Passion One'),
+            local('PassionOne'),
+            url('/assets/PassionOne-Bold.ttf') format('truetype');
+        font-weight: $bold-font;
+        font-display: swap;
+    }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: $title-font;
-    font-weight: 700;
-    color: $high-emphasis-color;
-    margin: 2.5rem 0 1.5rem 0;
-    line-height: 1.25;
-}
+    h1, h2, h3, h4, h5, h6 {
+        font-family: $title-font;
+        font-weight: $bold-font;
+        color: $high-emphasis-color;
+        margin: 2.5rem 0 1.5rem 0;
+        line-height: 1.25;
+    }
 
-h1 span {
-    margin: 0 !important;
-}
+    h1 span {
+        margin: 0 !important;
+        font-size: inherit;
+    }
 
-span, p, a, li, textarea, button, select, label, b, input, text, ol {
-    color: $medium-emphasis-color;
-    font-family: $body-font;
-    margin: 1em 0;
-    line-height: 1.5;
-}
+    span, p, a, li, textarea, button, select, label, b, input, text, ol {
+        color: $medium-emphasis-color;
+        font-family: $body-font;
+        margin: 1em 0;
+        line-height: 1.5;
+        font-size: $body-font-size;
+    }
 
-ol, ul {
-    margin: 1em;
-}
+    ol, ul {
+        margin: 1em;
+    }
 
-ol li ol, ol li ul, ul li ol, ul li ul {
-    margin: 0 2em;
-}
+    ol li ol, ol li ul, ul li ol, ul li ul {
+        margin: 0 2em;
+    }
 
-ol li p, ul li p {
-    margin: 0;
-}
+    ol li p, ul li p {
+        margin: 0;
+    }
 
-.title {
-    font-size: 2.5em;
-}
+    .title {
+        font-size: 2.5em;
+    }
 
-.title + p::first-letter {
-    font-family: $title-font;
-    font-weight: bold;
-    border-radius: 2px;
-    padding: 10px 3px 0 3px;
-    margin-right: 6px;
-    float: left;
-    color: $high-emphasis-color;
-    font-size: 325%;
-}
+    .title + p::first-letter {
+        font-family: $title-font;
+        font-weight: bold;
+        border-radius: 2px;
+        padding: 10px 3px 0 3px;
+        margin-right: 6px;
+        float: left;
+        color: $high-emphasis-color;
+        font-size: 325%;
+    }
 
-a {
-    color: $primary-color;
-    text-decoration: none;
-}
+    a {
+        color: $primary-color;
+        text-decoration: none;
+    }
 
-a:hover, a:focus, a:active {
-    text-decoration: underline;
+    a:hover, a:focus, a:active {
+        text-decoration: underline;
+    }
 }
