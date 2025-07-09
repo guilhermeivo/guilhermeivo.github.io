@@ -7,7 +7,7 @@ mkdir -p dependencies
 cd dependencies
 
 # wasi-sdk
-rm -r wasi-sdk
+[ -e wasi-sdk ] && rm -r wasi-sdk
 
 WASI_OS=linux
 WASI_ARCH=x86_64
@@ -19,7 +19,7 @@ rm wasi-sdk-${WASI_VERSION_FULL}-${WASI_ARCH}-${WASI_OS}.tar.gz
 mv wasi-sdk-${WASI_VERSION_FULL}-${WASI_ARCH}-${WASI_OS} wasi-sdk
 
 # wabt
-sudo rm -r wabt
+[ -e wabt ] && sudo rm -r wabt
 
 git clone --recursive https://github.com/WebAssembly/wabt
 cd wabt
