@@ -35,6 +35,8 @@ jobs:
         run: ./bin/build.sh
         env:
           JEKYLL_ENV: production
+      - name: Add CNAME
+        run: echo "${{ vars.DOMAIN }}" > ./_site/CNAME
       - name: Listar arquivos dentro do repositório
         run: |
           ls -a ${{ github.workspace }}/_site
