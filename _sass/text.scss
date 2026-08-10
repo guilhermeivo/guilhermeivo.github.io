@@ -2,11 +2,10 @@
 
 @mixin text($important: false) {
     @font-face {
-        font-family: 'Passion One';
-        src: local('Passion One'),
-            local('PassionOne'),
-            url('/assets/PassionOne-Bold.ttf') format('truetype');
-        font-weight: $bold-font;
+        font-family: 'Latin Modern Roman';
+        src: local('Latin Modern Roman'),
+            local('LatinModernRoman'),
+            url('/assets/font/lmroman10-bold.otf') format('OpenType');
         font-display: swap;
     }
 
@@ -49,13 +48,22 @@
 
     .title + p::first-letter {
         font-family: $title-font;
-        font-weight: bold;
-        border-radius: 2px;
-        padding: 10px 3px 0 3px;
-        margin-right: 6px;
-        float: left;
         color: $high-emphasis-color;
-        font-size: 325%;
+        font-weight: $bold-font;
+        margin-right: 6px;
+    }
+
+    @supports (initial-letter: 2) {
+        .title + p::first-letter {
+            initial-letter: 2;
+        }
+    }
+
+    @supports not (initial-letter: 2) {
+        .title + p::first-letter {
+            float: left;
+            font-size: 3rem;
+        }
     }
 
     a {
