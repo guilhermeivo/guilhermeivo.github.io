@@ -39,6 +39,17 @@ body {
     background: $surface-color;
 }
 
+.navigation-header {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 3.0em;
+
+    a {
+        font-weight: $bold-font;
+        color: $medium-emphasis-color;
+    }
+}
+
 footer {
     text-align: center;
     font-size: 80%;

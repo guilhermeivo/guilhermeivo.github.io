@@ -1,6 +1,35 @@
-.container-wrapper {
+article {
+    display: flex;
+    flex-wrap: wrap;
+
+    max-width: 1440px;
     position: relative;
     padding: 1.5em;
-    max-width: 42em;
+     
     margin: 0 auto;
+
+    aside {
+        max-width: 400px;
+        min-width: min(200px, 100%);
+        padding: 1.5em;
+
+        position: relative;
+
+        .title {
+            margin: 4px 0;
+        }
+
+        > div {
+            position: sticky;
+            top: 1.5em;
+        }
+    }
+
+    main {
+        max-width: 720px;
+        min-width: min(400px, 100%);
+        margin: 0 auto;
+        flex: 1;
+        padding: 1.5em;
+    }
 }
