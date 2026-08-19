@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4'
@@ -28,7 +28,7 @@ jobs:
           cache-version: 0
       - name: Setup Páginas
         id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Instalando os arquivos
         run: ./bin/install.sh
       - name: Compilando os arquivos
@@ -42,7 +42,7 @@ jobs:
           ls -a ${{ github.workspace }}/_site
       - name: Carregar arquivos estáticos como artefato
         id: deployment
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
   deploy:
     environment:
       name: github-pages
@@ -52,4 +52,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 
+        uses: actions/deploy-pages@v5
