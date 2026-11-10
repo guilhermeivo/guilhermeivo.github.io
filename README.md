@@ -41,5 +41,8 @@ $ ./bin/test.sh -r -t<NUMBER>
 
 <img src="https://github.githubassets.com/images/mona-whisper.gif" align="right" />
 
-## License
-Este projeto está sob licença. Consulte o arquivo [`LICENSE`](./LICENSE) para obter detalhes.
+## Licença
+
+Este projeto está licenciado sob a Licença Pública Geral GNU, versão 3 ou qualquer versão posterior (`GPL-3.0-or-later`).
+
+Consulte o arquivo [LICENSE](./LICENSE) para obter detalhes.
