@@ -28,7 +28,7 @@ git submodule update --init
 mkdir build
 cd build
 cmake ..
-cmake --build .
+cmake --build . --parallel
 
 npm install
 
