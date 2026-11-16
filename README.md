@@ -13,7 +13,7 @@
 `_posts/`\
  └ `YEAR-MONTH-DAY-title.MARKUP`: Jekyll Posts
 `assets/`\
-`bin/`\
+`scripts/`\
 `src/`\
  ├ `WebGL/`: Recursos usados para conectar com a WebGL API.\
  └ `wasm.h`: Baseado nos recursos utilizados no [wasi-libc](https://github.com/WebAssembly/wasi-libc).\
@@ -25,14 +25,14 @@
 Rodar aplicação:
 
 ```sh
-$ npm install && ./bin/install.sh
-$ ./bin/build.sh && ./bin/run.sh
+$ npm install && ./scripts/install.sh
+$ ./scripts/build.sh && ./scripts/run.sh
 ```
 
 # Testes/Benchmarks
 
 ```sh
-$ ./bin/test.sh -r -t<NUMBER>
+$ ./scripts/test.sh -r -t<NUMBER>
 ```
 
 | Realizar Benchmarks | Quantidade |
